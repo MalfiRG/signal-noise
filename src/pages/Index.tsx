@@ -1,11 +1,49 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import MatrixRain from "@/components/MatrixRain";
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <MatrixRain />
+      <div className="scanline fixed inset-0 z-10" />
+
+      <div className="relative z-20 text-center px-4 max-w-3xl">
+        <p className="text-muted-foreground text-sm tracking-[0.3em] mb-4 animate-fade-in opacity-0" style={{ animationDelay: "0.2s" }}>
+          {">"} INITIALIZING SYSTEM...
+        </p>
+
+        <h1 className="font-display text-5xl md:text-7xl font-black text-foreground text-glow mb-6 animate-fade-in opacity-0" style={{ animationDelay: "0.6s" }}>
+          SOFTWARE<br />
+          DEVELOPER<br />
+          IN TEST
+        </h1>
+
+        <div className="animate-fade-in opacity-0" style={{ animationDelay: "1s" }}>
+          <p className="text-foreground/80 text-lg mb-8 leading-relaxed">
+            Engineering quality into every line of code.<br />
+            Automation architect. Bug hunter. System breaker.
+          </p>
+        </div>
+
+        <div className="flex gap-4 justify-center animate-fade-in opacity-0" style={{ animationDelay: "1.4s" }}>
+          <a
+            href="/projects"
+            className="border border-primary/50 bg-primary/10 px-8 py-3 text-sm tracking-widest text-primary hover:bg-primary/20 hover:border-primary transition-all box-glow"
+          >
+            VIEW PROJECTS
+          </a>
+          <a
+            href="/blog"
+            className="border border-border px-8 py-3 text-sm tracking-widest text-muted-foreground hover:border-primary/50 hover:text-foreground transition-all"
+          >
+            READ BLOG
+          </a>
+        </div>
+
+        <div className="mt-16 animate-fade-in opacity-0" style={{ animationDelay: "1.8s" }}>
+          <p className="text-muted-foreground text-xs tracking-[0.2em] animate-glow-pulse">
+            ▼ SCROLL TO EXPLORE ▼
+          </p>
+        </div>
       </div>
     </div>
   );
