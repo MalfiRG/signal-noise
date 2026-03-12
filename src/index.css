@@ -107,3 +107,53 @@
     pointer-events: none;
   }
 }
+
+@layer components {
+  .markdown-body {
+    color: hsl(120 100% 65%);
+    line-height: 1.7;
+    font-size: 0.9rem;
+  }
+
+  .markdown-body h1 {
+    color: hsl(120 100% 65%);
+    font-family: 'Orbitron', sans-serif;
+    text-shadow: var(--matrix-text-glow);
+  }
+
+  .markdown-body h2 {
+    color: hsl(120 100% 60%);
+    font-family: 'Orbitron', sans-serif;
+  }
+
+  .markdown-body h3 {
+    color: hsl(120 80% 55%);
+    font-family: 'Orbitron', sans-serif;
+  }
+
+  .markdown-body p {
+    margin-bottom: 1rem;
+    color: hsl(120 40% 70%);
+  }
+
+  .markdown-body strong {
+    color: hsl(120 100% 65%);
+  }
+
+  .markdown-body blockquote {
+    border-left: 3px solid hsl(120 100% 50%);
+    padding-left: 1rem;
+    margin: 1rem 0;
+    color: hsl(120 40% 55%);
+    font-style: italic;
+  }
+
+  .markdown-body li {
+    color: hsl(120 40% 70%);
+  }
+
+  .markdown-body hr {
+    border-color: hsl(120 40% 15%);
+    margin: 2rem 0;
+  }
+}
