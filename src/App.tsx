@@ -8,6 +8,9 @@ import Index from "./pages/Index";
 import Projects from "./pages/Projects";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
+import SkillsPage from "./pages/SkillsPage";
+import HowIDoItIndexPage from "./pages/HowIDoItIndexPage";
+import HowIDoItSlugPage from "./pages/HowIDoItSlugPage";
 import Auth from "./pages/Auth";
 import AdminProject from "./pages/AdminProject";
 import AdminBlog from "./pages/AdminBlog";
@@ -25,6 +28,9 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/projects" element={<Projects />} />
+          <Route path="/skills" element={<SkillsPage />} />
+          <Route path="/how-i-do-it" element={<HowIDoItIndexPage />} />
+          <Route path="/how-i-do-it/:slug" element={<HowIDoItSlugPage />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:id" element={<BlogPost />} />
           <Route path="/auth" element={<Auth />} />
