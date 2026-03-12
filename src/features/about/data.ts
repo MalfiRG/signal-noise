@@ -50,7 +50,7 @@ export const socialLinks: SocialLink[] = [
   },
   {
     label: "LinkedIn",
-    url: "https://www.linkedin.com/in/piotr-tarach/",
+    url: "https://www.linkedin.com/in/piotrtarach/",
     icon: "linkedin",
   },
 ];
