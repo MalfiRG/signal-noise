@@ -49,7 +49,7 @@ const HowIDoItPage = () => {
 
         {pageInfo && (
           <div className="mb-8">
-            <p className="text-muted-foreground text-xs tracking-[0.3em] mb-2">
+            <p className="text-muted-foreground text-xs tracking-[0.3em] mb-2 hidden-in-reading">
               {">"} cat ~/methodology/{slug}.md
             </p>
             <h1 className="font-display text-3xl font-bold text-foreground text-glow">
@@ -66,7 +66,7 @@ const HowIDoItPage = () => {
           ) : (
             <MarkdownRenderer
               content={markdownContent}
-              className="border border-border p-6"
+              className="p-6"
             />
           )}
         </motion.div>
