@@ -120,6 +120,40 @@
   ::-webkit-scrollbar-thumb:hover {
     background: hsl(120 100% 50%);
   }
+
+  .theme-reading {
+    font-family: 'Atkinson Hyperlegible', sans-serif;
+    letter-spacing: normal;
+  }
+
+  .theme-reading h1,
+  .theme-reading h2,
+  .theme-reading h3,
+  .theme-reading h4,
+  .theme-reading h5,
+  .theme-reading h6 {
+    font-family: 'Atkinson Hyperlegible', sans-serif;
+    font-weight: 700;
+  }
+
+  .theme-reading .font-display {
+    font-family: 'Atkinson Hyperlegible', sans-serif !important;
+  }
+
+  .theme-reading ::selection {
+    background: hsl(30 20% 30% / 0.3);
+    color: hsl(30 10% 15%);
+  }
+
+  .theme-reading ::-webkit-scrollbar-track {
+    background: hsl(30 15% 88%);
+  }
+  .theme-reading ::-webkit-scrollbar-thumb {
+    background: hsl(30 10% 65%);
+  }
+  .theme-reading ::-webkit-scrollbar-thumb:hover {
+    background: hsl(30 10% 45%);
+  }
 }
 
 @layer utilities {
@@ -140,6 +174,18 @@
       hsl(120 100% 50% / 0.03) 4px
     );
     pointer-events: none;
+  }
+
+  .theme-reading .text-glow {
+    text-shadow: none;
+  }
+
+  .theme-reading .box-glow {
+    box-shadow: none;
+  }
+
+  .theme-reading .hidden-in-reading {
+    display: none;
   }
 }
 
@@ -190,5 +236,11 @@
   .markdown-body hr {
     border-color: hsl(120 40% 15%);
     margin: 2rem 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-reading {
+    transition-duration: 0ms !important;
   }
 }
