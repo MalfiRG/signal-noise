@@ -1,7 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { useEffect, useState } from "react";
-import { LogOut, Plus, Terminal, Menu, ChevronDown } from "lucide-react";
+import { useState } from "react";
+import { Terminal, Menu, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -21,23 +20,7 @@ import { howIDoItPages } from "@/features/how-i-do-it/data";
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [user, setUser] = useState<any>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
-
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-    });
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/");
-  };
 
   const links = [
     { to: "/", label: "HOME" },
@@ -100,33 +83,6 @@ const Navbar = () => {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-
-          {user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="text-xs tracking-wider border-primary/30 hover:border-primary hover:text-primary">
-                  ADMIN
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-card border-border">
-                <DropdownMenuItem onClick={() => navigate("/admin/project")} className="text-foreground hover:text-primary cursor-pointer">
-                  <Plus className="mr-2 h-4 w-4" /> New Project
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/admin/blog")} className="text-foreground hover:text-primary cursor-pointer">
-                  <Plus className="mr-2 h-4 w-4" /> New Blog Post
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleLogout} className="text-destructive cursor-pointer">
-                  <LogOut className="mr-2 h-4 w-4" /> Logout
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <Link to="/auth">
-              <Button variant="outline" size="sm" className="text-xs tracking-wider border-primary/30 hover:border-primary hover:text-primary">
-                LOGIN
-              </Button>
-            </Link>
-          )}
         </div>
 
         {/* Mobile hamburger */}
@@ -176,41 +132,6 @@ const Navbar = () => {
                       </Link>
                     ))}
                   </div>
-                </div>
-
-                <div className="border-t border-border pt-4">
-                  {user ? (
-                    <>
-                      <Link
-                        to="/admin/project"
-                        onClick={() => setMobileOpen(false)}
-                        className="block text-sm tracking-wider text-muted-foreground hover:text-primary transition-colors mb-2"
-                      >
-                        New Project
-                      </Link>
-                      <Link
-                        to="/admin/blog"
-                        onClick={() => setMobileOpen(false)}
-                        className="block text-sm tracking-wider text-muted-foreground hover:text-primary transition-colors mb-2"
-                      >
-                        New Blog Post
-                      </Link>
-                      <button
-                        onClick={() => { handleLogout(); setMobileOpen(false); }}
-                        className="text-sm tracking-wider text-destructive hover:text-destructive/80 transition-colors"
-                      >
-                        Logout
-                      </button>
-                    </>
-                  ) : (
-                    <Link
-                      to="/auth"
-                      onClick={() => setMobileOpen(false)}
-                      className="text-sm tracking-wider text-muted-foreground hover:text-primary transition-colors"
-                    >
-                      LOGIN
-                    </Link>
-                  )}
                 </div>
               </div>
             </SheetContent>
