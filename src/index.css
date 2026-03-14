@@ -48,6 +48,41 @@
     --matrix-glow: 0 0 20px hsl(120 100% 50% / 0.5), 0 0 40px hsl(120 100% 50% / 0.2);
     --matrix-text-glow: 0 0 10px hsl(120 100% 50% / 0.8);
   }
+
+  .theme-reading {
+    --background: 30 15% 88%;
+    --foreground: 30 10% 15%;
+
+    --card: 30 15% 92%;
+    --card-foreground: 30 10% 15%;
+
+    --popover: 30 15% 90%;
+    --popover-foreground: 30 10% 15%;
+
+    --primary: 30 20% 30%;
+    --primary-foreground: 30 15% 92%;
+
+    --secondary: 30 12% 82%;
+    --secondary-foreground: 30 10% 20%;
+
+    --muted: 30 10% 82%;
+    --muted-foreground: 30 8% 45%;
+
+    --accent: 30 15% 78%;
+    --accent-foreground: 30 10% 18%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 30 10% 78%;
+    --input: 30 10% 78%;
+    --ring: 30 20% 30%;
+
+    --matrix-glow: none;
+    --matrix-text-glow: none;
+
+    transition: background-color 400ms ease, color 400ms ease;
+  }
 }
 
 @layer base {
