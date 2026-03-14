@@ -237,6 +237,84 @@
     border-color: hsl(120 40% 15%);
     margin: 2rem 0;
   }
+
+  /* Reading mode markdown overrides */
+  .theme-reading .markdown-body {
+    color: hsl(30 10% 20%);
+    font-size: 1.05rem;
+    line-height: 1.8;
+    font-family: 'Atkinson Hyperlegible', sans-serif;
+  }
+
+  .theme-reading .markdown-body h1,
+  .theme-reading .markdown-body h2,
+  .theme-reading .markdown-body h3 {
+    color: hsl(30 10% 12%);
+    font-family: 'Atkinson Hyperlegible', sans-serif;
+    font-weight: 700;
+    text-shadow: none;
+  }
+
+  .theme-reading .markdown-body p,
+  .theme-reading .markdown-body li {
+    color: hsl(30 8% 25%);
+  }
+
+  .theme-reading .markdown-body strong {
+    color: hsl(30 10% 12%);
+  }
+
+  .theme-reading .markdown-body blockquote {
+    border-left-color: hsl(30 20% 50%);
+    color: hsl(30 8% 35%);
+  }
+
+  .theme-reading .markdown-body hr {
+    border-color: hsl(30 10% 78%);
+  }
+
+  /* Code blocks: keep dark in reading mode */
+  .theme-reading .markdown-body pre {
+    background-color: hsl(220 13% 18%) !important;
+    color: hsl(220 14% 71%) !important;
+  }
+
+  .theme-reading .markdown-body code:not(pre code) {
+    background-color: hsl(30 12% 82%);
+    color: hsl(30 10% 20%);
+  }
+
+  /* Links: underline for discoverability */
+  .theme-reading .markdown-body a {
+    text-decoration: underline;
+    text-decoration-color: hsl(30 20% 50%);
+    text-underline-offset: 3px;
+  }
+  .theme-reading .markdown-body a:hover {
+    text-decoration-color: hsl(30 20% 30%);
+  }
+
+  /* Mermaid diagrams: warm tones */
+  .theme-reading .mermaid .node rect,
+  .theme-reading .mermaid .node polygon {
+    fill: hsl(30 15% 90%) !important;
+    stroke: hsl(30 20% 50%) !important;
+  }
+  .theme-reading .mermaid .edgeLabel {
+    background-color: hsl(30 15% 88%) !important;
+    color: hsl(30 10% 15%) !important;
+  }
+  .theme-reading .mermaid text {
+    fill: hsl(30 10% 15%) !important;
+  }
+  .theme-reading .mermaid .edgePath path {
+    stroke: hsl(30 10% 45%) !important;
+  }
+
+  /* Hide in-content TOC in reading mode (sticky sidebar replaces it) */
+  .theme-reading .markdown-body > ul:first-of-type {
+    display: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
