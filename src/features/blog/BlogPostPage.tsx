@@ -64,7 +64,7 @@ const BlogPostPage = () => {
           ) : (
             <MarkdownRenderer
               content={markdownContent}
-              className="border border-border p-6"
+              className="p-6"
             />
           )}
         </motion.div>
