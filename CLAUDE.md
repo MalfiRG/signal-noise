@@ -258,4 +258,3 @@ Natural closing (no "Conclusion" header)
 - `npm install --legacy-peer-deps` is required due to Radix UI peer dependency conflicts
 - Dev server runs on port 8080 (not default 5173)
 - Polish character transliteration is handled in `MarkdownRenderer.tsx` slug generation (ą→a, ć→c, etc.)
-- `lovable-tagger` plugin runs in dev mode only (component tagging)
