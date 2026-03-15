@@ -312,7 +312,7 @@
   }
 
   /* Hide in-content TOC in reading mode (sticky sidebar replaces it) */
-  .theme-reading .markdown-body > ul:first-of-type {
+  .theme-reading .markdown-body.has-inline-toc > ul:first-of-type {
     display: none;
   }
 }
