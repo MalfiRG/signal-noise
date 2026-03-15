@@ -77,7 +77,7 @@ const BlogPostPage = () => {
           </div>
         ) : (
           <>
-            <div className="flex-1 min-w-0 max-w-[680px]">
+            <div className="flex-1 min-w-0">
               <MarkdownRenderer
                 content={markdownContent}
                 className="p-6"
