@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export interface TocHeading {
   id: string;
@@ -12,15 +12,26 @@ interface TableOfContentsProps {
 
 export function TableOfContents({ headings }: TableOfContentsProps) {
   const [activeId, setActiveId] = useState<string>("");
+  const visibleIds = useRef(new Set<string>());
 
   useEffect(() => {
     if (headings.length === 0) return;
+    visibleIds.current.clear();
 
     const observer = new IntersectionObserver(
       (entries) => {
-        const visible = entries.filter((e) => e.isIntersecting);
-        if (visible.length > 0) {
-          setActiveId(visible[0].target.id);
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            visibleIds.current.add(entry.target.id);
+          } else {
+            visibleIds.current.delete(entry.target.id);
+          }
+        });
+
+        // Pick the topmost visible heading (by document order)
+        const firstVisible = headings.find(({ id }) => visibleIds.current.has(id));
+        if (firstVisible) {
+          setActiveId(firstVisible.id);
         }
       },
       { rootMargin: "-80px 0px -60% 0px", threshold: 0 }
