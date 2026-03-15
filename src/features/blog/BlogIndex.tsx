@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { blogPosts } from "./data";
 
 const BlogIndex = () => {
+  const visiblePosts = blogPosts.filter((p) => !p.draft || !import.meta.env.PROD);
   return (
     <div className="min-h-screen pt-24 pb-16 px-4">
       <div className="container mx-auto max-w-3xl">
@@ -11,9 +12,9 @@ const BlogIndex = () => {
           <h1 className="font-display text-4xl font-bold text-foreground text-glow">BLOG</h1>
         </div>
 
-        {blogPosts.length > 0 ? (
+        {visiblePosts.length > 0 ? (
           <div className="space-y-8">
-            {blogPosts.map((post, i) => (
+            {visiblePosts.map((post, i) => (
               <motion.div
                 key={post.slug}
                 initial={{ opacity: 0, y: 20 }}
