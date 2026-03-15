@@ -1,10 +1,10 @@
-import { Link } from "react-router-dom";
-import { useOutletContext } from "react-router-dom";
+import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import { motion } from "framer-motion";
 import type { BlogOutletContext } from "./data";
 
 const BlogIndex = () => {
   const { filteredPosts, activeTags } = useOutletContext<BlogOutletContext>();
+  const navigate = useNavigate();
 
   const tagParams = activeTags.length > 0 ? `?tags=${activeTags.join(",")}` : "";
 
@@ -36,14 +36,26 @@ const BlogIndex = () => {
                     <>
                       <span className="text-border">|</span>
                       {post.tags.map((tag) => (
-                        <Link
+                        <span
                           key={tag}
-                          to={`/blog?tags=${tag}`}
-                          onClick={(e) => e.stopPropagation()}
-                          className="text-xs text-primary/60 tracking-wider hover:text-primary transition-colors"
+                          role="link"
+                          tabIndex={0}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            navigate(`/blog?tags=${tag}`);
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              navigate(`/blog?tags=${tag}`);
+                            }
+                          }}
+                          className="text-xs text-primary/60 tracking-wider hover:text-primary transition-colors cursor-pointer"
                         >
                           #{tag}
-                        </Link>
+                        </span>
                       ))}
                     </>
                   )}
