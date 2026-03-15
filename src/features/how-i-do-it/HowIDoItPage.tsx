@@ -1,9 +1,10 @@
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Loader2 } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useMarkdownContent } from "@/hooks/useMarkdownContent";
 import { MarkdownRenderer } from "@/components/markdown/MarkdownRenderer";
+import { TableOfContents, TocHeading } from "@/components/TableOfContents";
 import { howIDoItPages } from "./data";
 
 const HowIDoItPage = () => {
@@ -34,6 +35,8 @@ const HowIDoItPage = () => {
     fallback: "# Content not found",
   });
 
+  const [headings, setHeadings] = useState<TocHeading[]>([]);
+
   const pageInfo = howIDoItPages.find((p) => p.slug === slug);
 
   return (
@@ -58,16 +61,26 @@ const HowIDoItPage = () => {
           </div>
         )}
 
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex gap-8"
+        >
           {isLoading ? (
-            <div className="flex justify-center py-20">
+            <div className="flex justify-center py-20 flex-1">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
           ) : (
-            <MarkdownRenderer
-              content={markdownContent}
-              className="p-6"
-            />
+            <>
+              <div className="flex-1 min-w-0 max-w-[680px]">
+                <MarkdownRenderer
+                  content={markdownContent}
+                  className="p-6"
+                  onHeadingsExtracted={setHeadings}
+                />
+              </div>
+              <TableOfContents headings={headings} />
+            </>
           )}
         </motion.div>
       </div>
