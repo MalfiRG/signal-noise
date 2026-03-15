@@ -130,3 +130,143 @@ test.describe("Mermaid diagrams", () => {
     }
   });
 });
+
+test.describe("Images & GIFs", () => {
+  test("all images have alt text", async ({ page, blogPage }) => {
+    const images = page.locator(".markdown-body img");
+    const count = await images.count();
+    expect(count).toBeGreaterThan(0);
+
+    for (let i = 0; i < count; i++) {
+      const alt = await images.nth(i).getAttribute("alt");
+      expect(alt).toBeTruthy();
+    }
+  });
+
+  test("images have valid src attributes", async ({ page, blogPage }) => {
+    const images = page.locator(".markdown-body img");
+    const count = await images.count();
+
+    for (let i = 0; i < count; i++) {
+      const src = await images.nth(i).getAttribute("src");
+      expect(src).toBeTruthy();
+      expect(src!.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+test.describe("Links", () => {
+  test("internal anchor links do not open in new tab", async ({ page, blogPage }) => {
+    const anchorLinks = page.locator('.markdown-body a[href^="#"]');
+    const count = await anchorLinks.count();
+    expect(count).toBeGreaterThan(0);
+
+    for (let i = 0; i < count; i++) {
+      const target = await anchorLinks.nth(i).getAttribute("target");
+      expect(target).not.toBe("_blank");
+    }
+  });
+
+  test("external links open in new tab with noopener noreferrer", async ({ page, blogPage }) => {
+    const externalLinks = page.locator('.markdown-body a[href^="http"]');
+    const count = await externalLinks.count();
+    expect(count).toBeGreaterThan(0);
+
+    for (let i = 0; i < count; i++) {
+      const target = await externalLinks.nth(i).getAttribute("target");
+      const rel = await externalLinks.nth(i).getAttribute("rel");
+      expect(target).toBe("_blank");
+      expect(rel).toContain("noopener");
+      expect(rel).toContain("noreferrer");
+    }
+  });
+
+  test("external link URLs are well-formed", async ({ page, blogPage }) => {
+    const externalLinks = page.locator('.markdown-body a[href^="http"]');
+    const count = await externalLinks.count();
+
+    for (let i = 0; i < count; i++) {
+      const href = await externalLinks.nth(i).getAttribute("href");
+      expect(href).toBeTruthy();
+      expect(() => new URL(href!)).not.toThrow();
+    }
+  });
+});
+
+test.describe("Blockquotes", () => {
+  test("blockquotes render as blockquote elements", async ({ page, blogPage }) => {
+    const blockquotes = page.locator(".markdown-body blockquote");
+    const count = await blockquotes.count();
+    expect(count).toBeGreaterThan(0);
+  });
+
+  test("callout patterns have bold lead text", async ({ page, blogPage }) => {
+    const calloutPatterns = ["Key Insight:", "Hot Take:", "Tech Note:", "Warning:"];
+
+    for (const pattern of calloutPatterns) {
+      const blockquote = page.locator(".markdown-body blockquote", { hasText: pattern });
+      await expect(blockquote.first()).toBeVisible();
+      const strong = blockquote.first().locator("strong", { hasText: pattern });
+      await expect(strong).toBeVisible();
+    }
+  });
+});
+
+test.describe("Lists", () => {
+  test("ordered lists render with list-decimal class", async ({ page, blogPage }) => {
+    const ol = page.locator(".markdown-body ol.list-decimal");
+    await expect(ol.first()).toBeVisible();
+  });
+
+  test("unordered lists render with list-disc class", async ({ page, blogPage }) => {
+    // The first ul.list-disc is the inline TOC (hidden in reading mode), use a visible one
+    const ul = page.locator(".markdown-body ul.list-disc");
+    const count = await ul.count();
+    expect(count).toBeGreaterThan(0);
+    // Find the first visible unordered list
+    let foundVisible = false;
+    for (let i = 0; i < count; i++) {
+      const isVisible = await ul.nth(i).isVisible();
+      if (isVisible) {
+        foundVisible = true;
+        break;
+      }
+    }
+    expect(foundVisible).toBe(true);
+  });
+
+  test("nested lists exist", async ({ page, blogPage }) => {
+    const nestedUl = page.locator(".markdown-body li ul, .markdown-body li ol");
+    const count = await nestedUl.count();
+    expect(count).toBeGreaterThan(0);
+  });
+
+  test("GFM task list checkboxes render", async ({ page, blogPage }) => {
+    const checkboxes = page.locator('.markdown-body input[type="checkbox"]');
+    const count = await checkboxes.count();
+    expect(count).toBeGreaterThan(0);
+  });
+});
+
+test.describe("Typography", () => {
+  test("inline formatting elements render", async ({ page, blogPage }) => {
+    await expect(page.locator(".markdown-body strong").first()).toBeVisible();
+    await expect(page.locator(".markdown-body em").first()).toBeVisible();
+    await expect(page.locator(".markdown-body del").first()).toBeVisible();
+  });
+
+  test("horizontal rules render", async ({ page, blogPage }) => {
+    const hrs = page.locator(".markdown-body hr");
+    const count = await hrs.count();
+    expect(count).toBeGreaterThan(0);
+  });
+});
+
+test.describe("Navigation", () => {
+  test("BACK TO BLOG link navigates to /blog", async ({ page, blogPage }) => {
+    const backLink = page.locator("a", { hasText: "BACK TO BLOG" });
+    await expect(backLink).toBeVisible();
+    await backLink.click();
+    await expect(page).toHaveURL(/\/blog$/);
+  });
+});
