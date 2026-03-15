@@ -13,8 +13,9 @@
 - **Package:** `@playwright/test` (devDependency)
 - **Config:** `playwright.config.ts` at project root
   - `baseURL`: `http://localhost:8080`
-  - `webServer`: `npm run dev` (port 8080)
+  - `webServer`: `npm run dev` (port 8080), `reuseExistingServer: !process.env.CI`
   - Single project: Chromium only (expand later if needed)
+  - `timeout`: 30000, `retries`: 1 in CI (`process.env.CI ? 1 : 0`)
   - `testDir`: `e2e/`
 - **Directory structure:**
   ```
@@ -26,12 +27,12 @@
     responsive.spec.ts
   ```
 - **Scripts:** Add `"test:e2e": "npx playwright test"` to `package.json`
-- **`.gitignore`:** Add `test-results/`, `playwright-report/`, `blob-report/`
+- **`.gitignore`:** Add `test-results/`, `playwright-report/`, `blob-report/`, `.playwright/`
 
 ### CI/CD (GitHub Actions)
 
 - **File:** `.github/workflows/e2e.yml`
-- **Triggers:** Push to `main` and `dev-*` branches
+- **Triggers:** Push to `main` and `dev-*` branches, pull requests targeting `main`
 - **Steps:**
   1. Checkout
   2. Node.js setup
@@ -43,8 +44,8 @@
 ### Draft Filtering
 
 - Add `draft?: boolean` to `BlogPost` interface in `src/features/blog/data.ts`
-- Mark `style-test` entry with `draft: true`
-- `BlogIndex.tsx` filters out drafts when `import.meta.env.PROD` is true
+- Mark the existing `style-test` entry with `draft: true` (the entry and its markdown file already exist)
+- **Add filtering logic to `BlogIndex.tsx`** — currently there is no draft filtering. Add: `blogPosts.filter(p => !p.draft || !import.meta.env.PROD).map(...)` so drafts are hidden in production but visible in dev
 - `BlogPostPage.tsx` renders all slugs regardless of draft status (tests navigate directly by URL)
 
 ---
@@ -85,7 +86,7 @@ All tests run against the style-test page using the `blogPage` fixture.
 
 | Test | Assertion |
 |------|-----------|
-| Syntax highlighting applied | Code blocks have `hljs` classes from rehype-highlight |
+| Syntax highlighting applied | `<code>` elements inside `<pre>` have `hljs` and/or `language-*` classes (selector: `pre > code[class*='hljs']` or `pre > code[class*='language-']`) |
 | Horizontal scroll on wide code | `pre` element: `scrollWidth > clientWidth`, programmatic `scrollLeft` changes |
 | Inline code styled differently | `<code>` not inside `<pre>` has `bg-secondary` class |
 
@@ -100,7 +101,7 @@ All tests run against the style-test page using the `blogPage` fixture.
 
 | Test | Assertion |
 |------|-----------|
-| Mermaid diagrams rendered | At least 3 `<svg>` elements inside `.my-6` divs |
+| Mermaid diagrams rendered | At least 4 `<svg>` elements inside `.my-6` divs (style-test.md has exactly 4 mermaid blocks) |
 | SVGs have dimensions | Each SVG has non-zero `width` and `height` |
 
 ### Images & GIFs
@@ -141,6 +142,12 @@ All tests run against the style-test page using the `blogPage` fixture.
 | Inline formatting | `<strong>`, `<em>`, `<del>` elements present |
 | Horizontal rules | `<hr>` elements present |
 
+### Navigation
+
+| Test | Assertion |
+|------|-----------|
+| Back to blog link works | "BACK TO BLOG" link navigates to `/blog` |
+
 ---
 
 ## 4. Test Spec: `reading-mode.spec.ts`
@@ -165,7 +172,7 @@ All tests run against the style-test page using the `blogPage` fixture.
 | Test | Assertion |
 |------|-----------|
 | Body uses Atkinson Hyperlegible | Computed `font-family` includes `Atkinson Hyperlegible` |
-| `.font-display` overridden | Elements with `.font-display` also use Atkinson Hyperlegible |
+| `.font-display` overridden | Post title `h1.font-display` in BlogPostPage uses Atkinson Hyperlegible (computed `font-family`) |
 
 ### Glow Suppression
 
@@ -184,11 +191,14 @@ All tests run against the style-test page using the `blogPage` fixture.
 
 | Test | Assertion |
 |------|-----------|
-| Inline TOC not visible | The `<ul>` at the top of `.markdown-body.has-inline-toc` has `display: none` |
+| `has-inline-toc` class applied | `.markdown-body` has `has-inline-toc` class when content contains a Table of Contents section |
+| Inline TOC not visible | `.markdown-body.has-inline-toc > ul:first-of-type` has `display: none` in reading mode |
 
 ---
 
 ## 5. Test Spec: `responsive.spec.ts`
+
+**Breakpoint reference:** Navbar switches at `md` (768px) — `hidden md:flex` for desktop links, `md:hidden` for hamburger. TOC switches at `lg` (1024px) — `hidden lg:block`.
 
 ### Desktop (1280x720)
 
@@ -198,20 +208,27 @@ All tests run against the style-test page using the `blogPage` fixture.
 | Two-column layout | Content and TOC side by side |
 | Desktop nav visible | Nav links visible, hamburger hidden |
 
-### Tablet (1023x768 — below `lg` breakpoint)
+### Below `lg` breakpoint (1023x768) — TOC hides, nav stays
 
 | Test | Assertion |
 |------|-----------|
 | TOC hidden | Sidebar TOC has `display: none` |
 | Content fills width | No empty TOC column |
 | Reading mode still applies | `.theme-reading` class present, warm colors applied |
+| Desktop nav still visible | Nav links visible at 1023px (above `md` breakpoint) |
+
+### Below `md` breakpoint (767x1024) — nav switches to hamburger
+
+| Test | Assertion |
+|------|-----------|
+| TOC hidden | Same as above |
 | Hamburger menu appears | Desktop nav hidden, hamburger button visible |
 
 ### Mobile (375x667)
 
 | Test | Assertion |
 |------|-----------|
-| TOC hidden | Same as tablet |
+| TOC hidden | Same as above |
 | Hamburger menu functional | Open Sheet → nav links visible → click BLOG → navigates to `/blog` |
 
 ---
