@@ -60,10 +60,10 @@ const BlogLayout = () => {
           onToggleTag={handleToggleTag}
         />
         <main className="flex-1 px-4">
-          {/* max-w-3xl used for both index and post views since sidebar takes ~250px.
-              BlogIndex was max-w-3xl, BlogPostPage was max-w-4xl — unified to 3xl
-              to keep content readable alongside the sidebar. */}
-          <div className="mx-auto max-w-3xl">
+          {/* max-w-6xl gives code blocks room to breathe while keeping layout centered.
+              BlogIndex constrains itself to max-w-3xl internally.
+              Prose elements are constrained to 680px via CSS in index.css. */}
+          <div className="mx-auto max-w-6xl">
             <Outlet context={context} />
           </div>
         </main>
