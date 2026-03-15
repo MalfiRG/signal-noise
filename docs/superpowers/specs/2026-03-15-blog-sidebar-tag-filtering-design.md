@@ -32,12 +32,26 @@ export interface BlogPost {
 }
 ```
 
-Derived data computed at render time from `blogPosts`:
+Tags are stored as lowercase kebab-case strings (e.g., `"test-automation"`, not `"Test Automation"`). Tag matching is case-insensitive.
+
+Derived data computed via `useMemo` inside `BlogLayout` from `blogPosts`:
 - `categories` — unique category list
 - `allTags` — unique tag list
 - `postsByCategory` — `Record<string, BlogPost[]>`
 
 No separate data store needed.
+
+### Outlet Context Type
+
+```typescript
+interface BlogOutletContext {
+  filteredPosts: BlogPost[];
+  activeTags: string[];
+  allTags: string[];
+}
+```
+
+Child routes consume this via `useOutletContext<BlogOutletContext>()`.
 
 ## Component Architecture
 
@@ -46,17 +60,24 @@ All new components inside `src/features/blog/`:
 ```
 src/features/blog/
 ├── data.ts              # existing — add category field
-├── BlogIndex.tsx        # existing — receives filtered posts as prop
-├── BlogPostPage.tsx     # existing — tag clicks navigate to filtered index
-├── BlogLayout.tsx       # NEW — sidebar + <Outlet /> wrapper
+├── BlogIndex.tsx        # existing — strip page shell, receive filtered posts from outlet context
+├── BlogPostPage.tsx     # existing — strip page shell, tag clicks navigate to filtered index
+├── BlogLayout.tsx       # NEW — sidebar + <Outlet /> wrapper, owns page shell (min-h-screen, pt-24, container)
 ├── BlogSidebar.tsx      # NEW — composes CategoryTree + TagFilter
 ├── CategoryTree.tsx     # NEW — collapsible folder tree by category
 └── TagFilter.tsx        # NEW — clickable tag pills, AND logic
+
+src/pages/
+├── BlogLayoutPage.tsx   # NEW — thin wrapper: () => <BlogLayout />
+├── BlogIndexPage.tsx    # existing (unchanged)
+└── BlogSlugPage.tsx     # existing (unchanged)
 ```
 
 ### BlogLayout
 
-Wraps all `/blog/*` routes. Renders `BlogSidebar` on the left, `<Outlet />` on the right. Reads `?tags=foo,bar` from URL search params, computes filtered posts, passes them to child routes via Outlet context.
+Wraps all `/blog/*` routes. Owns the page shell (`min-h-screen`, `pt-24` to clear fixed Navbar, container). Renders `BlogSidebar` on the left, `<Outlet />` on the right in a flex/grid layout. Reads `?tags=foo,bar` from `useSearchParams`, computes filtered posts via `useMemo`, passes `BlogOutletContext` to child routes via `<Outlet context={...} />`.
+
+**Important:** Both `BlogIndex` and `BlogPostPage` currently own their own page shells (`min-h-screen pt-24 pb-16 px-4`, `container mx-auto`). These outer wrappers must be stripped from both components since `BlogLayout` takes over that responsibility.
 
 ### BlogSidebar
 
@@ -64,11 +85,13 @@ Composition component stacking `CategoryTree` and `TagFilter` vertically. On mob
 
 ### CategoryTree
 
-Groups posts by `category`. Each category is a collapsible node with chevron + folder icon. Posts are leaf nodes linking to `/blog/:slug`. When tag filters are active, non-matching posts are greyed out or hidden. Categories with zero visible posts collapse automatically.
+Groups posts by `category`. Each category is a collapsible node with chevron + folder icon. **All categories start expanded by default** (no active filters). Posts are leaf nodes linking to `/blog/:slug` (preserving `?tags=` params). When tag filters are active, non-matching posts are greyed out or hidden. Categories with zero visible posts collapse automatically.
+
+Accessibility: uses `role="tree"`, `role="treeitem"`, `aria-expanded` on category nodes.
 
 ### TagFilter
 
-Renders all unique tags as clickable pills below the category tree. Active tags highlighted in Matrix green. Clicking toggles the tag in URL search params. AND logic: only posts matching ALL active tags are shown.
+Renders all unique tags as clickable pills below the category tree. Active tags highlighted in Matrix green. Clicking toggles the tag in URL search params. AND logic: only posts matching ALL active tags are shown. Uses `aria-pressed` on tag buttons for accessibility.
 
 ### BlogIndex (modified)
 
@@ -76,7 +99,7 @@ Receives filtered `BlogPost[]` from layout context instead of importing `blogPos
 
 ### BlogPostPage (modified)
 
-Tags in the post header become clickable links navigating to `/blog?tags=tagname`. Back link preserves `?tags=` params to restore filtered list.
+Strip the outer page shell (`min-h-screen pt-24 pb-16 px-4`, `container mx-auto`). Consume `BlogOutletContext` via `useOutletContext<BlogOutletContext>()` to access `activeTags`. Tags in the post header become clickable links navigating to `/blog?tags=tagname` (replaces all active filters with that single tag). Back link reads `activeTags` from context and appends them as `?tags=` to the `/blog` URL to restore the filtered list.
 
 ## Routing Changes
 
@@ -109,7 +132,7 @@ New (nested layout route):
 ## Mobile Responsiveness
 
 - **Desktop (>= 768px):** Sidebar fixed left (~250px), main content fills remainder
-- **Mobile (< 768px):** Sidebar hidden by default. Toggle button (folder icon) at top of blog area. Opens as slide-in `Sheet` panel. Matches existing `Navbar.tsx` mobile hamburger pattern.
+- **Mobile (< 768px):** Sidebar hidden by default. Toggle button (folder icon) rendered by `BlogLayout` above the `<Outlet />` content area, left-aligned. Opens as a left-sliding `Sheet` panel (`side="left"`) to match the desktop sidebar position. Matches existing `Navbar.tsx` mobile pattern using the same shadcn/ui Sheet component.
 
 ## Empty States
 
@@ -123,7 +146,7 @@ New (nested layout route):
 
 - Clicking a post in the tree navigates to `/blog/:slug` (preserves active tag params)
 - Clicking a tag pill toggles it in URL params
-- Clicking a tag on a post card navigates to `/blog?tags=tagname`
+- Clicking a tag on a post card navigates to `/blog?tags=tagname` (replaces current filters with that single tag)
 - "Back to posts" link on individual post preserves `?tags=` params
 - Sidebar expand/collapse state persists across navigation within `/blog/*` (layout doesn't unmount)
 
