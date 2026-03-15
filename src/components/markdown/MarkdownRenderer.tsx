@@ -10,6 +10,7 @@ import "highlight.js/styles/atom-one-dark.css";
 interface MarkdownRendererProps {
   content: string;
   className?: string;
+  onHeadingsExtracted?: (headings: { id: string; text: string; level: number }[]) => void;
 }
 
 const customSlugify = (text: string): string => {
@@ -93,7 +94,7 @@ const MermaidRenderer = ({ code }: { code: string }) => {
   return <div className="my-6" ref={mermaidRef} />;
 };
 
-export function MarkdownRenderer({ content, className = "" }: MarkdownRendererProps) {
+export function MarkdownRenderer({ content, className = "", onHeadingsExtracted }: MarkdownRendererProps) {
   const [tocLinks, setTocLinks] = useState<string[]>([]);
   const [hasTableOfContents, setHasTableOfContents] = useState(false);
 
@@ -120,6 +121,25 @@ export function MarkdownRenderer({ content, className = "" }: MarkdownRendererPr
       }
     }
   }, [content]);
+
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!onHeadingsExtracted || !contentRef.current) return;
+
+    const timer = setTimeout(() => {
+      if (!contentRef.current) return;
+      const headingElements = contentRef.current.querySelectorAll('h2, h3');
+      const headings = Array.from(headingElements).map((el) => ({
+        id: el.id,
+        text: el.textContent || '',
+        level: parseInt(el.tagName.charAt(1)),
+      }));
+      onHeadingsExtracted(headings);
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [content, onHeadingsExtracted]);
 
   const renderHeading = (level: "h1" | "h2" | "h3") => {
     const sizing = {
@@ -192,7 +212,7 @@ export function MarkdownRenderer({ content, className = "" }: MarkdownRendererPr
   }
 
   return (
-    <div className={`markdown-body ${className}`}>
+    <div ref={contentRef} className={`markdown-body ${hasTableOfContents ? "has-inline-toc" : ""} ${className}`}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={rehypePlugins}
