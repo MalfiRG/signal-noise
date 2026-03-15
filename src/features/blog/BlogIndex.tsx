@@ -10,7 +10,7 @@ const BlogIndex = () => {
   const tagParams = activeTags.length > 0 ? `?tags=${activeTags.join(",")}` : "";
 
   return (
-    <>
+    <div className="max-w-3xl mx-auto">
       <div className="mb-12">
         <p className="text-muted-foreground text-xs tracking-[0.3em] mb-2">{">"} cat ~/blog/posts.md</p>
         <h1 className="font-display text-4xl font-bold text-foreground text-glow">BLOG</h1>
@@ -86,7 +86,7 @@ const BlogIndex = () => {
           </p>
         </div>
       )}
-    </>
+    </div>
   );
 };
 
