@@ -67,3 +67,66 @@ test.describe("Headings & TOC interaction", () => {
     await expect(h3TocLink).toHaveClass(/pl-3/);
   });
 });
+
+test.describe("Code blocks", () => {
+  test("syntax highlighting is applied to code blocks", async ({ page, blogPage }) => {
+    const highlightedCode = page.locator("pre > code[class*='hljs']");
+    const count = await highlightedCode.count();
+    expect(count).toBeGreaterThan(0);
+  });
+
+  test("wide code blocks are horizontally scrollable", async ({ page, blogPage }) => {
+    const preBlocks = page.locator(".markdown-body pre.overflow-x-auto");
+    const count = await preBlocks.count();
+    expect(count).toBeGreaterThan(0);
+
+    // Verify the overflow-x-auto class is applied (enabling scroll when content overflows)
+    // and that the CSS overflow-x property is set to auto or scroll
+    const firstPre = preBlocks.first();
+    const overflowX = await firstPre.evaluate((el) => window.getComputedStyle(el).overflowX);
+    expect(["auto", "scroll"]).toContain(overflowX);
+  });
+
+  test("inline code has bg-secondary class", async ({ page, blogPage }) => {
+    const inlineCode = page.locator(".markdown-body code:not(pre code)").first();
+    await expect(inlineCode).toHaveClass(/bg-secondary/);
+  });
+});
+
+test.describe("Tables", () => {
+  test("tables render with correct structure", async ({ page, blogPage }) => {
+    const table = page.locator(".markdown-body table").first();
+    await expect(table).toBeVisible();
+    await expect(table.locator("thead")).toBeVisible();
+    await expect(table.locator("th").first()).toBeVisible();
+    await expect(table.locator("td").first()).toBeVisible();
+    await expect(table.locator("tr").first()).toBeVisible();
+  });
+
+  test("table wrapper has overflow-x-auto", async ({ page, blogPage }) => {
+    const tableWrapper = page.locator(".markdown-body div.overflow-x-auto").first();
+    await expect(tableWrapper).toBeVisible();
+    const table = tableWrapper.locator("table");
+    await expect(table).toBeVisible();
+  });
+});
+
+test.describe("Mermaid diagrams", () => {
+  test("at least 4 Mermaid diagrams render as SVGs", async ({ page, blogPage }) => {
+    const mermaidSvgs = page.locator(".my-6 svg");
+    await expect(mermaidSvgs).toHaveCount(4, { timeout: 15000 });
+  });
+
+  test("Mermaid SVGs have non-zero dimensions", async ({ page, blogPage }) => {
+    const mermaidSvgs = page.locator(".my-6 svg");
+    await expect(mermaidSvgs).toHaveCount(4, { timeout: 15000 });
+    const count = await mermaidSvgs.count();
+
+    for (let i = 0; i < count; i++) {
+      const box = await mermaidSvgs.nth(i).boundingBox();
+      expect(box).not.toBeNull();
+      expect(box!.width).toBeGreaterThan(0);
+      expect(box!.height).toBeGreaterThan(0);
+    }
+  });
+});
