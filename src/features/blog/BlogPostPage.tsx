@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useOutletContext } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -6,9 +6,11 @@ import { useMarkdownContent } from "@/hooks/useMarkdownContent";
 import { MarkdownRenderer } from "@/components/markdown/MarkdownRenderer";
 import { TableOfContents, TocHeading } from "@/components/TableOfContents";
 import { blogPosts } from "./data";
+import type { BlogOutletContext } from "./data";
 
 const BlogPostPage = () => {
   const { slug } = useParams<{ slug: string }>();
+  const { activeTags } = useOutletContext<BlogOutletContext>();
 
   const contentMap = useMemo(() => {
     const map: Record<string, () => Promise<string>> = {};
@@ -29,60 +31,64 @@ const BlogPostPage = () => {
 
   const postInfo = blogPosts.find((p) => p.slug === slug);
 
+  const backParams = activeTags.length > 0 ? `?tags=${activeTags.join(",")}` : "";
+
   return (
-    <div className="min-h-screen pt-24 pb-16 px-4">
-      <div className="container mx-auto max-w-4xl">
-        <Link
-          to="/blog"
-          className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors text-sm tracking-wider mb-8"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          BACK TO BLOG
-        </Link>
+    <>
+      <Link
+        to={`/blog${backParams}`}
+        className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors text-sm tracking-wider mb-8"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        BACK TO BLOG
+      </Link>
 
-        {postInfo && (
-          <div className="mb-8">
-            <div className="flex items-center gap-3 mb-2">
-              <span className="text-muted-foreground text-xs tracking-wider">
-                {postInfo.date}
-              </span>
-              {postInfo.tags.length > 0 &&
-                postInfo.tags.map((tag) => (
-                  <span key={tag} className="text-xs text-primary/60 tracking-wider">
-                    #{tag}
-                  </span>
-                ))}
-            </div>
-            <h1 className="font-display text-3xl font-bold text-foreground text-glow">
-              {postInfo.title}
-            </h1>
+      {postInfo && (
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="text-muted-foreground text-xs tracking-wider">
+              {postInfo.date}
+            </span>
+            {postInfo.tags.length > 0 &&
+              postInfo.tags.map((tag) => (
+                <Link
+                  key={tag}
+                  to={`/blog?tags=${tag}`}
+                  className="text-xs text-primary/60 tracking-wider hover:text-primary transition-colors"
+                >
+                  #{tag}
+                </Link>
+              ))}
           </div>
-        )}
+          <h1 className="font-display text-3xl font-bold text-foreground text-glow">
+            {postInfo.title}
+          </h1>
+        </div>
+      )}
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="flex gap-8"
-        >
-          {isLoading ? (
-            <div className="flex justify-center py-20 flex-1">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="flex gap-8"
+      >
+        {isLoading ? (
+          <div className="flex justify-center py-20 flex-1">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : (
+          <>
+            <div className="flex-1 min-w-0 max-w-[680px]">
+              <MarkdownRenderer
+                content={markdownContent}
+                className="p-6"
+                onHeadingsExtracted={setHeadings}
+              />
             </div>
-          ) : (
-            <>
-              <div className="flex-1 min-w-0 max-w-[680px]">
-                <MarkdownRenderer
-                  content={markdownContent}
-                  className="p-6"
-                  onHeadingsExtracted={setHeadings}
-                />
-              </div>
-              <TableOfContents headings={headings} />
-            </>
-          )}
-        </motion.div>
-      </div>
-    </div>
+            <TableOfContents headings={headings} />
+          </>
+        )}
+      </motion.div>
+    </>
   );
 };
 
