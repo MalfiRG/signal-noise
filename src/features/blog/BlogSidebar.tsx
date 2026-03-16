@@ -50,7 +50,7 @@ const BlogSidebar = (props: BlogSidebarProps) => {
             <span className="text-xs tracking-wider">EXPLORER</span>
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="bg-background border-border w-72 p-0">
+        <SheetContent side="left" className="bg-background border-border w-72 p-0 pt-[env(safe-area-inset-top)] pl-[env(safe-area-inset-left)]">
           <SheetHeader className="px-3 pt-3">
             <SheetTitle className="font-display text-foreground text-glow tracking-wider text-left text-sm">
               BLOG EXPLORER

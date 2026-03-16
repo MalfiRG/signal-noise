@@ -328,10 +328,11 @@
     border-color: hsl(30 10% 78%);
   }
 
-  /* Code blocks: keep dark in reading mode (targets CodeBlock wrapper's code element) */
+  /* Code blocks: keep dark in reading mode (targets CodeBlock wrapper's code element).
+     Uses background shorthand to properly override highlight.js atom-one-dark's background shorthand. */
   .theme-reading .markdown-body pre,
   .theme-reading .markdown-body .code-block-wrapper code {
-    background-color: hsl(220 13% 18%) !important;
+    background: hsl(220 13% 18%) !important;
     color: hsl(220 14% 71%) !important;
   }
 
