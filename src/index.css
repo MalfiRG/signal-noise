@@ -254,6 +254,45 @@
     max-width: 680px;
   }
 
+  /* Code block scroll shadows */
+  .code-block-wrapper {
+    position: relative;
+  }
+
+  .code-block-wrapper::before,
+  .code-block-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 24px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 200ms;
+    z-index: 1;
+  }
+
+  .code-block-wrapper::before {
+    left: 0;
+    background: linear-gradient(to right, hsl(var(--background)), transparent);
+  }
+  .code-block-wrapper::after {
+    right: 0;
+    background: linear-gradient(to left, hsl(var(--background)), transparent);
+  }
+
+  .theme-reading .code-block-wrapper::before {
+    background: linear-gradient(to right, hsl(220 13% 18%), transparent);
+  }
+  .theme-reading .code-block-wrapper::after {
+    background: linear-gradient(to left, hsl(220 13% 18%), transparent);
+  }
+
+  .code-block-wrapper.can-scroll-left::before,
+  .code-block-wrapper.can-scroll-right::after {
+    opacity: 1;
+  }
+
   /* Reading mode markdown overrides */
   .theme-reading .markdown-body {
     color: hsl(30 10% 20%);
