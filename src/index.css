@@ -350,23 +350,6 @@
     text-decoration-color: hsl(30 20% 30%);
   }
 
-  /* Mermaid diagrams: warm tones */
-  .theme-reading .mermaid .node rect,
-  .theme-reading .mermaid .node polygon {
-    fill: hsl(30 15% 90%) !important;
-    stroke: hsl(30 20% 50%) !important;
-  }
-  .theme-reading .mermaid .edgeLabel {
-    background-color: hsl(30 15% 88%) !important;
-    color: hsl(30 10% 15%) !important;
-  }
-  .theme-reading .mermaid text {
-    fill: hsl(30 10% 15%) !important;
-  }
-  .theme-reading .mermaid .edgePath path {
-    stroke: hsl(30 10% 45%) !important;
-  }
-
   /* Hide in-content TOC in reading mode (sticky sidebar replaces it) */
   .theme-reading .markdown-body.has-inline-toc > ul:first-of-type {
     display: none;
