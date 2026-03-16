@@ -238,6 +238,22 @@
     margin: 2rem 0;
   }
 
+  /* Prose width constraint: keep text readable while code blocks break out */
+  .markdown-body > p,
+  .markdown-body > h1,
+  .markdown-body > h2,
+  .markdown-body > h3,
+  .markdown-body > h4,
+  .markdown-body > h5,
+  .markdown-body > h6,
+  .markdown-body > ul,
+  .markdown-body > ol,
+  .markdown-body > blockquote,
+  .markdown-body > hr,
+  .markdown-body > .overflow-x-auto {
+    max-width: 680px;
+  }
+
   /* Reading mode markdown overrides */
   .theme-reading .markdown-body {
     color: hsl(30 10% 20%);
@@ -273,8 +289,9 @@
     border-color: hsl(30 10% 78%);
   }
 
-  /* Code blocks: keep dark in reading mode */
-  .theme-reading .markdown-body pre {
+  /* Code blocks: keep dark in reading mode (targets CodeBlock wrapper's code element) */
+  .theme-reading .markdown-body pre,
+  .theme-reading .markdown-body .code-block-wrapper code {
     background-color: hsl(220 13% 18%) !important;
     color: hsl(220 14% 71%) !important;
   }
