@@ -1,5 +1,5 @@
 import { useMemo, useCallback } from "react";
-import { Outlet, useSearchParams } from "react-router-dom";
+import { Outlet, useSearchParams, useMatch } from "react-router-dom";
 import { blogPosts } from "./data";
 import type { BlogOutletContext } from "./data";
 import BlogSidebar from "./BlogSidebar";
@@ -48,17 +48,20 @@ const BlogLayout = () => {
   );
 
   const context: BlogOutletContext = { filteredPosts, activeTags, allTags };
+  const isPostPage = useMatch("/blog/:slug");
 
   return (
     <div className="min-h-dvh pt-[calc(6rem_+_env(safe-area-inset-top,0px))] pb-16 bg-background">
       <div className="flex">
-        <BlogSidebar
-          posts={blogPosts}
-          filteredSlugs={filteredSlugs}
-          allTags={allTags}
-          activeTags={activeTags}
-          onToggleTag={handleToggleTag}
-        />
+        {!isPostPage && (
+          <BlogSidebar
+            posts={blogPosts}
+            filteredSlugs={filteredSlugs}
+            allTags={allTags}
+            activeTags={activeTags}
+            onToggleTag={handleToggleTag}
+          />
+        )}
         <main className="flex-1 px-4">
           {/* max-w-6xl gives code blocks room to breathe while keeping layout centered.
               BlogIndex constrains itself to max-w-3xl internally.
