@@ -50,7 +50,7 @@ const BlogLayout = () => {
   const context: BlogOutletContext = { filteredPosts, activeTags, allTags };
 
   return (
-    <div className="min-h-screen pt-24 pb-16">
+    <div className="min-h-dvh pt-[calc(6rem+env(safe-area-inset-top))] pb-16">
       <div className="flex">
         <BlogSidebar
           posts={blogPosts}
