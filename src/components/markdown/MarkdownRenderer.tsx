@@ -43,54 +43,80 @@ const findElementId = (href: string): string => {
   return customSlugify(linkText);
 };
 
-mermaid.initialize({
-  startOnLoad: false,
-  theme: "dark",
-  securityLevel: "loose",
-  themeCSS: `
-    .node rect, .node circle, .node ellipse, .node polygon, .node path {
-      fill: hsl(120 10% 7%);
-      stroke: hsl(120 100% 50%);
-    }
-    .edgePath .path {
-      stroke: hsl(120 100% 50%);
-    }
-    .cluster rect {
-      fill: hsl(120 10% 4%);
-      stroke: hsl(120 100% 50%);
-    }
-    .label {
-      color: hsl(120 100% 65%);
-    }
-    .edgeLabel {
-      background-color: hsl(120 10% 7%);
-      color: hsl(120 100% 65%);
-    }
-  `,
-});
+const matrixThemeCSS = `
+  .node rect, .node circle, .node ellipse, .node polygon, .node path {
+    fill: hsl(120 10% 7%);
+    stroke: hsl(120 100% 50%);
+  }
+  .edgePath .path { stroke: hsl(120 100% 50%); }
+  .cluster rect { fill: hsl(120 10% 4%); stroke: hsl(120 100% 50%); }
+  .label { color: hsl(120 100% 65%); }
+  .edgeLabel { background-color: hsl(120 10% 7%); color: hsl(120 100% 65%); }
+`;
+
+const readingThemeCSS = `
+  .node rect, .node circle, .node ellipse, .node polygon, .node path {
+    fill: hsl(30 15% 90%);
+    stroke: hsl(30 20% 50%);
+  }
+  .edgePath .path { stroke: hsl(30 10% 45%); }
+  .cluster rect { fill: hsl(30 15% 92%); stroke: hsl(30 20% 50%); }
+  .label { color: hsl(30 10% 15%); }
+  .edgeLabel { background-color: hsl(30 15% 88%); color: hsl(30 10% 15%); }
+`;
+
+function useMermaidTheme() {
+  const [isReading, setIsReading] = useState(
+    () => !!document.querySelector(".theme-reading")
+  );
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsReading(!!document.querySelector(".theme-reading"));
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: "dark",
+      securityLevel: "loose",
+      themeCSS: isReading ? readingThemeCSS : matrixThemeCSS,
+    });
+  }, [isReading]);
+
+  return isReading;
+}
 
 const MermaidRenderer = ({ code }: { code: string }) => {
   const mermaidRef = useRef<HTMLDivElement>(null);
-  const codeId = `mermaid-${Math.random().toString(36).substring(2, 11)}`;
+  const isReading = useMermaidTheme();
 
   useEffect(() => {
-    if (mermaidRef.current) {
-      mermaidRef.current.innerHTML = "";
-      mermaid
-        .render(codeId, code)
-        .then(({ svg }) => {
-          if (mermaidRef.current) {
-            mermaidRef.current.innerHTML = svg;
-          }
-        })
-        .catch((error) => {
-          console.error("Failed to render mermaid diagram:", error);
-          if (mermaidRef.current) {
-            mermaidRef.current.innerHTML = `<pre>Error rendering diagram: ${error.message}</pre>`;
-          }
-        });
-    }
-  }, [code, codeId]);
+    if (!mermaidRef.current) return;
+
+    const codeId = `mermaid-${crypto.randomUUID()}`;
+    mermaidRef.current.innerHTML = "";
+
+    mermaid
+      .render(codeId, code)
+      .then(({ svg }) => {
+        if (mermaidRef.current) {
+          mermaidRef.current.innerHTML = svg;
+        }
+      })
+      .catch((error) => {
+        console.error("Failed to render mermaid diagram:", error);
+        if (mermaidRef.current) {
+          mermaidRef.current.innerHTML = `<pre>Error rendering diagram: ${error.message}</pre>`;
+        }
+      });
+  }, [code, isReading]);
 
   return <div className="my-6" ref={mermaidRef} />;
 };
