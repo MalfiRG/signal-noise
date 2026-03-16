@@ -100,7 +100,7 @@ const MermaidRenderer = ({ code }: { code: string }) => {
   useEffect(() => {
     if (!mermaidRef.current) return;
 
-    const codeId = `mermaid-${crypto.randomUUID()}`;
+    const codeId = `mermaid-${Math.random().toString(36).substring(2, 11)}`;
     mermaidRef.current.innerHTML = "";
 
     mermaid
