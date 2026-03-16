@@ -75,10 +75,10 @@ test.describe("Glow suppression", () => {
 });
 
 test.describe("Code blocks stay dark", () => {
-  test("pre elements keep dark background in reading mode", async ({ page, blogPage }) => {
-    const pre = page.locator(".theme-reading .markdown-body pre").first();
-    await expect(pre).toBeVisible();
-    const bgColor = await pre.evaluate((el) => getComputedStyle(el).backgroundColor);
+  test("code block elements keep dark background in reading mode", async ({ page, blogPage }) => {
+    const codeEl = page.locator(".theme-reading .markdown-body .code-block-wrapper code").first();
+    await expect(codeEl).toBeVisible();
+    const bgColor = await codeEl.evaluate((el) => getComputedStyle(el).backgroundColor);
     const match = bgColor.match(/(\d+),\s*(\d+),\s*(\d+)/);
     expect(match).toBeTruthy();
     const [, r, g, b] = match!.map(Number);
