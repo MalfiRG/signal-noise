@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
 import rehypeSlug from "rehype-slug";
@@ -6,6 +6,7 @@ import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import remarkGfm from "remark-gfm";
 import mermaid from "mermaid";
 import "highlight.js/styles/atom-one-dark.css";
+import { CodeBlock } from "./CodeBlock";
 
 interface MarkdownRendererProps {
   content: string;
@@ -275,6 +276,23 @@ export function MarkdownRenderer({ content, className = "", onHeadingsExtracted 
           td: ({ ...props }) => <td className="border border-border p-2" {...props} />,
           tr: ({ ...props }) => <tr className="even:bg-card odd:bg-background" {...props} />,
 
+          pre({ children }) {
+            const codeEl = React.Children.toArray(children).find(
+              (child) => React.isValidElement(child) && child.type === "code"
+            );
+            const className = React.isValidElement(codeEl)
+              ? (codeEl as React.ReactElement<{ className?: string }>).props?.className || ""
+              : "";
+
+            // Mermaid blocks are handled by the code handler — don't wrap in CodeBlock
+            if (className.includes("language-mermaid")) {
+              return <>{children}</>;
+            }
+
+            const language = /language-(\w+)/.exec(className)?.[1] || "";
+            return <CodeBlock language={language}>{children}</CodeBlock>;
+          },
+
           code({ className, children, ...props }) {
             const match = /language-(\w+)/.exec(className || "");
             const language = match ? match[1] : "";
@@ -284,13 +302,17 @@ export function MarkdownRenderer({ content, className = "", onHeadingsExtracted 
               return <MermaidRenderer code={String(children).replace(/\n$/, "")} />;
             }
 
-            return !isInline ? (
-              <pre className="bg-background text-foreground p-2 rounded overflow-x-auto my-4 border border-border">
-                <code className={className} {...props}>
+            // Block code: padding/border on the element, background from highlight.js atom-one-dark
+            if (!isInline) {
+              return (
+                <code className={`${className} block p-4 rounded border border-border`} {...props}>
                   {children}
                 </code>
-              </pre>
-            ) : (
+              );
+            }
+
+            // Inline code
+            return (
               <code className="bg-secondary text-foreground px-1 rounded" {...props}>
                 {children}
               </code>
