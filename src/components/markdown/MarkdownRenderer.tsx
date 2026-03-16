@@ -304,7 +304,9 @@ export function MarkdownRenderer({ content, className = "", onHeadingsExtracted 
 
           pre({ children }) {
             const codeEl = React.Children.toArray(children).find(
-              (child) => React.isValidElement(child) && child.type === "code"
+              (child) =>
+                React.isValidElement(child) &&
+                (child as React.ReactElement<{ className?: string }>).props?.className
             );
             const className = React.isValidElement(codeEl)
               ? (codeEl as React.ReactElement<{ className?: string }>).props?.className || ""

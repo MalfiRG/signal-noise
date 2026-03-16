@@ -70,25 +70,52 @@ test.describe("Headings & TOC interaction", () => {
 
 test.describe("Code blocks", () => {
   test("syntax highlighting is applied to code blocks", async ({ page, blogPage }) => {
-    const highlightedCode = page.locator("pre > code[class*='hljs']");
+    const highlightedCode = page.locator(".code-block-wrapper code[class*='hljs']");
     const count = await highlightedCode.count();
     expect(count).toBeGreaterThan(0);
   });
 
-  test("wide code blocks are horizontally scrollable", async ({ page, blogPage }) => {
-    const preBlocks = page.locator(".markdown-body pre.overflow-x-auto");
-    const count = await preBlocks.count();
+  test("code blocks have scroll container with overflow-x-auto", async ({ page, blogPage }) => {
+    const scrollContainers = page.locator(".code-block-wrapper .code-scroll-container");
+    const count = await scrollContainers.count();
     expect(count).toBeGreaterThan(0);
 
-    // Verify the overflow-x-auto class is applied (enabling scroll when content overflows)
-    // and that the CSS overflow-x property is set to auto or scroll
-    const firstPre = preBlocks.first();
-    const overflowX = await firstPre.evaluate((el) => window.getComputedStyle(el).overflowX);
+    const firstContainer = scrollContainers.first();
+    const overflowX = await firstContainer.evaluate(
+      (el) => window.getComputedStyle(el).getPropertyValue("overflow-x") || window.getComputedStyle(el).overflow
+    );
     expect(["auto", "scroll"]).toContain(overflowX);
   });
 
+  test("code blocks have a copy button", async ({ page, blogPage }) => {
+    const copyBtn = page.locator(".code-block-wrapper button[aria-label='Copy code']").first();
+    await expect(copyBtn).toBeAttached();
+  });
+
+  test("code blocks show language badge", async ({ page, blogPage }) => {
+    const badge = page.locator(".code-block-wrapper .code-lang-badge").first();
+    await expect(badge).toBeAttached();
+    const text = await badge.textContent();
+    expect(text!.length).toBeGreaterThan(0);
+  });
+
+  test("code blocks are wider than prose paragraphs", async ({ page, blogPage }) => {
+    const paragraph = page.locator(".markdown-body > p").first();
+    const codeBlock = page.locator(".code-block-wrapper").first();
+
+    await expect(paragraph).toBeVisible();
+    await expect(codeBlock).toBeVisible();
+
+    const pBox = await paragraph.boundingBox();
+    const codeBox = await codeBlock.boundingBox();
+
+    expect(pBox).not.toBeNull();
+    expect(codeBox).not.toBeNull();
+    expect(codeBox!.width).toBeGreaterThan(pBox!.width);
+  });
+
   test("inline code has bg-secondary class", async ({ page, blogPage }) => {
-    const inlineCode = page.locator(".markdown-body code:not(pre code)").first();
+    const inlineCode = page.locator(".markdown-body code:not(.code-block-wrapper code)").first();
     await expect(inlineCode).toHaveClass(/bg-secondary/);
   });
 });
@@ -104,7 +131,7 @@ test.describe("Tables", () => {
   });
 
   test("table wrapper has overflow-x-auto", async ({ page, blogPage }) => {
-    const tableWrapper = page.locator(".markdown-body div.overflow-x-auto").first();
+    const tableWrapper = page.locator(".markdown-body div.overflow-x-auto:has(table)").first();
     await expect(tableWrapper).toBeVisible();
     const table = tableWrapper.locator("table");
     await expect(table).toBeVisible();
