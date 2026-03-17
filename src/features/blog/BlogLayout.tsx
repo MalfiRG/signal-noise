@@ -62,7 +62,7 @@ const BlogLayout = () => {
             onToggleTag={handleToggleTag}
           />
         )}
-        <main className="flex-1 px-4">
+        <main className="flex-1 min-w-0 px-4">
           {/* max-w-6xl gives code blocks room to breathe while keeping layout centered.
               BlogIndex constrains itself to max-w-3xl internally.
               Prose elements are constrained to 680px via CSS in index.css. */}
