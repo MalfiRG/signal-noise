@@ -55,14 +55,47 @@ const matrixThemeCSS = `
 `;
 
 const readingThemeCSS = `
+  /* Flowchart nodes */
   .node rect, .node circle, .node ellipse, .node polygon, .node path {
-    fill: hsl(30 15% 90%);
-    stroke: hsl(30 20% 50%);
+    fill: hsl(30 10% 95%);
+    stroke: hsl(30 15% 35%);
+    stroke-width: 1.5px;
   }
-  .edgePath .path { stroke: hsl(30 10% 45%); }
-  .cluster rect { fill: hsl(30 15% 92%); stroke: hsl(30 20% 50%); }
-  .label { color: hsl(30 10% 15%); }
-  .edgeLabel { background-color: hsl(30 15% 88%); color: hsl(30 10% 15%); }
+  /* Arrows and edges */
+  .edgePath .path { stroke: hsl(30 10% 30%); stroke-width: 1.5px; }
+  .edgePath marker path { fill: hsl(30 10% 30%); }
+  /* Clusters */
+  .cluster rect { fill: hsl(30 10% 93%); stroke: hsl(30 15% 45%); }
+  /* All text labels */
+  .label, .nodeLabel, .edgeLabel, .labelText {
+    color: hsl(30 10% 10%) !important;
+    fill: hsl(30 10% 10%) !important;
+  }
+  .edgeLabel {
+    background-color: hsl(30 10% 93%);
+    color: hsl(30 10% 10%);
+    padding: 2px 4px;
+  }
+  /* Sequence diagram — !important needed to override inline SVG attributes */
+  rect.actor { fill: hsl(30 10% 95%) !important; stroke: hsl(30 15% 35%) !important; }
+  .actor-line { stroke: hsl(30 10% 50%) !important; }
+  text.actor > tspan { fill: hsl(30 10% 10%) !important; }
+  .messageText { fill: hsl(30 10% 15%) !important; stroke: none !important; }
+  .messageLine0, .messageLine1 { stroke: hsl(30 10% 30%) !important; stroke-width: 1.5px; }
+  marker path { fill: hsl(30 10% 30%) !important; stroke: hsl(30 10% 30%) !important; }
+  .activation0, .activation1, .activation2 {
+    fill: hsl(30 10% 85%) !important; stroke: hsl(30 15% 45%) !important;
+  }
+  .loopText, .loopText > tspan { fill: hsl(30 10% 10%) !important; }
+  .loopLine { stroke: hsl(30 10% 50%) !important; }
+  .labelBox { fill: hsl(30 10% 92%) !important; stroke: hsl(30 15% 45%) !important; }
+  /* State diagram */
+  .state-note-edge .path { stroke: hsl(30 10% 40%) !important; }
+  .statediagram-state rect.basic { fill: hsl(30 10% 95%) !important; stroke: hsl(30 15% 35%) !important; }
+  .statediagram-state .nodeLabel { color: hsl(30 10% 10%) !important; }
+  /* Alt/opt/loop sections */
+  .labelText { fill: hsl(30 10% 10%) !important; }
+  line { stroke: hsl(30 10% 40%) !important; }
 `;
 
 function useMermaidTheme() {
@@ -118,7 +151,7 @@ const MermaidRenderer = ({ code }: { code: string }) => {
       });
   }, [code, isReading]);
 
-  return <div className="my-6" ref={mermaidRef} />;
+  return <div className="my-6 max-w-full overflow-x-auto" ref={mermaidRef} />;
 };
 
 export function MarkdownRenderer({ content, className = "", onHeadingsExtracted }: MarkdownRendererProps) {
