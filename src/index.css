@@ -49,6 +49,12 @@
     --matrix-text-glow: 0 0 10px hsl(120 100% 50% / 0.8);
   }
 
+  /* When reading mode is active, set the root background so horizontal
+     overflow areas don't show the dark Matrix body background */
+  html:has(.theme-reading) {
+    background-color: hsl(30 15% 88%);
+  }
+
   .theme-reading {
     --background: 30 15% 88%;
     --foreground: 30 10% 15%;
