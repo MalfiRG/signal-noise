@@ -61,9 +61,9 @@ const readingThemeCSS = `
     stroke: hsl(30 15% 35%);
     stroke-width: 1.5px;
   }
-  /* Arrows and edges */
-  .edgePath .path { stroke: hsl(30 10% 30%); stroke-width: 1.5px; }
-  .edgePath marker path { fill: hsl(30 10% 30%); }
+  /* Arrows and edges — darker for contrast */
+  .edgePath .path { stroke: hsl(30 10% 25%) !important; stroke-width: 2px !important; }
+  .edgePath marker path { fill: hsl(30 10% 25%) !important; }
   /* Clusters */
   .cluster rect { fill: hsl(30 10% 93%); stroke: hsl(30 15% 45%); }
   /* All text labels */
@@ -71,9 +71,13 @@ const readingThemeCSS = `
     color: hsl(30 10% 10%) !important;
     fill: hsl(30 10% 10%) !important;
   }
+  /* Edge label background — override mermaid dark theme's rgba(88,88,88,0.5) */
+  .labelBkg {
+    background-color: hsl(30 10% 93%) !important;
+  }
   .edgeLabel {
-    background-color: hsl(30 10% 93%);
-    color: hsl(30 10% 10%);
+    background-color: hsl(30 10% 93%) !important;
+    color: hsl(30 10% 10%) !important;
     padding: 2px 4px;
   }
   /* Sequence diagram — !important needed to override inline SVG attributes */
