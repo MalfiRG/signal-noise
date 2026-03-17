@@ -71,14 +71,17 @@ const readingThemeCSS = `
     color: hsl(30 10% 10%) !important;
     fill: hsl(30 10% 10%) !important;
   }
-  /* Edge label background — override mermaid dark theme's rgba(88,88,88,0.5) */
-  .labelBkg {
-    background-color: hsl(30 10% 93%) !important;
+  /* Edge label background — transparent looks cleanest against cream */
+  .labelBkg, .edgeLabel {
+    background-color: transparent !important;
+    background: transparent !important;
   }
   .edgeLabel {
-    background-color: hsl(30 10% 93%) !important;
     color: hsl(30 10% 10%) !important;
-    padding: 2px 4px;
+  }
+  .edgeLabel p {
+    background-color: transparent !important;
+    background: transparent !important;
   }
   /* Sequence diagram — !important needed to override inline SVG attributes */
   rect.actor { fill: hsl(30 10% 95%) !important; stroke: hsl(30 15% 35%) !important; }
