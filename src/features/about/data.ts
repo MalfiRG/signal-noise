@@ -13,7 +13,7 @@ export const introText = {
   headline: "ABOUT ME",
   terminal: "> whoami",
   bio: [
-    "ISTQB-certified QA Engineer at [redacted-employer], specializing in test automation for enterprise backup & recovery solutions.",
+    "ISTQB-certified QA Engineer specializing in test automation for enterprise backup & recovery solutions.",
     "I build robust test frameworks with Pytest and PowerShell/Pester, integrate them into CI/CD pipelines, and leverage AI to accelerate QA workflows.",
     "Outside of work, I explore full-stack development, contribute to open-source testing tools, and write about software quality on this blog.",
   ],
