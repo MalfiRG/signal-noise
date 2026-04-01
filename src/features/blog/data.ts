@@ -22,7 +22,7 @@ export const blogPosts: BlogPost[] = [
     tags: ["AI", "QA", "automation", "Claude", "Playwright"],
     category: "AI & Automation",
     excerpt:
-      "How I set up a 30-minute autonomous loop that screenshots my frontends, finds visual bugs, fixes them, commits, and then builds new features when everything's clean.",
+      "How a 30-minute autonomous loop screenshotted my frontends, found bugs, fixed them, built 8 new pages, wired up an Apify scraper, and scraped 254 real jobs — all in one session.",
     draft: true,
   },
   {
