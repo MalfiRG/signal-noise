@@ -15,7 +15,7 @@ export const skills: Skill[] = [
     name: "Pytest (Python)",
     level: 80,
     description:
-      "Primary automation framework at Veeam. Designing and maintaining large-scale test suites with fixtures, parametrization, and custom plugins.",
+      "Primary automation framework at work. Designing and maintaining large-scale test suites with fixtures, parametrization, and custom plugins.",
   },
   {
     name: "PowerShell / Pester",
