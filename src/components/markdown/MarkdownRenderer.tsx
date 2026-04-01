@@ -332,12 +332,12 @@ export function MarkdownRenderer({ content, className = "", onHeadingsExtracted 
 
           table: ({ ...props }) => (
             <div className="overflow-x-auto my-4">
-              <table className="min-w-full border-collapse border border-border" {...props} />
+              <table className="border-collapse border border-border" {...props} />
             </div>
           ),
           thead: ({ ...props }) => <thead className="bg-secondary" {...props} />,
           th: ({ ...props }) => (
-            <th className="border border-border p-2 text-left font-bold" {...props} />
+            <th className="border border-border p-2 text-left font-bold whitespace-nowrap" {...props} />
           ),
           td: ({ ...props }) => <td className="border border-border p-2" {...props} />,
           tr: ({ ...props }) => <tr className="even:bg-card odd:bg-background" {...props} />,
@@ -364,16 +364,15 @@ export function MarkdownRenderer({ content, className = "", onHeadingsExtracted 
           code({ className, children, ...props }) {
             const match = /language-(\w+)/.exec(className || "");
             const language = match ? match[1] : "";
-            const isInline = !className;
 
             if (language === "mermaid") {
               return <MermaidRenderer code={String(children).replace(/\n$/, "")} />;
             }
 
-            // Block code: padding/border on the element, background from highlight.js atom-one-dark
-            if (!isInline) {
+            // Block code — CSS handles styling via .code-block-wrapper rules
+            if (className) {
               return (
-                <code className={`${className} block p-4 rounded border border-border`} {...props}>
+                <code className={className} {...props}>
                   {children}
                 </code>
               );
