@@ -336,12 +336,12 @@
 
   /* Code blocks: keep dark in reading mode (Shiki handles colors via inline styles) */
   .theme-reading .markdown-body pre {
-    background: #282c34 !important;
+    background: #2d2d2d !important;
   }
 
   /* Code blocks rendered by Shiki: ensure pre has correct background */
   .markdown-body pre {
-    background: #282c34 !important;
+    background: #2d2d2d !important;
     margin: 0;
     padding: 0;
   }
