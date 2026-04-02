@@ -335,20 +335,22 @@
   }
 
   /* Code blocks: keep dark in reading mode */
-  .theme-reading .markdown-body pre[class*="language-"],
   .theme-reading .markdown-body code[class*="language-"] {
     background: #2d2d2d !important;
+    color: #ccc !important;
   }
 
   /* ===== Prism code block theme (Tomorrow Night) ===== */
-  /* Container: solid dark background, horizontal scroll, no wrapping */
-  .markdown-body pre[class*="language-"],
-  .markdown-body code[class*="language-"] {
+  /* Target code elements inside CodeBlock wrappers and standalone pre blocks */
+  code[class*="language-"],
+  pre[class*="language-"],
+  .markdown-body code[class*="language-"],
+  .markdown-body pre[class*="language-"] {
     background: #2d2d2d !important;
     color: #ccc !important;
     font-family: 'Share Tech Mono', 'Fira Code', 'Consolas', monospace;
     font-size: 0.875rem;
-    line-height: 1.5;
+    line-height: 1.6;
     white-space: pre !important;
     word-wrap: normal !important;
     overflow-wrap: normal !important;
@@ -358,11 +360,9 @@
     padding: 0;
   }
 
-  /* Kill ALL token backgrounds — Prism tokens get COLOR only */
-  .markdown-body pre[class*="language-"] .token,
-  .markdown-body code[class*="language-"] .token,
-  .markdown-body pre[class*="language-"] span,
-  .markdown-body code[class*="language-"] span {
+  /* Kill ALL token backgrounds everywhere — tokens get COLOR only */
+  .token,
+  code[class*="language-"] span {
     background: none !important;
     background-color: transparent !important;
   }
