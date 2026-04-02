@@ -45,7 +45,6 @@ export function CodeBlock({ language, children }: CodeBlockProps) {
     return () => observer.disconnect();
   }, [updateScrollShadows]);
 
-  // Lock body scroll and handle Escape when expanded
   useEffect(() => {
     if (!expanded) return;
     const handleKey = (e: KeyboardEvent) => {
@@ -64,37 +63,40 @@ export function CodeBlock({ language, children }: CodeBlockProps) {
       {/* Inline code block — hidden when overlay is open */}
       {!expanded && (
         <div ref={wrapperRef} className="code-block-wrapper relative my-4 group">
-          {language && (
-            <span className="code-lang-badge absolute top-2 left-3 text-xs text-muted-foreground opacity-60 select-none z-10">
-              {language}
-            </span>
-          )}
-          {/* Buttons: always visible on mobile (no hover), hover-reveal on desktop */}
-          <div className="absolute top-2 right-3 flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-within:opacity-100 transition-opacity z-10">
-            <button
-              className="p-1.5 rounded text-muted-foreground hover:text-foreground"
-              aria-label="Expand code"
-              onClick={() => setExpanded(true)}
-            >
-              <Maximize2 className="h-3.5 w-3.5" />
-            </button>
-            <button
-              className="p-1.5 rounded text-muted-foreground hover:text-foreground"
-              aria-label="Copy code"
-              onClick={handleCopy}
-            >
-              {copied ? (
-                <span aria-live="polite" className="flex items-center gap-1 text-xs">
-                  <Check className="h-3.5 w-3.5" /> Copied!
-                </span>
-              ) : (
-                <Copy className="h-3.5 w-3.5" />
-              )}
-            </button>
+          {/* Top bar: language + buttons on same row */}
+          <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-3 py-1.5 z-10">
+            {language ? (
+              <span className="text-xs text-muted-foreground opacity-60 select-none">
+                {language}
+              </span>
+            ) : <span />}
+            <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-within:opacity-100 transition-opacity">
+              <button
+                className="p-1 rounded text-muted-foreground hover:text-foreground"
+                aria-label="Expand code"
+                onClick={() => setExpanded(true)}
+              >
+                <Maximize2 className="h-3.5 w-3.5" />
+              </button>
+              <button
+                className="p-1 rounded text-muted-foreground hover:text-foreground"
+                aria-label="Copy code"
+                onClick={handleCopy}
+              >
+                {copied ? (
+                  <span aria-live="polite" className="flex items-center gap-1 text-xs">
+                    <Check className="h-3.5 w-3.5" /> Copied!
+                  </span>
+                ) : (
+                  <Copy className="h-3.5 w-3.5" />
+                )}
+              </button>
+            </div>
           </div>
+          {/* Code content — padded top to clear the bar */}
           <div
             ref={scrollRef}
-            className="code-scroll-container overflow-x-auto"
+            className="code-scroll-container overflow-x-auto pt-8"
             onScroll={updateScrollShadows}
           >
             {children}
@@ -105,12 +107,14 @@ export function CodeBlock({ language, children }: CodeBlockProps) {
       {/* Fullscreen overlay modal */}
       {expanded && (
         <div
-          className="fixed inset-0 z-50 bg-background flex flex-col"
+          className="fixed inset-0 z-50 flex flex-col"
+          style={{ background: "hsl(220 13% 18%)" }}
           onClick={() => setExpanded(false)}
         >
           {/* Header bar */}
           <div
-            className="flex items-center justify-between px-4 py-3 border-b border-border bg-card"
+            className="flex items-center justify-between px-4 py-3 border-b border-border/30"
+            style={{ background: "hsl(220 13% 14%)" }}
             onClick={(e) => e.stopPropagation()}
           >
             <span className="text-sm font-mono text-primary">
@@ -123,7 +127,7 @@ export function CodeBlock({ language, children }: CodeBlockProps) {
                 onClick={handleCopy}
               >
                 {copied ? (
-                  <span aria-live="polite" className="flex items-center gap-1 text-xs">
+                  <span aria-live="polite" className="flex items-center gap-1 text-xs text-green-400">
                     <Check className="h-3.5 w-3.5" /> Copied!
                   </span>
                 ) : (
@@ -140,15 +144,14 @@ export function CodeBlock({ language, children }: CodeBlockProps) {
             </div>
           </div>
 
-          {/* Scrollable code area — full opaque background */}
+          {/* Scrollable code — matches syntax highlight background */}
           <div
             ref={modalScrollRef}
-            className="flex-1 overflow-auto p-4 bg-background"
+            className="flex-1 overflow-auto p-4"
+            style={{ background: "hsl(220 13% 18%)" }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="code-block-wrapper">
-              {children}
-            </div>
+            {children}
           </div>
         </div>
       )}
