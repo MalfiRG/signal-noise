@@ -49,6 +49,14 @@
     --matrix-text-glow: 0 0 10px hsl(120 100% 50% / 0.8);
   }
 
+  /* Soften glow on small screens to reduce harshness */
+  @media (max-width: 640px) {
+    :root {
+      --matrix-text-glow: 0 0 6px hsl(120 100% 50% / 0.4);
+      --matrix-glow: 0 0 12px hsl(120 100% 50% / 0.3);
+    }
+  }
+
   /* When reading mode is active, set the root background so horizontal
      overflow areas don't show the dark Matrix body background */
   html:has(.theme-reading) {
@@ -193,6 +201,10 @@
   .theme-reading .hidden-in-reading {
     display: none;
   }
+
+  .theme-reading .scanline {
+    display: none;
+  }
 }
 
 @layer components {
@@ -334,10 +346,15 @@
     border-color: hsl(30 10% 78%);
   }
 
-  /* Code blocks: keep dark in reading mode */
+  /* Code blocks: keep dark in reading mode with clear contrast border */
+  .theme-reading .markdown-body pre[class*="language-"] {
+    background: hsl(220 13% 15%) !important;
+    border: 1px solid hsl(220 10% 25%);
+    border-radius: 0.5rem;
+  }
   .theme-reading .markdown-body code[class*="language-"] {
-    background: #2d2d2d !important;
-    color: #ccc !important;
+    background: hsl(220 13% 15%) !important;
+    color: hsl(220 15% 85%) !important;
   }
 
   /* ===== Prism code block theme (Tomorrow Night) ===== */
