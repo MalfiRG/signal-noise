@@ -334,27 +334,20 @@
     border-color: hsl(30 10% 78%);
   }
 
-  /* Code blocks: keep dark in reading mode (targets CodeBlock wrapper's code element).
-     Uses background shorthand to properly override highlight.js atom-one-dark's background shorthand. */
-  .theme-reading .markdown-body pre,
-  .theme-reading .markdown-body .code-block-wrapper code {
-    background: hsl(220 13% 18%) !important;
-    color: hsl(220 14% 71%) !important;
+  /* Code blocks: keep dark in reading mode (Shiki handles colors via inline styles) */
+  .theme-reading .markdown-body pre {
+    background: #282c34 !important;
   }
 
-  /* Code overlay modal: nuke ALL backgrounds from syntax highlighter spans/elements.
-     The overlay container itself provides the uniform background. */
-  .code-overlay-modal * {
+  /* Code blocks rendered by Shiki: ensure pre has correct background */
+  .markdown-body pre {
+    background: #282c34 !important;
+    margin: 0;
+    padding: 0;
+  }
+
+  .markdown-body pre code {
     background: transparent !important;
-    background-color: transparent !important;
-  }
-
-  /* Preserve text colors from syntax highlighting */
-  .code-overlay-modal pre,
-  .code-overlay-modal code {
-    white-space: pre;
-    word-wrap: normal;
-    overflow-wrap: normal;
   }
 
   .theme-reading .markdown-body code:not(pre code) {
