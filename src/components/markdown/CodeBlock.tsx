@@ -144,10 +144,10 @@ export function CodeBlock({ language, children }: CodeBlockProps) {
             </div>
           </div>
 
-          {/* Scrollable code — matches syntax highlight background */}
+          {/* Scrollable code — horizontal scroll, no line wrapping */}
           <div
             ref={modalScrollRef}
-            className="flex-1 overflow-auto p-4"
+            className="flex-1 overflow-auto p-4 text-sm"
             style={{ background: "hsl(220 13% 18%)" }}
             onClick={(e) => e.stopPropagation()}
           >
