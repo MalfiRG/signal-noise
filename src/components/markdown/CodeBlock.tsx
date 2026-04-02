@@ -107,7 +107,7 @@ export function CodeBlock({ language, children }: CodeBlockProps) {
       {/* Fullscreen overlay modal */}
       {expanded && (
         <div
-          className="fixed inset-0 z-50 flex flex-col"
+          className="code-overlay-modal fixed inset-0 z-50 flex flex-col"
           style={{ background: "hsl(220 13% 18%)" }}
           onClick={() => setExpanded(false)}
         >
