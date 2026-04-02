@@ -22,13 +22,11 @@ interface BlogSidebarProps {
 }
 
 const SidebarContent = ({ posts, filteredSlugs, allTags, activeTags, onToggleTag }: BlogSidebarProps) => (
-  <div className="flex flex-col h-full">
+  <div className="overflow-y-auto h-full">
     <div className="px-3 pt-3 pb-2">
       <p className="text-xs tracking-[0.2em] text-muted-foreground">FILE EXPLORER</p>
     </div>
-    <div className="flex-1 overflow-y-auto">
-      <CategoryTree posts={posts} filteredSlugs={filteredSlugs} activeTags={activeTags} />
-    </div>
+    <CategoryTree posts={posts} filteredSlugs={filteredSlugs} activeTags={activeTags} />
     <TagFilter allTags={allTags} activeTags={activeTags} onToggleTag={onToggleTag} />
   </div>
 );
