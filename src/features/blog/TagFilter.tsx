@@ -8,9 +8,9 @@ const TagFilter = ({ allTags, activeTags, onToggleTag }: TagFilterProps) => {
   if (allTags.length === 0) return null;
 
   return (
-    <div className="px-3 py-4 border-t border-border">
+    <div className="px-3 py-4 border-t border-border max-h-48 overflow-y-auto flex-shrink-0">
       <p className="text-xs tracking-[0.2em] text-muted-foreground mb-3">TAGS</p>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-1.5">
         {allTags.map((tag) => {
           const isActive = activeTags.includes(tag);
           return (
