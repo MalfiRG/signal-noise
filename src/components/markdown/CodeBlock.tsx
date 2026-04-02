@@ -52,6 +52,18 @@ export function CodeBlock({ language, children }: CodeBlockProps) {
     };
     document.addEventListener("keydown", handleKey);
     document.body.style.overflow = "hidden";
+
+    // Nuclear: strip all background colors from overlay children via DOM
+    // CSS !important can't reliably beat highlight.js themes across Tailwind layers
+    requestAnimationFrame(() => {
+      const container = modalScrollRef.current;
+      if (!container) return;
+      container.querySelectorAll("*").forEach((el) => {
+        (el as HTMLElement).style.backgroundColor = "transparent";
+        (el as HTMLElement).style.background = "transparent";
+      });
+    });
+
     return () => {
       document.removeEventListener("keydown", handleKey);
       document.body.style.overflow = "";
