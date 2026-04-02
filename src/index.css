@@ -342,6 +342,13 @@
     color: hsl(220 14% 71%) !important;
   }
 
+  /* Code overlay: force all child elements to use the same dark background */
+  .code-overlay-modal pre,
+  .code-overlay-modal code,
+  .code-overlay-modal .hljs {
+    background: transparent !important;
+  }
+
   .theme-reading .markdown-body code:not(pre code) {
     background-color: hsl(30 12% 82%);
     color: hsl(30 10% 20%);
