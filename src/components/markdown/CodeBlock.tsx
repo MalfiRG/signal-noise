@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback, type ReactNode } from "react";
 import { Copy, Check, Maximize2, X } from "lucide-react";
 
-const CODE_BG = "#282c34";
+const CODE_BG = "#2d2d2d";
 
 interface CodeBlockProps {
   language: string;

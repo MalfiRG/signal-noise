@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
-import rehypeShiki from "@shikijs/rehype";
+import rehypePrismPlus from "rehype-prism-plus";
 import rehypeSlug from "rehype-slug";
+import "prismjs/themes/prism-tomorrow.css";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import remarkGfm from "remark-gfm";
 import mermaid from "mermaid";
@@ -257,10 +258,7 @@ export function MarkdownRenderer({ content, className = "", onHeadingsExtracted 
   };
 
   const rehypePlugins: any[] = [
-    [rehypeShiki, {
-      theme: "one-dark-pro",
-      langs: ["typescript", "javascript", "python", "bash", "json", "css", "html", "yaml", "markdown", "sql", "powershell", "dockerfile"],
-    }],
+    [rehypePrismPlus, { ignoreMissing: true }],
     [rehypeSlug, { slugify: customSlugify }],
   ];
 
