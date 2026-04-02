@@ -1,9 +1,21 @@
 import { useState, useRef, useEffect, useCallback, type ReactNode } from "react";
 import { Copy, Check, Maximize2, X } from "lucide-react";
 
+const CODE_BG = "#282c34"; // atom-one-dark background
+
 interface CodeBlockProps {
   language: string;
   children: ReactNode;
+}
+
+/** Strip all background colors from child elements, leaving only the container bg */
+function nukeChildBackgrounds(container: HTMLElement | null) {
+  if (!container) return;
+  container.querySelectorAll("*").forEach((el) => {
+    const htmlEl = el as HTMLElement;
+    htmlEl.style.setProperty("background", "transparent", "important");
+    htmlEl.style.setProperty("background-color", "transparent", "important");
+  });
 }
 
 export function CodeBlock({ language, children }: CodeBlockProps) {
@@ -35,6 +47,12 @@ export function CodeBlock({ language, children }: CodeBlockProps) {
     wrapper.classList.toggle("can-scroll-right", canScrollRight);
   }, []);
 
+  // Strip backgrounds from inline code block after render
+  useEffect(() => {
+    if (expanded) return;
+    requestAnimationFrame(() => nukeChildBackgrounds(scrollRef.current));
+  }, [expanded, children]);
+
   useEffect(() => {
     updateScrollShadows();
     const el = scrollRef.current;
@@ -45,6 +63,7 @@ export function CodeBlock({ language, children }: CodeBlockProps) {
     return () => observer.disconnect();
   }, [updateScrollShadows]);
 
+  // Overlay: lock scroll, escape key, strip backgrounds
   useEffect(() => {
     if (!expanded) return;
     const handleKey = (e: KeyboardEvent) => {
@@ -53,16 +72,7 @@ export function CodeBlock({ language, children }: CodeBlockProps) {
     document.addEventListener("keydown", handleKey);
     document.body.style.overflow = "hidden";
 
-    // Nuclear: strip all background colors from overlay children via DOM
-    // CSS !important can't reliably beat highlight.js themes across Tailwind layers
-    requestAnimationFrame(() => {
-      const container = modalScrollRef.current;
-      if (!container) return;
-      container.querySelectorAll("*").forEach((el) => {
-        (el as HTMLElement).style.backgroundColor = "transparent";
-        (el as HTMLElement).style.background = "transparent";
-      });
-    });
+    requestAnimationFrame(() => nukeChildBackgrounds(modalScrollRef.current));
 
     return () => {
       document.removeEventListener("keydown", handleKey);
@@ -74,29 +84,35 @@ export function CodeBlock({ language, children }: CodeBlockProps) {
     <>
       {/* Inline code block — hidden when overlay is open */}
       {!expanded && (
-        <div ref={wrapperRef} className="code-block-wrapper relative my-4 group">
-          {/* Top bar: language + buttons on same row */}
-          <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-3 py-1.5 z-10">
+        <div
+          ref={wrapperRef}
+          className="code-block-wrapper relative my-4 group rounded-md overflow-hidden"
+          style={{ background: CODE_BG }}
+        >
+          {/* Top bar: language + buttons */}
+          <div className="flex items-center justify-between px-3 py-1.5" style={{ background: CODE_BG }}>
             {language ? (
-              <span className="text-xs text-muted-foreground opacity-60 select-none">
+              <span className="text-xs opacity-60 select-none" style={{ color: "#abb2bf" }}>
                 {language}
               </span>
             ) : <span />}
             <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-within:opacity-100 transition-opacity">
               <button
-                className="p-1 rounded text-muted-foreground hover:text-foreground"
+                className="p-1 rounded hover:bg-white/10"
+                style={{ color: "#abb2bf" }}
                 aria-label="Expand code"
                 onClick={() => setExpanded(true)}
               >
                 <Maximize2 className="h-3.5 w-3.5" />
               </button>
               <button
-                className="p-1 rounded text-muted-foreground hover:text-foreground"
+                className="p-1 rounded hover:bg-white/10"
+                style={{ color: "#abb2bf" }}
                 aria-label="Copy code"
                 onClick={handleCopy}
               >
                 {copied ? (
-                  <span aria-live="polite" className="flex items-center gap-1 text-xs">
+                  <span className="flex items-center gap-1 text-xs" style={{ color: "#98c379" }}>
                     <Check className="h-3.5 w-3.5" /> Copied!
                   </span>
                 ) : (
@@ -105,10 +121,11 @@ export function CodeBlock({ language, children }: CodeBlockProps) {
               </button>
             </div>
           </div>
-          {/* Code content — padded top to clear the bar */}
+          {/* Code content */}
           <div
             ref={scrollRef}
-            className="code-scroll-container overflow-x-auto pt-8"
+            className="overflow-x-auto px-3 pb-3"
+            style={{ background: CODE_BG }}
             onScroll={updateScrollShadows}
           >
             {children}
@@ -119,27 +136,28 @@ export function CodeBlock({ language, children }: CodeBlockProps) {
       {/* Fullscreen overlay modal */}
       {expanded && (
         <div
-          className="code-overlay-modal fixed inset-0 z-50 flex flex-col"
-          style={{ background: "hsl(220 13% 18%)" }}
+          className="fixed inset-0 z-50 flex flex-col"
+          style={{ background: CODE_BG }}
           onClick={() => setExpanded(false)}
         >
           {/* Header bar */}
           <div
-            className="flex items-center justify-between px-4 py-3 border-b border-border/30"
-            style={{ background: "hsl(220 13% 14%)" }}
+            className="flex items-center justify-between px-4 py-3 border-b border-white/10"
+            style={{ background: "#21252b" }}
             onClick={(e) => e.stopPropagation()}
           >
-            <span className="text-sm font-mono text-primary">
+            <span className="text-sm font-mono" style={{ color: "#98c379" }}>
               {language || "code"}
             </span>
             <div className="flex items-center gap-2">
               <button
-                className="p-1.5 rounded text-muted-foreground hover:text-foreground"
+                className="p-1.5 rounded hover:bg-white/10"
+                style={{ color: "#abb2bf" }}
                 aria-label="Copy code"
                 onClick={handleCopy}
               >
                 {copied ? (
-                  <span aria-live="polite" className="flex items-center gap-1 text-xs text-green-400">
+                  <span className="flex items-center gap-1 text-xs" style={{ color: "#98c379" }}>
                     <Check className="h-3.5 w-3.5" /> Copied!
                   </span>
                 ) : (
@@ -147,7 +165,8 @@ export function CodeBlock({ language, children }: CodeBlockProps) {
                 )}
               </button>
               <button
-                className="p-1.5 rounded text-muted-foreground hover:text-foreground"
+                className="p-1.5 rounded hover:bg-white/10"
+                style={{ color: "#abb2bf" }}
                 aria-label="Close"
                 onClick={() => setExpanded(false)}
               >
@@ -156,11 +175,11 @@ export function CodeBlock({ language, children }: CodeBlockProps) {
             </div>
           </div>
 
-          {/* Scrollable code — horizontal scroll, no line wrapping */}
+          {/* Scrollable code area */}
           <div
             ref={modalScrollRef}
             className="flex-1 overflow-auto p-4 text-sm"
-            style={{ background: "hsl(220 13% 18%)" }}
+            style={{ background: CODE_BG }}
             onClick={(e) => e.stopPropagation()}
           >
             {children}
