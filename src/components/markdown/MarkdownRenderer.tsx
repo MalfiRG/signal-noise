@@ -1,11 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
-import rehypeHighlight from "rehype-highlight";
+import rehypeShiki from "@shikijs/rehype";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import remarkGfm from "remark-gfm";
 import mermaid from "mermaid";
-import "highlight.js/styles/atom-one-dark.css";
 import { CodeBlock } from "./CodeBlock";
 
 interface MarkdownRendererProps {
@@ -257,7 +256,13 @@ export function MarkdownRenderer({ content, className = "", onHeadingsExtracted 
     };
   };
 
-  const rehypePlugins: any[] = [rehypeHighlight, [rehypeSlug, { slugify: customSlugify }]];
+  const rehypePlugins: any[] = [
+    [rehypeShiki, {
+      theme: "one-dark-pro",
+      langs: ["typescript", "javascript", "python", "bash", "json", "css", "html", "yaml", "markdown", "sql", "powershell", "dockerfile"],
+    }],
+    [rehypeSlug, { slugify: customSlugify }],
+  ];
 
   if (hasTableOfContents) {
     rehypePlugins.push([
@@ -342,22 +347,23 @@ export function MarkdownRenderer({ content, className = "", onHeadingsExtracted 
           td: ({ ...props }) => <td className="border border-border p-2" {...props} />,
           tr: ({ ...props }) => <tr className="even:bg-card odd:bg-background" {...props} />,
 
-          pre({ children }) {
+          pre({ children, className: preClassName, ...preProps }) {
+            // Extract language from code child's className or pre's className
             const codeEl = React.Children.toArray(children).find(
-              (child) =>
-                React.isValidElement(child) &&
-                (child as React.ReactElement<{ className?: string }>).props?.className
+              (child) => React.isValidElement(child)
             );
-            const className = React.isValidElement(codeEl)
+            const codeClassName = React.isValidElement(codeEl)
               ? (codeEl as React.ReactElement<{ className?: string }>).props?.className || ""
               : "";
 
-            // Mermaid blocks are handled by the code handler — don't wrap in CodeBlock
-            if (className.includes("language-mermaid")) {
+            const allClasses = `${preClassName || ""} ${codeClassName}`;
+
+            // Mermaid blocks are handled by the code handler
+            if (allClasses.includes("mermaid")) {
               return <>{children}</>;
             }
 
-            const language = /language-(\w+)/.exec(className)?.[1] || "";
+            const language = /language-(\w+)/.exec(allClasses)?.[1] || "";
             return <CodeBlock language={language}>{children}</CodeBlock>;
           },
 
