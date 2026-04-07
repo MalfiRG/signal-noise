@@ -16,6 +16,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { howIDoItPages } from "@/features/how-i-do-it/data";
+import ThemeSelector from "./ThemeSelector";
 
 const Navbar = () => {
   const location = useLocation();
@@ -83,10 +84,13 @@ const Navbar = () => {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
+
+          <ThemeSelector />
         </div>
 
-        {/* Mobile hamburger */}
-        <div className="md:hidden">
+        {/* Mobile: theme dot + hamburger */}
+        <div className="md:hidden flex items-center gap-3">
+          <ThemeSelector />
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="sm" className="text-foreground">
