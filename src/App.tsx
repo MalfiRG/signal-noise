@@ -47,7 +47,7 @@ const App = () => {
     <ThemeProvider
       themes={["matrix", "violet", "amber"]}
       attribute="class"
-      value={{ matrix: "", violet: "theme-violet", amber: "theme-amber" }}
+      value={{ matrix: "theme-matrix", violet: "theme-violet", amber: "theme-amber" }}
       defaultTheme="matrix"
       storageKey="theme-profile"
       enableSystem={false}
