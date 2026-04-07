@@ -328,7 +328,7 @@
   }
 
   ::selection {
-    background: hsl(var(--primary) / 0.3);
+    background: hsl(var(--primary) / 0.4);
     color: hsl(var(--foreground));
   }
 
@@ -635,6 +635,20 @@
   .theme-reading {
     transition-duration: 0ms !important;
   }
+}
+
+/*
+ * Code block text selection — MUST be unlayered (outside any @layer block).
+ * Token color rules live in @layer components; layered rules always lose to
+ * unlayered rules of the same specificity. Moving here ensures our selection
+ * background + black text override all syntax-highlighted token colors.
+ */
+pre ::selection,
+code ::selection,
+.token::selection,
+code[class*="language-"] span::selection {
+  background: hsl(var(--primary));
+  color: hsl(0 0% 0%);
 }
 
 /* Hero ambient glow — slow breathing for background orbs */
