@@ -134,6 +134,8 @@
     --prose-heading-2: 120 100% 60%;
     --prose-heading-3: 120 80% 55%;
     --prose-quote: 120 40% 55%;
+    --hero-orb-primary: 120 100% 50% / 0.18;
+    --hero-orb-accent: 120 60% 30% / 0.14;
   }
 
   /* Soften glow on small screens to reduce harshness */
@@ -181,6 +183,8 @@
 
     --matrix-glow: none;
     --matrix-text-glow: none;
+    --hero-orb-primary: 0 0% 0% / 0;
+    --hero-orb-accent: 0 0% 0% / 0;
 
     transition: background-color 400ms ease, color 400ms ease;
   }
@@ -507,5 +511,18 @@
 @media (prefers-reduced-motion: reduce) {
   .theme-reading {
     transition-duration: 0ms !important;
+  }
+}
+
+/* Hero ambient glow — slow breathing for background orbs */
+@keyframes hero-glow {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.12); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @keyframes hero-glow {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
   }
 }
