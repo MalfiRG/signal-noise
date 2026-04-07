@@ -1,5 +1,6 @@
 import MatrixRain from "@/components/MatrixRain";
 import AboutSection from "@/features/about/AboutSection";
+import SocialProof from "@/features/social-proof/SocialProof";
 
 const Index = () => {
   return (
@@ -61,6 +62,7 @@ const Index = () => {
 
       <div className="relative z-20">
         <AboutSection />
+        <SocialProof />
       </div>
     </>
   );
