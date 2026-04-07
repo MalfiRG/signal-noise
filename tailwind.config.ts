@@ -92,6 +92,10 @@ export default {
           "0%, 100%": { opacity: "1" },
           "50%": { opacity: "0.5" },
         },
+        "hero-glow": {
+          "0%, 100%": { transform: "scale(1)", opacity: "0.6" },
+          "50%": { transform: "scale(1.12)", opacity: "1" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -100,6 +104,8 @@ export default {
         "typing": "typing 2s steps(30) forwards",
         "blink": "blink 1s infinite",
         "glow-pulse": "glow-pulse 2s ease-in-out infinite",
+        "hero-glow-slow": "hero-glow 8s ease-in-out infinite",
+        "hero-glow-slower": "hero-glow 11s ease-in-out infinite reverse",
       },
     },
   },

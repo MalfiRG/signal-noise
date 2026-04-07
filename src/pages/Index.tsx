@@ -8,6 +8,16 @@ const Index = () => {
       <div className="scanline fixed inset-0 z-10" />
 
       <section className="relative z-20 min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Ambient orbs — mix-blend-mode: screen ensures visibility behind canvas */}
+        <div
+          className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full blur-3xl -translate-y-1/3 translate-x-1/3 hidden sm:block animate-hero-glow-slow pointer-events-none"
+          style={{ backgroundColor: 'hsl(var(--hero-orb-primary))', mixBlendMode: 'screen' }}
+        />
+        <div
+          className="absolute bottom-0 left-0 w-[450px] h-[450px] rounded-full blur-3xl translate-y-1/3 -translate-x-1/3 hidden sm:block animate-hero-glow-slower pointer-events-none"
+          style={{ backgroundColor: 'hsl(var(--hero-orb-accent))', mixBlendMode: 'screen' }}
+        />
+
         <div className="text-center px-4 max-w-3xl">
           <p className="text-muted-foreground text-sm tracking-[0.3em] mb-4 animate-fade-in opacity-0" style={{ animationDelay: "0.2s" }}>
             {">"} INITIALIZING SYSTEM...
