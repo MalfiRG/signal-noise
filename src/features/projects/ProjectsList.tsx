@@ -19,7 +19,7 @@ const ProjectsList = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
-                className="border border-border bg-card/50 p-6 hover:border-primary/50 transition-all group"
+                className="border border-border bg-card/50 p-6 hover:border-primary/50 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/15 transition-all duration-200 group"
               >
                 <h3 className="font-display text-xl font-bold text-foreground group-hover:text-glow mb-3">
                   {project.title}
