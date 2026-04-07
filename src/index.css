@@ -212,6 +212,11 @@
   }
 }
 
+/* ========== THEME: MATRIX — Default green (uses :root vars) ========== */
+/* No overrides needed — :root provides all Matrix values. This empty rule
+   exists so next-themes has a valid class name to add/remove when switching. */
+.theme-matrix {}
+
 /* ========== THEME: VIOLET — Cyberpunk purple ========== */
 .theme-violet {
   --background: 270 10% 5%;
