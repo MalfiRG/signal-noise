@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ExternalLink, Github } from "lucide-react";
+import { ExternalLink, Github, Star, GitFork, Clock } from "lucide-react";
 import { projects } from "./data";
 
 const ProjectsList = () => {
@@ -61,6 +61,36 @@ const ProjectsList = () => {
                     >
                       <ExternalLink className="h-4 w-4" />
                     </a>
+                  )}
+                </div>
+                <div className="flex items-center gap-3 mt-4 pt-3 border-t border-border/50 text-xs text-muted-foreground">
+                  {project.stars !== "0" ? (
+                    <>
+                      <span className="flex items-center gap-1">
+                        <Star className="h-3 w-3" />
+                        {project.stars}
+                      </span>
+                      {project.forks !== "0" && (
+                        <span className="flex items-center gap-1">
+                          <GitFork className="h-3 w-3" />
+                          {project.forks}
+                        </span>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      {project.language && (
+                        <span className="flex items-center gap-1">
+                          {project.language}
+                        </span>
+                      )}
+                      {project.pushedAt && (
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {project.pushedAt}
+                        </span>
+                      )}
+                    </>
                   )}
                 </div>
               </motion.div>
