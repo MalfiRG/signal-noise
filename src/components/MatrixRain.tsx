@@ -1,7 +1,23 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
+import { useTheme } from "next-themes";
 
 const MatrixRain = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const { resolvedTheme } = useTheme();
+  const rainColorRef = useRef<string>("hsl(120 100% 50%)");
+  const trailBgRef = useRef<string>("rgba(2, 10, 2, 0.05)");
+
+  // Cache color at mount and on theme change — NOT getComputedStyle every frame
+  useEffect(() => {
+    const style = getComputedStyle(document.documentElement);
+    const raw = style.getPropertyValue('--matrix-rain-color').trim();
+    rainColorRef.current = raw ? `hsl(${raw})` : "hsl(120 100% 50%)";
+
+    const bg = style.getPropertyValue('--background').trim();
+    if (bg) {
+      trailBgRef.current = `hsl(${bg} / 0.05)`;
+    }
+  }, [resolvedTheme]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -23,10 +39,9 @@ const MatrixRain = () => {
     const drops: number[] = Array(columns).fill(1).map(() => Math.random() * -100);
 
     const draw = () => {
-      ctx.fillStyle = "rgba(2, 10, 2, 0.05)";
+      ctx.fillStyle = trailBgRef.current;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      ctx.fillStyle = "#00ff41";
       ctx.font = `${fontSize}px 'Share Tech Mono', monospace`;
 
       for (let i = 0; i < drops.length; i++) {
@@ -34,15 +49,9 @@ const MatrixRain = () => {
         const x = i * fontSize;
         const y = drops[i] * fontSize;
 
-        // Brighter head
-        ctx.fillStyle = `rgba(0, 255, 65, ${Math.random() * 0.5 + 0.5})`;
+        // Use themed rain color
+        ctx.fillStyle = rainColorRef.current;
         ctx.fillText(char, x, y);
-
-        // Dimmer trail
-        if (Math.random() > 0.98) {
-          ctx.fillStyle = "rgba(100, 255, 100, 1)";
-          ctx.fillText(char, x, y);
-        }
 
         if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
           drops[i] = 0;

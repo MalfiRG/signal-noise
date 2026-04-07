@@ -186,7 +186,105 @@
     --hero-orb-primary: 0 0% 0% / 0;
     --hero-orb-accent: 0 0% 0% / 0;
 
+    --matrix-rain-color: 0 0% 0% / 0;
+
     transition: background-color 400ms ease, color 400ms ease;
+  }
+}
+
+/* ========== THEME: VIOLET — Cyberpunk purple ========== */
+.theme-violet {
+  --background: 270 10% 5%;
+  --foreground: 270 100% 85%;
+  --card: 270 10% 8%;
+  --card-foreground: 270 100% 85%;
+  --popover: 270 10% 8%;
+  --popover-foreground: 270 100% 85%;
+  --primary: 270 100% 60%;
+  --primary-foreground: 270 10% 5%;
+  --secondary: 270 20% 14%;
+  --secondary-foreground: 270 100% 85%;
+  --muted: 270 10% 15%;
+  --muted-foreground: 270 40% 55%;
+  --accent: 330 100% 60%;
+  --accent-foreground: 270 10% 5%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 270 30% 18%;
+  --input: 270 30% 18%;
+  --ring: 270 100% 60%;
+  --sidebar-background: 270 10% 6%;
+  --sidebar-foreground: 270 100% 85%;
+  --sidebar-primary: 270 100% 60%;
+  --sidebar-primary-foreground: 270 10% 5%;
+  --sidebar-accent: 270 20% 14%;
+  --sidebar-accent-foreground: 270 100% 85%;
+  --sidebar-border: 270 30% 18%;
+  --sidebar-ring: 270 100% 60%;
+  --matrix-glow: 0 0 20px hsl(270 100% 60% / 0.5), 0 0 40px hsl(270 100% 60% / 0.2);
+  --matrix-text-glow: 0 0 10px hsl(270 100% 60% / 0.8);
+  --matrix-rain-color: 270 100% 60%;
+  --scrollbar-thumb: 270 30% 22%;
+  --prose-body: 270 40% 70%;
+  --prose-heading-2: 270 100% 75%;
+  --prose-heading-3: 270 80% 65%;
+  --prose-quote: 270 40% 60%;
+  --hero-orb-primary: 270 100% 60% / 0.18;
+  --hero-orb-accent: 330 100% 60% / 0.14;
+}
+
+@media (max-width: 640px) {
+  .theme-violet {
+    --matrix-text-glow: 0 0 6px hsl(270 100% 60% / 0.4);
+    --matrix-glow: 0 0 12px hsl(270 100% 60% / 0.3);
+  }
+}
+
+/* ========== THEME: AMBER — Retro terminal ========== */
+.theme-amber {
+  --background: 30 10% 5%;
+  --foreground: 38 90% 70%;
+  --card: 30 10% 8%;
+  --card-foreground: 38 90% 70%;
+  --popover: 30 10% 8%;
+  --popover-foreground: 38 90% 70%;
+  --primary: 38 85% 50%;
+  --primary-foreground: 30 10% 5%;
+  --secondary: 30 20% 14%;
+  --secondary-foreground: 38 90% 70%;
+  --muted: 30 10% 15%;
+  --muted-foreground: 38 40% 50%;
+  --accent: 25 100% 45%;
+  --accent-foreground: 30 10% 5%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 30 30% 16%;
+  --input: 30 30% 16%;
+  --ring: 38 85% 50%;
+  --sidebar-background: 30 10% 6%;
+  --sidebar-foreground: 38 90% 70%;
+  --sidebar-primary: 38 85% 50%;
+  --sidebar-primary-foreground: 30 10% 5%;
+  --sidebar-accent: 30 20% 14%;
+  --sidebar-accent-foreground: 38 90% 70%;
+  --sidebar-border: 30 30% 16%;
+  --sidebar-ring: 38 85% 50%;
+  --matrix-glow: 0 0 20px hsl(38 85% 50% / 0.5), 0 0 40px hsl(38 85% 50% / 0.2);
+  --matrix-text-glow: 0 0 10px hsl(38 85% 50% / 0.8);
+  --matrix-rain-color: 38 85% 50%;
+  --scrollbar-thumb: 30 30% 20%;
+  --prose-body: 38 40% 65%;
+  --prose-heading-2: 38 90% 65%;
+  --prose-heading-3: 38 70% 58%;
+  --prose-quote: 38 40% 55%;
+  --hero-orb-primary: 38 85% 50% / 0.18;
+  --hero-orb-accent: 25 100% 45% / 0.14;
+}
+
+@media (max-width: 640px) {
+  .theme-amber {
+    --matrix-text-glow: 0 0 6px hsl(38 85% 50% / 0.4);
+    --matrix-glow: 0 0 12px hsl(38 85% 50% / 0.3);
   }
 }
 
