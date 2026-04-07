@@ -45,15 +45,22 @@
     --sidebar-border: 120 40% 15%;
     --sidebar-ring: 120 100% 50%;
 
-    --matrix-glow: 0 0 20px hsl(120 100% 50% / 0.5), 0 0 40px hsl(120 100% 50% / 0.2);
-    --matrix-text-glow: 0 0 10px hsl(120 100% 50% / 0.8);
+    --matrix-glow: 0 0 20px hsl(var(--primary) / 0.5), 0 0 40px hsl(var(--primary) / 0.2);
+    --matrix-text-glow: 0 0 10px hsl(var(--primary) / 0.8);
+
+    --matrix-rain-color: 120 100% 50%;
+    --scrollbar-thumb: 120 40% 20%;
+    --prose-body: 120 40% 70%;
+    --prose-heading-2: 120 100% 60%;
+    --prose-heading-3: 120 80% 55%;
+    --prose-quote: 120 40% 55%;
   }
 
   /* Soften glow on small screens to reduce harshness */
   @media (max-width: 640px) {
     :root {
-      --matrix-text-glow: 0 0 6px hsl(120 100% 50% / 0.4);
-      --matrix-glow: 0 0 12px hsl(120 100% 50% / 0.3);
+      --matrix-text-glow: 0 0 6px hsl(var(--primary) / 0.4);
+      --matrix-glow: 0 0 12px hsl(var(--primary) / 0.3);
     }
   }
 
@@ -114,8 +121,8 @@
   }
 
   ::selection {
-    background: hsl(120 100% 50% / 0.3);
-    color: hsl(120 100% 80%);
+    background: hsl(var(--primary) / 0.3);
+    color: hsl(var(--foreground));
   }
 
   ::-webkit-scrollbar {
@@ -123,16 +130,16 @@
   }
 
   ::-webkit-scrollbar-track {
-    background: hsl(120 10% 4%);
+    background: hsl(var(--background));
   }
 
   ::-webkit-scrollbar-thumb {
-    background: hsl(120 40% 20%);
+    background: hsl(var(--scrollbar-thumb));
     border-radius: 3px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: hsl(120 100% 50%);
+    background: hsl(var(--primary));
   }
 
   .theme-reading {
@@ -184,8 +191,8 @@
       0deg,
       transparent,
       transparent 2px,
-      hsl(120 100% 50% / 0.03) 2px,
-      hsl(120 100% 50% / 0.03) 4px
+      hsl(var(--primary) / 0.03) 2px,
+      hsl(var(--primary) / 0.03) 4px
     );
     pointer-events: none;
   }
@@ -209,50 +216,50 @@
 
 @layer components {
   .markdown-body {
-    color: hsl(120 100% 65%);
+    color: hsl(var(--foreground));
     line-height: 1.7;
     font-size: 0.9rem;
   }
 
   .markdown-body h1 {
-    color: hsl(120 100% 65%);
+    color: hsl(var(--foreground));
     font-family: 'Orbitron', sans-serif;
     text-shadow: var(--matrix-text-glow);
   }
 
   .markdown-body h2 {
-    color: hsl(120 100% 60%);
+    color: hsl(var(--prose-heading-2));
     font-family: 'Orbitron', sans-serif;
   }
 
   .markdown-body h3 {
-    color: hsl(120 80% 55%);
+    color: hsl(var(--prose-heading-3));
     font-family: 'Orbitron', sans-serif;
   }
 
   .markdown-body p {
     margin-bottom: 1rem;
-    color: hsl(120 40% 70%);
+    color: hsl(var(--prose-body));
   }
 
   .markdown-body strong {
-    color: hsl(120 100% 65%);
+    color: hsl(var(--foreground));
   }
 
   .markdown-body blockquote {
-    border-left: 3px solid hsl(120 100% 50%);
+    border-left: 3px solid hsl(var(--primary));
     padding-left: 1rem;
     margin: 1rem 0;
-    color: hsl(120 40% 55%);
+    color: hsl(var(--prose-quote));
     font-style: italic;
   }
 
   .markdown-body li {
-    color: hsl(120 40% 70%);
+    color: hsl(var(--prose-body));
   }
 
   .markdown-body hr {
-    border-color: hsl(120 40% 15%);
+    border-color: hsl(var(--border));
     margin: 2rem 0;
   }
 
