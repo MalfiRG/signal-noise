@@ -1,11 +1,9 @@
-import MatrixRain from "@/components/MatrixRain";
 import AboutSection from "@/features/about/AboutSection";
 import SocialProof from "@/features/social-proof/SocialProof";
 
 const Index = () => {
   return (
     <>
-      <MatrixRain />
       <div className="scanline fixed inset-0 z-10" />
 
       <section className="relative z-20 min-h-screen flex items-center justify-center overflow-hidden">
