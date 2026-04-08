@@ -3,8 +3,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/s
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const THEMES = [
-  { id: "matrix", label: "Matrix", color: "hsl(120 100% 50%)" },
-  { id: "violet", label: "Violet", color: "hsl(270 100% 60%)" },
+  { id: "violet", label: "Violet", color: "hsl(270 100% 65%)" },
   { id: "amber", label: "Amber", color: "hsl(38 85% 50%)" },
 ] as const;
 

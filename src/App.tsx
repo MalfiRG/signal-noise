@@ -15,6 +15,14 @@ import HowIDoItIndexPage from "./pages/HowIDoItIndexPage";
 import HowIDoItSlugPage from "./pages/HowIDoItSlugPage";
 import NotFound from "./pages/NotFound";
 
+// One-time migration: users who previously selected the matrix theme (removed
+// in the palette refactor) would otherwise land with a broken/no-class state.
+// Runs at module load — before React mounts and before next-themes reads
+// localStorage — so the ThemeProvider never sees the stale "matrix" value.
+if (typeof window !== "undefined" && localStorage.getItem("theme-profile") === "matrix") {
+  localStorage.setItem("theme-profile", "violet");
+}
+
 const queryClient = new QueryClient();
 
 const AppContent = () => {
@@ -45,10 +53,10 @@ const AppContent = () => {
 const App = () => {
   return (
     <ThemeProvider
-      themes={["matrix", "violet", "amber"]}
+      themes={["violet", "amber"]}
       attribute="class"
-      value={{ matrix: "theme-matrix", violet: "theme-violet", amber: "theme-amber" }}
-      defaultTheme="matrix"
+      value={{ violet: "theme-violet", amber: "theme-amber" }}
+      defaultTheme="violet"
       storageKey="theme-profile"
       enableSystem={false}
     >
