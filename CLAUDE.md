@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Personal technical blog by **Piotr Tarach** (QA engineer based in Prague). Matrix-inspired aesthetic with digital rain background. Built as a React + TypeScript SPA.
+Personal technical blog by **Piotr Tarach**, QA engineer based in Prague. Multiple theme profiles (violet, amber) with reading-mode toggle for blog posts. Built as a React + TypeScript SPA.
 
 **Repo:** `https://github.com/MalfiRG/the-digital-matrix.git`
 **Hosting:** Vercel (auto-deploys from `main`)
