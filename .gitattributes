@@ -1,0 +1,94 @@
+# .gitattributes — line-ending normalization for The Digital Matrix
+#
+# Why this file exists:
+# Without explicit normalization, files in this repo have ended up with
+# inconsistent line endings depending on which tool last edited them.
+# Some files were stored as CRLF blobs (touched by Windows tools), others
+# as LF blobs (touched by WSL/Linux tools). This causes massive spurious
+# diffs when the same file is edited from a different platform.
+#
+# This file pins all text files to LF and lets git enforce it on every
+# checkout and commit. The `text=auto` default tells git to detect text
+# files automatically; the explicit `*.ext text eol=lf` rules override
+# the default for known file types.
+#
+# IMPORTANT: adding this file does NOT renormalize existing files in the
+# repo. To do that, run `git add --renormalize .` and review the diff
+# carefully. That should be its own focused commit/PR — never bundled
+# with feature work, because it touches every text file in the repo.
+
+# Default: detect text files automatically
+* text=auto
+
+# JavaScript / TypeScript ecosystem
+*.ts            text eol=lf
+*.tsx           text eol=lf
+*.js            text eol=lf
+*.jsx           text eol=lf
+*.mjs           text eol=lf
+*.cjs           text eol=lf
+
+# Web styling
+*.css           text eol=lf
+*.scss          text eol=lf
+*.sass          text eol=lf
+*.less          text eol=lf
+
+# Web markup
+*.html          text eol=lf
+*.htm           text eol=lf
+
+# Configuration
+*.json          text eol=lf
+*.json5         text eol=lf
+*.yml           text eol=lf
+*.yaml          text eol=lf
+*.toml          text eol=lf
+*.xml           text eol=lf
+
+# Documentation
+*.md            text eol=lf
+*.mdx           text eol=lf
+*.txt           text eol=lf
+
+# Shell and scripting (Linux/WSL)
+*.sh            text eol=lf
+*.bash          text eol=lf
+*.zsh           text eol=lf
+*.fish          text eol=lf
+
+# Windows-native script files (must stay CRLF for batch interpreter)
+*.bat           text eol=crlf
+*.cmd           text eol=crlf
+*.ps1           text eol=crlf
+
+# SVG is XML — treat as text so it diffs cleanly
+*.svg           text eol=lf
+
+# Lock files (text but never hand-edit; LF for consistency)
+package-lock.json   text eol=lf
+yarn.lock           text eol=lf
+pnpm-lock.yaml      text eol=lf
+
+# Binaries — never normalize, never diff
+*.png           binary
+*.jpg           binary
+*.jpeg          binary
+*.gif           binary
+*.ico           binary
+*.webp          binary
+*.avif          binary
+
+# Fonts — binary
+*.woff          binary
+*.woff2         binary
+*.ttf           binary
+*.otf           binary
+*.eot           binary
+
+# Documents and archives — binary
+*.pdf           binary
+*.zip           binary
+*.gz            binary
+*.tar           binary
+*.7z            binary
