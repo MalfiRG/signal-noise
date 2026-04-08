@@ -42,16 +42,31 @@ const findElementId = (href: string): string => {
   return customSlugify(linkText);
 };
 
-const matrixThemeCSS = `
-  .node rect, .node circle, .node ellipse, .node polygon, .node path {
-    fill: hsl(120 10% 7%);
-    stroke: hsl(120 100% 50%);
+// Reads active CSS custom properties at call time, so Mermaid diagrams
+// pick up the correct colors regardless of which color theme is active.
+// Static values would hardcode matrix-green and look wrong in violet/amber.
+function buildDarkMermaidThemeCSS(): string {
+  if (typeof window === "undefined") {
+    // SSR path — next-themes is client-only, so this branch is effectively dead,
+    // but keep it to satisfy TypeScript and future SSR scenarios.
+    return "";
   }
-  .edgePath .path { stroke: hsl(120 100% 50%); }
-  .cluster rect { fill: hsl(120 10% 4%); stroke: hsl(120 100% 50%); }
-  .label { color: hsl(120 100% 65%); }
-  .edgeLabel { background-color: hsl(120 10% 7%); color: hsl(120 100% 65%); }
-`;
+  const style = getComputedStyle(document.documentElement);
+  const primary = style.getPropertyValue("--primary").trim();
+  const background = style.getPropertyValue("--background").trim();
+  const foreground = style.getPropertyValue("--foreground").trim();
+  const card = style.getPropertyValue("--card").trim();
+  return `
+    .node rect, .node circle, .node ellipse, .node polygon, .node path {
+      fill: hsl(${card});
+      stroke: hsl(${primary});
+    }
+    .edgePath .path { stroke: hsl(${primary}); }
+    .cluster rect { fill: hsl(${background}); stroke: hsl(${primary}); }
+    .label { color: hsl(${foreground}); }
+    .edgeLabel { background-color: hsl(${card}); color: hsl(${foreground}); }
+  `;
+}
 
 const readingThemeCSS = `
   /* Flowchart nodes */
@@ -108,10 +123,20 @@ function useMermaidTheme() {
   const [isReading, setIsReading] = useState(
     () => !!document.querySelector(".theme-reading")
   );
+  // Tracks the active color theme class (e.g. "theme-violet", "theme-amber").
+  // When this changes the MutationObserver fires, we rebuild the dark theme CSS
+  // from live CSS vars so Mermaid picks up the new color palette.
+  const [colorThemeKey, setColorThemeKey] = useState(
+    () => document.documentElement.className
+  );
 
   useEffect(() => {
     const observer = new MutationObserver(() => {
       setIsReading(!!document.querySelector(".theme-reading"));
+      // Capture the full class string as a change signal. Any color theme swap
+      // (e.g. .theme-violet -> .theme-amber) will produce a different string,
+      // triggering the mermaid.initialize effect below.
+      setColorThemeKey(document.documentElement.className);
     });
     observer.observe(document.documentElement, {
       attributes: true,
@@ -125,9 +150,12 @@ function useMermaidTheme() {
       startOnLoad: false,
       theme: "dark",
       securityLevel: "loose",
-      themeCSS: isReading ? readingThemeCSS : matrixThemeCSS,
+      // Reading mode uses a fixed light palette; dark themes read from live CSS vars.
+      themeCSS: isReading ? readingThemeCSS : buildDarkMermaidThemeCSS(),
     });
-  }, [isReading]);
+    // colorThemeKey is intentionally in the dep array: we need to re-initialize
+    // mermaid whenever the color theme changes, not just reading mode.
+  }, [isReading, colorThemeKey]);
 
   return isReading;
 }
