@@ -212,12 +212,7 @@
   }
 }
 
-/* ========== THEME: MATRIX — Default green (uses :root vars) ========== */
-/* No overrides needed — :root provides all Matrix values. This empty rule
-   exists so next-themes has a valid class name to add/remove when switching. */
-.theme-matrix {}
-
-/* ========== THEME: VIOLET — Cyberpunk purple ========== */
+/* ========== THEME: VIOLET — Retrowave purple (default) ========== */
 .theme-violet {
   --background: 270 10% 5%;
   --foreground: 270 100% 85%;
@@ -225,7 +220,10 @@
   --card-foreground: 270 100% 85%;
   --popover: 270 10% 8%;
   --popover-foreground: 270 100% 85%;
-  --primary: 270 100% 60%;
+  /* WCAG AA fix: L=60% yields 3.98:1 on this background (fails AA).
+     L=65% raises contrast to ~5.5:1 — passes AA for nav active links
+     and home CTA button. See docs/superpowers/specs/2026-04-08-palette-decision-research.md */
+  --primary: 270 100% 65%;
   --primary-foreground: 270 10% 5%;
   --secondary: 270 20% 14%;
   --secondary-foreground: 270 100% 85%;
@@ -237,31 +235,31 @@
   --destructive-foreground: 0 0% 100%;
   --border: 270 30% 18%;
   --input: 270 30% 18%;
-  --ring: 270 100% 60%;
+  --ring: 270 100% 65%;
   --sidebar-background: 270 10% 6%;
   --sidebar-foreground: 270 100% 85%;
-  --sidebar-primary: 270 100% 60%;
+  --sidebar-primary: 270 100% 65%;
   --sidebar-primary-foreground: 270 10% 5%;
   --sidebar-accent: 270 20% 14%;
   --sidebar-accent-foreground: 270 100% 85%;
   --sidebar-border: 270 30% 18%;
-  --sidebar-ring: 270 100% 60%;
-  --matrix-glow: 0 0 20px hsl(270 100% 60% / 0.5), 0 0 40px hsl(270 100% 60% / 0.2);
-  --matrix-text-glow: 0 0 10px hsl(270 100% 60% / 0.8);
-  --matrix-rain-color: 270 100% 60%;
+  --sidebar-ring: 270 100% 65%;
+  --matrix-glow: 0 0 20px hsl(270 100% 65% / 0.5), 0 0 40px hsl(270 100% 65% / 0.2);
+  --matrix-text-glow: 0 0 10px hsl(270 100% 65% / 0.8);
+  --matrix-rain-color: 270 100% 65%;
   --scrollbar-thumb: 270 30% 22%;
   --prose-body: 270 40% 70%;
   --prose-heading-2: 270 100% 75%;
   --prose-heading-3: 270 80% 65%;
   --prose-quote: 270 40% 60%;
-  --hero-orb-primary: 270 100% 60% / 0.18;
+  --hero-orb-primary: 270 100% 65% / 0.18;
   --hero-orb-accent: 330 100% 60% / 0.14;
 }
 
 @media (max-width: 640px) {
   .theme-violet {
-    --matrix-text-glow: 0 0 6px hsl(270 100% 60% / 0.4);
-    --matrix-glow: 0 0 12px hsl(270 100% 60% / 0.3);
+    --matrix-text-glow: 0 0 6px hsl(270 100% 65% / 0.4);
+    --matrix-glow: 0 0 12px hsl(270 100% 65% / 0.3);
   }
 }
 

@@ -27,7 +27,7 @@ export const projects: Project[] = [
   {
     title: "The Digital Matrix",
     description:
-      "This blog. A Matrix-themed portfolio and technical blog built as a React SPA with a voice-first content pipeline. Features digital rain animations, dark/reading mode toggle, Mermaid diagram rendering, and file-explorer-style navigation.",
+      "This blog. A personal portfolio and technical blog built as a React SPA with a voice-first content pipeline. Features multiple theme profiles, dark/reading mode toggle, Mermaid diagram rendering, and file-explorer-style navigation.",
     tech_stack: ["React", "TypeScript", "Vite", "Tailwind CSS", "Framer Motion", "Markdown"],
     github_url: "https://github.com/MalfiRG/the-digital-matrix",
     live_url: "https://the-digital-matrix.vercel.app",
