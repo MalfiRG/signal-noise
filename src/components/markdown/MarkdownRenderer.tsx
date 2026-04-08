@@ -119,24 +119,36 @@ const readingThemeCSS = `
   line { stroke: hsl(30 10% 40%) !important; }
 `;
 
+// Returns a stable signature for the active color theme, normalized so that
+// transient classes don't cause spurious re-renders. next-themes briefly adds
+// and removes a `next-themes-transition-disable` class during theme switches
+// to suppress mid-animation flash; capturing the full className string would
+// fire this signature twice per switch, causing two mermaid.initialize() calls
+// instead of one.
+function getActiveColorThemeKey(): string {
+  const cl = document.documentElement.classList;
+  if (cl.contains("theme-violet")) return "violet";
+  if (cl.contains("theme-amber")) return "amber";
+  return "default";
+}
+
 function useMermaidTheme() {
   const [isReading, setIsReading] = useState(
     () => !!document.querySelector(".theme-reading")
   );
-  // Tracks the active color theme class (e.g. "theme-violet", "theme-amber").
-  // When this changes the MutationObserver fires, we rebuild the dark theme CSS
-  // from live CSS vars so Mermaid picks up the new color palette.
+  // Tracks the active color theme as a normalized key. When this changes the
+  // MutationObserver fires, we rebuild the dark theme CSS from live CSS vars
+  // so Mermaid picks up the new color palette.
   const [colorThemeKey, setColorThemeKey] = useState(
-    () => document.documentElement.className
+    () => getActiveColorThemeKey()
   );
 
   useEffect(() => {
     const observer = new MutationObserver(() => {
       setIsReading(!!document.querySelector(".theme-reading"));
-      // Capture the full class string as a change signal. Any color theme swap
-      // (e.g. .theme-violet -> .theme-amber) will produce a different string,
-      // triggering the mermaid.initialize effect below.
-      setColorThemeKey(document.documentElement.className);
+      // Use the normalized key so transient classes from next-themes don't
+      // cause double re-initialization on theme swap.
+      setColorThemeKey(getActiveColorThemeKey());
     });
     observer.observe(document.documentElement, {
       attributes: true,
