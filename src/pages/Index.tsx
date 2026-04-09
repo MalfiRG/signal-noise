@@ -23,15 +23,15 @@ const Index = () => {
           </p>
 
           <h1 className="font-display text-5xl md:text-7xl font-black text-foreground text-glow mb-6 animate-fade-in opacity-0" style={{ animationDelay: "0.6s" }}>
-            SOFTWARE<br />
-            DEVELOPER<br />
-            IN TEST
+            BREAK IT<br />
+            BUILD IT<br />
+            PROVE IT
           </h1>
 
           <div className="animate-fade-in opacity-0" style={{ animationDelay: "1s" }}>
             <p className="text-foreground/80 text-lg mb-8 leading-relaxed">
-              Engineering quality into every line of code.<br />
-              Automation architect. Bug hunter. System breaker.
+              I find where systems fail before users do.<br />
+              Pytest, Playwright, CI/CD — from hypothesis to production.
             </p>
           </div>
 
