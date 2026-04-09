@@ -13,9 +13,9 @@ export const introText = {
   headline: "ABOUT ME",
   terminal: "> whoami",
   bio: [
-    "ISTQB-certified QA Engineer specializing in test automation for enterprise software.",
-    "I build robust test frameworks with Pytest and PowerShell/Pester, integrate them into CI/CD pipelines, and leverage AI to accelerate QA workflows.",
-    "Outside of work, I explore full-stack development, contribute to open-source testing tools, and write about software quality on this blog.",
+    "QA engineer who started in molecular biology — the lab training didn't stick, but the method did: hypothesis, experiment, multi-level validation.",
+    "I don't remember 95% of the science, but the mental model stays permanent — now it runs on Pytest, Playwright, and CI/CD.",
+    "Currently neck-deep in agent-driven development — testing systems that think for themselves and writing about what I find on this blog.",
   ],
 };
 

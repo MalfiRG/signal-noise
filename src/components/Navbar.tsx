@@ -45,7 +45,7 @@ const Navbar = () => {
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link to="/" className="font-display text-lg font-bold text-foreground text-glow tracking-wider">
           <Terminal className="inline-block mr-2 h-5 w-5" />
-          SDET_PORTFOLIO
+          SIGNAL_NOISE
         </Link>
 
         {/* Desktop nav */}
