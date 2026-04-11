@@ -44,13 +44,13 @@ export function CodeBlock({ language, children }: CodeBlockProps) {
       {!expanded && (
         <div
           ref={wrapperRef}
-          className="relative my-4 group rounded-md overflow-hidden"
+          className="code-block-wrapper relative my-4 group rounded-md overflow-hidden"
           style={{ background: CODE_BG }}
         >
           {/* Top bar */}
           <div className="flex items-center justify-between px-3 py-1.5" style={{ background: CODE_BG }}>
             {language ? (
-              <span className="text-xs opacity-60 select-none" style={{ color: "#abb2bf" }}>
+              <span className="code-lang-badge text-xs opacity-60 select-none" style={{ color: "#abb2bf" }}>
                 {language}
               </span>
             ) : <span />}
@@ -82,7 +82,7 @@ export function CodeBlock({ language, children }: CodeBlockProps) {
           {/* Code content */}
           <div
             ref={scrollRef}
-            className="overflow-x-auto px-3 pb-3"
+            className="code-scroll-container overflow-x-auto px-3 pb-3"
             style={{ background: CODE_BG }}
           >
             {children}
