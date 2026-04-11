@@ -16,6 +16,16 @@ export interface BlogOutletContext {
 
 export const blogPosts: BlogPost[] = [
   {
+    slug: "rag-retrieval-harness",
+    title: "I Didn't Read Any RAG Papers. I Just Built a Test Harness.",
+    date: "2026-04-11",
+    tags: ["AI", "RAG", "memory-systems", "testing", "ChromaDB", "Claude"],
+    category: "AI & Automation",
+    excerpt:
+      "How a QA engineer approached AI memory optimization the only way he knows — by building a regression test harness first, then iterating until the numbers moved.",
+    draft: true,
+  },
+  {
     slug: "autonomous-qa-loop",
     title: "I Built an Autonomous QA Agent That Develops Its Own Fixes",
     date: "2026-04-01",
