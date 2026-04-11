@@ -70,7 +70,8 @@ test.describe("Headings & TOC interaction", () => {
 
 test.describe("Code blocks", () => {
   test("syntax highlighting is applied to code blocks", async ({ page, blogPage }) => {
-    const highlightedCode = page.locator(".code-block-wrapper code[class*='hljs']");
+    // rehype-prism-plus adds language-* classes (Prism), not hljs classes
+    const highlightedCode = page.locator(".code-block-wrapper code[class*='language-']");
     const count = await highlightedCode.count();
     expect(count).toBeGreaterThan(0);
   });

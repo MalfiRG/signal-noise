@@ -73,7 +73,7 @@ test.describe("Below md breakpoint (767x1024) — hamburger appears", () => {
     const desktopNav = page.locator("nav.fixed .hidden.md\\:flex");
     await expect(desktopNav).not.toBeVisible();
 
-    const hamburger = page.locator("nav.fixed .md\\:hidden button");
+    const hamburger = page.locator("nav.fixed button[data-testid='hamburger-menu']");
     await expect(hamburger).toBeVisible();
   });
 });
@@ -87,7 +87,7 @@ test.describe("Mobile (375x667)", () => {
   });
 
   test("hamburger menu opens and navigation works", async ({ page, blogPage }) => {
-    const hamburger = page.locator("nav.fixed .md\\:hidden button");
+    const hamburger = page.locator("nav.fixed button[data-testid='hamburger-menu']");
     await hamburger.click();
 
     const sheet = page.locator("[role='dialog']");
