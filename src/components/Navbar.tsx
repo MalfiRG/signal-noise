@@ -93,7 +93,7 @@ const Navbar = () => {
           <ThemeSelector />
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="sm" className="text-foreground">
+              <Button variant="ghost" size="sm" className="text-foreground" data-testid="hamburger-menu">
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
