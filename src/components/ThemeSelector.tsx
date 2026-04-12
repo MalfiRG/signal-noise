@@ -5,6 +5,8 @@ import { useIsMobile } from "@/hooks/use-mobile";
 const THEMES = [
   { id: "violet", label: "Violet", color: "hsl(270 100% 65%)" },
   { id: "amber", label: "Amber", color: "hsl(38 85% 50%)" },
+  { id: "cyberpunk", label: "Neon", color: "#00d4ff" },
+  { id: "cyberpunk-gold", label: "Night City", color: "#f3e600" },
 ] as const;
 
 const ThemeSelector = () => {
