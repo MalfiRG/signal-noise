@@ -311,6 +311,129 @@
   }
 }
 
+/* ========== THEME: CYBERPUNK — Neomilitarism HUD (Cyan + Magenta) ========== */
+.theme-cyberpunk {
+  --background: 230 33% 3%;
+  --foreground: 222 33% 91%;
+  --card: 215 24% 10%;
+  --card-foreground: 222 33% 91%;
+  --popover: 215 24% 10%;
+  --popover-foreground: 222 33% 91%;
+  --primary: 191 100% 50%;
+  --primary-foreground: 230 33% 3%;
+  --secondary: 227 27% 14%;
+  --secondary-foreground: 222 33% 91%;
+  --muted: 218 14% 41%;
+  --muted-foreground: 220 13% 59%;
+  --accent: 342 100% 59%;
+  --accent-foreground: 230 33% 3%;
+  --destructive: 0 100% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 220 20% 16%;
+  --input: 220 20% 16%;
+  --ring: 191 100% 50%;
+  --sidebar-background: 215 31% 7%;
+  --sidebar-foreground: 222 33% 91%;
+  --sidebar-primary: 191 100% 50%;
+  --sidebar-primary-foreground: 230 33% 3%;
+  --sidebar-accent: 227 27% 14%;
+  --sidebar-accent-foreground: 222 33% 91%;
+  --sidebar-border: 220 20% 16%;
+  --sidebar-ring: 191 100% 50%;
+  --matrix-glow: 0 0 20px hsl(191 100% 50% / 0.5), 0 0 40px hsl(191 100% 50% / 0.2);
+  --matrix-text-glow: 0 0 10px hsl(191 100% 50% / 0.8);
+  --matrix-rain-color: 191 100% 50%;
+  --scrollbar-thumb: 220 20% 20%;
+  --prose-body: 218 22% 74%;
+  --prose-heading-2: 191 100% 50%;
+  --prose-heading-3: 222 33% 91%;
+  --prose-quote: 220 13% 59%;
+  --hero-orb-primary: 191 100% 50% / 0.18;
+  --hero-orb-accent: 342 100% 59% / 0.14;
+}
+
+@media (max-width: 640px) {
+  .theme-cyberpunk {
+    --matrix-text-glow: 0 0 6px hsl(191 100% 50% / 0.4);
+    --matrix-glow: 0 0 12px hsl(191 100% 50% / 0.3);
+  }
+}
+
+/* ========== THEME: CYBERPUNK GOLD — Night City (Yellow + Cyan) ========== */
+.theme-cyberpunk-gold {
+  --background: 222 15% 5%;
+  --foreground: 57 80% 82%;
+  --card: 222 15% 8%;
+  --card-foreground: 57 80% 82%;
+  --popover: 222 15% 8%;
+  --popover-foreground: 57 80% 82%;
+  --primary: 57 100% 48%;
+  --primary-foreground: 222 15% 5%;
+  --secondary: 222 20% 14%;
+  --secondary-foreground: 57 80% 82%;
+  --muted: 222 15% 15%;
+  --muted-foreground: 222 30% 55%;
+  --accent: 171 77% 60%;
+  --accent-foreground: 222 15% 5%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 222 30% 16%;
+  --input: 222 30% 16%;
+  --ring: 57 100% 48%;
+  --sidebar-background: 222 15% 6%;
+  --sidebar-foreground: 57 80% 82%;
+  --sidebar-primary: 57 100% 48%;
+  --sidebar-primary-foreground: 222 15% 5%;
+  --sidebar-accent: 222 20% 14%;
+  --sidebar-accent-foreground: 57 80% 82%;
+  --sidebar-border: 222 30% 16%;
+  --sidebar-ring: 57 100% 48%;
+  --matrix-glow: 0 0 20px hsl(57 100% 48% / 0.5), 0 0 40px hsl(57 100% 48% / 0.2);
+  --matrix-text-glow: 0 0 10px hsl(57 100% 48% / 0.8);
+  --matrix-rain-color: 57 100% 48%;
+  --scrollbar-thumb: 222 30% 22%;
+  --prose-body: 57 50% 68%;
+  --prose-heading-2: 57 100% 75%;
+  --prose-heading-3: 57 80% 65%;
+  --prose-quote: 171 50% 55%;
+  --hero-orb-primary: 57 100% 48% / 0.18;
+  --hero-orb-accent: 171 77% 60% / 0.14;
+}
+
+@media (max-width: 640px) {
+  .theme-cyberpunk-gold {
+    --matrix-text-glow: 0 0 6px hsl(57 100% 48% / 0.4);
+    --matrix-glow: 0 0 12px hsl(57 100% 48% / 0.3);
+  }
+}
+
+/* Cyberpunk font scoping — TODO: self-host woff2 files */
+@font-face {
+  font-family: 'Rajdhani';
+  font-style: normal;
+  font-weight: 500 700;
+  font-display: swap;
+  src: url('https://fonts.gstatic.com/s/rajdhani/v15/LDI2apCSOBg7S-QT7p4GM-amkfY.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Chakra Petch';
+  font-style: normal;
+  font-weight: 300 500;
+  font-display: swap;
+  src: url('https://fonts.gstatic.com/s/chakrapetch/v11/cIf6MapbsEk7TDLdtEz1BwkWi6pgeL4.woff2') format('woff2');
+}
+
+.theme-cyberpunk,
+.theme-cyberpunk-gold {
+  font-family: 'Chakra Petch', system-ui, sans-serif;
+}
+
+.theme-cyberpunk h2, .theme-cyberpunk h3, .theme-cyberpunk h4,
+.theme-cyberpunk-gold h2, .theme-cyberpunk-gold h3, .theme-cyberpunk-gold h4 {
+  font-family: 'Rajdhani', system-ui, sans-serif;
+}
+
 @layer base {
   * {
     @apply border-border;
