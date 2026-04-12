@@ -55,9 +55,9 @@ const AppContent = () => {
 const App = () => {
   return (
     <ThemeProvider
-      themes={["violet", "amber"]}
+      themes={["violet", "amber", "cyberpunk", "cyberpunk-gold"]}
       attribute="class"
-      value={{ violet: "theme-violet", amber: "theme-amber" }}
+      value={{ violet: "theme-violet", amber: "theme-amber", cyberpunk: "theme-cyberpunk", "cyberpunk-gold": "theme-cyberpunk-gold" }}
       defaultTheme="violet"
       storageKey="theme-profile"
       enableSystem={false}

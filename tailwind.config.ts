@@ -16,6 +16,8 @@ export default {
       fontFamily: {
         mono: ['"Share Tech Mono"', 'monospace'],
         display: ['"Orbitron"', 'sans-serif'],
+        heading: ['"Rajdhani"', 'sans-serif'],
+        body: ['"Chakra Petch"', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
