@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { parseFrontmatter } from "@/lib/frontmatter";
 
 interface UseMarkdownContentOptions {
   contentMap: Record<string, () => Promise<string>>;
@@ -18,7 +19,8 @@ export function useMarkdownContent({ contentMap, slug, fallback = "" }: UseMarkd
 
       try {
         if (contentMap[slug]) {
-          const content = await contentMap[slug]();
+          const raw = await contentMap[slug]();
+          const { content } = parseFrontmatter(raw);
           setMarkdownContent(content);
         } else {
           setMarkdownContent(fallback || "# Content not found");

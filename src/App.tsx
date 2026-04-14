@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import Navbar from "@/components/Navbar";
+import PageTransition from "@/components/PageTransition";
 import Index from "./pages/Index";
 import ProjectsPage from "./pages/ProjectsPage";
 import BlogLayoutPage from "./pages/BlogLayoutPage";
@@ -16,6 +17,8 @@ import SkillsPage from "./pages/SkillsPage";
 import HowIDoItIndexPage from "./pages/HowIDoItIndexPage";
 import HowIDoItSlugPage from "./pages/HowIDoItSlugPage";
 import NotFound from "./pages/NotFound";
+import { useIsCyberTheme } from "@/lib/motion";
+import { useScrollRestoration } from "@/hooks/useScrollRestoration";
 
 // One-time migration: users who previously selected the matrix theme (removed
 // in the palette refactor) would otherwise land with a broken/no-class state.
@@ -30,23 +33,29 @@ const queryClient = new QueryClient();
 const AppContent = () => {
   const location = useLocation();
   const isReadingMode = /^\/(blog|how-i-do-it)\/[^/]+/.test(location.pathname);
+  const isCyber = useIsCyberTheme();
+  useScrollRestoration();
 
   return (
     <>
       <Navbar />
+      {/* Ambient effects — cyberpunk themes only, disabled on mobile via CSS */}
+      {isCyber && <div className="scanline-overlay scan-sweep" />}
       <div className={isReadingMode ? "theme-reading min-h-screen bg-background" : ""}>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/projects" element={<ProjectsPage />} />
-          <Route path="/skills" element={<SkillsPage />} />
-          <Route path="/how-i-do-it" element={<HowIDoItIndexPage />} />
-          <Route path="/how-i-do-it/:slug" element={<HowIDoItSlugPage />} />
-          <Route path="/blog" element={<BlogLayoutPage />}>
-            <Route index element={<BlogIndexPage />} />
-            <Route path=":slug" element={<BlogSlugPage />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <PageTransition>
+          <Routes location={location}>
+            <Route path="/" element={<Index />} />
+            <Route path="/projects" element={<ProjectsPage />} />
+            <Route path="/skills" element={<SkillsPage />} />
+            <Route path="/how-i-do-it" element={<HowIDoItIndexPage />} />
+            <Route path="/how-i-do-it/:slug" element={<HowIDoItSlugPage />} />
+            <Route path="/blog" element={<BlogLayoutPage />}>
+              <Route index element={<BlogIndexPage />} />
+              <Route path=":slug" element={<BlogSlugPage />} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </PageTransition>
       </div>
     </>
   );

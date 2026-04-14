@@ -1,30 +1,31 @@
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { ScrollReveal, ScrollRevealItem } from "@/components/ScrollReveal";
+import BlogSidebar from "./BlogSidebar";
 import type { BlogOutletContext } from "./data";
 
 const BlogIndex = () => {
-  const { filteredPosts, activeTags } = useOutletContext<BlogOutletContext>();
+  const { filteredPosts, activeTags, sidebarProps } = useOutletContext<BlogOutletContext>();
   const navigate = useNavigate();
 
   const tagParams = activeTags.length > 0 ? `?tags=${activeTags.join(",")}` : "";
 
   return (
     <div className="max-w-3xl mx-auto">
-      <div className="mb-12">
+      <div className="mb-6">
         <p className="text-muted-foreground text-xs tracking-[0.3em] mb-2">{">"} cat ~/blog/posts.md</p>
         <h1 className="font-display text-4xl font-bold text-foreground text-glow">BLOG</h1>
       </div>
 
+      {/* Mobile: EXPLORER below heading, inside content flow */}
+      <div className="md:hidden mb-8">
+        <BlogSidebar {...sidebarProps} />
+      </div>
+
       {filteredPosts.length > 0 ? (
-        <div className="space-y-8">
-          {filteredPosts.map((post, i) => (
-            <motion.div
-              key={post.slug}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-            >
+        <ScrollReveal key={activeTags.join(",") || "all"} className="space-y-8">
+          {filteredPosts.map((post) => (
+            <ScrollRevealItem key={post.slug}>
               <Link
                 to={`/blog/${post.slug}${tagParams}`}
                 className="block border border-border bg-card/50 p-6 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/15 transition-all duration-200 group"
@@ -70,9 +71,9 @@ const BlogIndex = () => {
                   </p>
                 )}
               </Link>
-            </motion.div>
+            </ScrollRevealItem>
           ))}
-        </div>
+        </ScrollReveal>
       ) : activeTags.length > 0 ? (
         <div className="text-center py-20 border border-border/50">
           <p className="text-muted-foreground text-sm tracking-wider">
