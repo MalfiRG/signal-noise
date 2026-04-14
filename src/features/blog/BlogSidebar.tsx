@@ -40,9 +40,10 @@ const BlogSidebar = (props: BlogSidebarProps) => {
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
           <Button
-            variant="ghost"
+            variant="outline"
             size="sm"
-            className="text-muted-foreground hover:text-primary mb-2"
+            className="text-muted-foreground hover:text-primary min-h-[44px] px-4 ml-2 mt-2 affordance-pulse"
+            aria-label="Open blog file explorer"
           >
             <FolderTree className="h-4 w-4 mr-2" />
             <span className="text-xs tracking-wider">EXPLORER</span>

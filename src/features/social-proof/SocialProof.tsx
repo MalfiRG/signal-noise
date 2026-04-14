@@ -1,6 +1,6 @@
-import { motion } from "framer-motion";
 import { Star, GitFork, ExternalLink, Clock } from "lucide-react";
 import { projects, type Project } from "@/features/projects/data";
+import { ScrollReveal, ScrollRevealItem } from "@/components/ScrollReveal";
 
 const RepoCard = ({ project }: { project: Project }) => (
   <a
@@ -61,19 +61,13 @@ const SocialProof = () => {
           <h2 className="font-display text-4xl font-bold text-foreground text-glow">SIGNALS</h2>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          {githubProjects.map((project, i) => (
-            <motion.div
-              key={project.github_owner_repo}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ delay: i * 0.1 }}
-            >
+        <ScrollReveal className="grid gap-6 md:grid-cols-2">
+          {githubProjects.map((project) => (
+            <ScrollRevealItem key={project.github_owner_repo}>
               <RepoCard project={project} />
-            </motion.div>
+            </ScrollRevealItem>
           ))}
-        </div>
+        </ScrollReveal>
       </div>
     </section>
   );

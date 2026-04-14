@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AnimatedProgressBar from "./AnimatedProgressBar";
 import { skills, learning } from "./data";
+import { ScrollReveal, ScrollRevealItem } from "@/components/ScrollReveal";
 
 const Skills = () => {
   return (
@@ -32,15 +33,9 @@ const Skills = () => {
             </TabsList>
 
             <TabsContent value="skills" className="mt-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <ScrollReveal className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {skills.map((skill, index) => (
-                  <motion.div
-                    key={skill.name}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="space-y-2"
-                  >
+                  <ScrollRevealItem key={skill.name} className="space-y-2">
                     <div className="flex justify-between items-center">
                       <span className="text-sm font-medium text-foreground">{skill.name}</span>
                       <span className="text-sm text-muted-foreground">{skill.level}%</span>
@@ -55,24 +50,18 @@ const Skills = () => {
                         {skill.description}
                       </p>
                     )}
-                  </motion.div>
+                  </ScrollRevealItem>
                 ))}
-              </div>
+              </ScrollReveal>
             </TabsContent>
 
             <TabsContent value="learning" className="mt-8">
               <p className="text-muted-foreground text-sm mb-6">
                 Growth is a key part of my career. Currently expanding into these areas:
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <ScrollReveal className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {learning.map((item, index) => (
-                  <motion.div
-                    key={item.name}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="space-y-2"
-                  >
+                  <ScrollRevealItem key={item.name} className="space-y-2">
                     <div className="flex justify-between items-center">
                       <span className="text-sm font-medium text-amber-500">{item.name}</span>
                       <span className="text-sm text-amber-500/70">{item.level}%</span>
@@ -85,9 +74,9 @@ const Skills = () => {
                     <p className="text-xs text-muted-foreground leading-relaxed">
                       {item.description}
                     </p>
-                  </motion.div>
+                  </ScrollRevealItem>
                 ))}
-              </div>
+              </ScrollReveal>
             </TabsContent>
           </Tabs>
         </motion.div>
