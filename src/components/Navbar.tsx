@@ -17,11 +17,13 @@ import {
 } from "@/components/ui/sheet";
 import { howIDoItPages } from "@/features/how-i-do-it/data";
 import ThemeSelector from "./ThemeSelector";
+import { useIsCyberTheme } from "@/lib/motion";
 
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const isCyber = useIsCyberTheme();
 
   const links = [
     { to: "/", label: "HOME" },
@@ -36,9 +38,9 @@ const Navbar = () => {
   };
 
   const navLinkClass = (path: string) =>
-    `text-sm tracking-widest transition-colors hover:text-primary ${
+    `text-sm tracking-widest transition-colors hover:text-primary nav-link-motion ${
       isActive(path) ? "text-primary text-glow" : "text-muted-foreground"
-    }`;
+    }${isCyber ? " glitch-hover" : ""}`;
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/90 backdrop-blur-sm pt-[env(safe-area-inset-top)]">
@@ -51,7 +53,13 @@ const Navbar = () => {
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-6">
           {links.map((link) => (
-            <Link key={link.to} to={link.to} className={navLinkClass(link.to)}>
+            <Link
+              key={link.to}
+              to={link.to}
+              className={navLinkClass(link.to)}
+              data-text={link.label}
+              {...(isActive(link.to) ? { "aria-current": "page" as const } : {})}
+            >
               {link.label}
             </Link>
           ))}
@@ -59,9 +67,11 @@ const Navbar = () => {
           {/* How I Do It dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger
-              className={`inline-flex items-center gap-1 text-sm tracking-widest transition-colors hover:text-primary ${
+              className={`inline-flex items-center gap-1 text-sm tracking-widest transition-colors hover:text-primary nav-link-motion ${
                 isActive("/how-i-do-it") ? "text-primary text-glow" : "text-muted-foreground"
-              }`}
+              }${isCyber ? " glitch-hover" : ""}`}
+              data-text="HOW I DO IT"
+              {...(isActive("/how-i-do-it") ? { "aria-current": "page" as const } : {})}
             >
               HOW I DO IT
               <ChevronDown className="h-3 w-3" />
@@ -93,7 +103,7 @@ const Navbar = () => {
           <ThemeSelector />
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="sm" className="text-foreground" data-testid="hamburger-menu">
+              <Button variant="ghost" size="icon" className="text-foreground min-h-[44px] min-w-[44px]" aria-label="Open navigation menu" data-testid="hamburger-menu">
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>

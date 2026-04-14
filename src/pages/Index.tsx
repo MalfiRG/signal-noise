@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Link } from "react-router-dom";
 import AboutSection from "@/features/about/AboutSection";
-import SocialProof from "@/features/social-proof/SocialProof";
+// SocialProof removed from Index — repo cards merged into ProjectsList
 import LetterReveal from "@/components/LetterReveal";
 import { staggerContainer, staggerItem, useIsCyberTheme } from "@/lib/motion";
 
@@ -130,7 +130,7 @@ const Index = () => {
               </Link>
             </motion.div>
 
-            <motion.div variants={staggerItem} className="mt-16">
+            <motion.div variants={staggerItem} className="mt-8">
               <p className="text-muted-foreground text-xs tracking-[0.2em] animate-glow-pulse">
                 ▼ SCROLL TO EXPLORE ▼
               </p>
@@ -141,7 +141,6 @@ const Index = () => {
 
       <div className="relative z-20">
         <AboutSection />
-        <SocialProof />
       </div>
     </>
   );

@@ -13,7 +13,7 @@ export const introText = {
   headline: "ABOUT ME",
   terminal: "> whoami",
   bio: [
-    "QA engineer who started in molecular biology — I don't remember 95% of the science and the lab training didn't stick, but the mental model and methodology did: hypothesis, experiment, multi-level validation.",
+    "QA engineer who started in molecular biology — I don't remember 95% of the science and the lab training didn't stick, but the mental model and methodology did: research, execute, certify.",
     "Now it runs on Pytest, Playwright, and CI/CD, with a pinch of DevOps and Agent-Driven development.",
     "Speaking of the Wolf — testing systems that think for themselves and writing about what I find on this blog.",
   ],
