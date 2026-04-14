@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Personal technical blog by **Piotr Tarach**, QA engineer based in Prague. Multiple theme profiles (violet, amber) with reading-mode toggle for blog posts. Built as a React + TypeScript SPA.
+Personal technical blog by **Piotr Tarach**, QA engineer based in Prague. Four theme profiles (violet, amber, cyberpunk, cyberpunk-gold) with reading-mode toggle for blog posts. Built as a React + TypeScript SPA.
 
 **Repo:** `https://github.com/MalfiRG/the-digital-matrix.git`
 **Hosting:** Vercel (auto-deploys from `main`)
@@ -62,7 +62,6 @@ src/
 ├── components/
 │   ├── Navbar.tsx                           # Fixed top nav (desktop + mobile hamburger)
 │   ├── NavLink.tsx                          # Reusable nav link component
-│   ├── MatrixRain.tsx                       # Canvas digital rain effect
 │   ├── markdown/
 │   │   └── MarkdownRenderer.tsx             # Markdown rendering (GFM, syntax highlight, Mermaid, TOC)
 │   └── ui/                                  # shadcn/ui component library (~40 components)
@@ -148,12 +147,17 @@ Each feature folder contains its own components and data files. Cross-cutting co
 
 Route-level files in `src/pages/` are thin wrappers that import and render the actual feature component. This separates routing from feature logic.
 
-### Matrix Visual Identity
+### Visual Identity & Themes
 
-The entire UI is themed around The Matrix aesthetic:
-- **MatrixRain**: Canvas-based falling characters (Katakana + Latin + numbers)
-- **Glow effects**: Text shadows using Matrix green palette
-- **CSS Variables**: `--matrix-primary` (#22b455 green), `--matrix-bg` (#111), etc.
+Four theme profiles driven by `next-themes` (class-based switching on `<html>`):
+- **Violet** (default) — synthwave purple, `--primary: 270 100% 65%`
+- **Amber** — retro terminal warm tones
+- **Cyberpunk** (Night City) — cyan + magenta, scanline/glitch effects
+- **Cyberpunk-Gold** — yellow + cyan, scanline/glitch effects
+
+Cyberpunk themes get extra ambient effects via `useIsCyberTheme()` hook. MatrixRain component was removed (PR #27) — ambient orbs cover the visual-interest role now.
+
+- **CSS Variables**: Theme colors defined in `src/index.css` per `.theme-*` class
 - All custom styles in the global CSS using Tailwind `@layer` directives
 
 ---
@@ -188,11 +192,7 @@ Opening hook paragraph (no "Introduction" header)...
 
 ## Section with Personality-Rich Header
 
-Body content with callouts:
-
-> **💡 Key Insight:** Important takeaway
-> **🔥 Hot Take:** Opinionated stance
-> **⚙️ Tech Note:** Technical detail
+Body content — weave insights and opinions into prose (no labeled callout boxes).
 
 Natural closing (no "Conclusion" header)
 ```

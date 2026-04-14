@@ -60,14 +60,14 @@ const CategoryTree = ({ posts, filteredSlugs, activeTags }: CategoryTreeProps) =
           <div key={cat} role="treeitem" aria-expanded={isExpanded}>
             <button
               onClick={() => toggleCategory(cat)}
-              className="flex items-center gap-1 w-full px-2 py-1.5 text-xs tracking-wider text-muted-foreground hover:text-primary transition-colors"
+              className="flex items-center gap-1 w-full px-2 py-1.5 text-xs tracking-wider text-primary/90 hover:text-primary transition-colors font-medium"
             >
               <ChevronRight
-                className={`h-3 w-3 transition-transform ${isExpanded ? "rotate-90" : ""}`}
+                className={`h-3 w-3 transition-transform text-muted-foreground ${isExpanded ? "rotate-90" : ""}`}
               />
-              <Folder className="h-3 w-3" />
+              <Folder className="h-3 w-3 text-primary/60" />
               <span>{cat}</span>
-              <span className="ml-auto text-border">{postsByCategory[cat].length}</span>
+              <span className="ml-auto text-muted-foreground/50 font-normal">{postsByCategory[cat].length}</span>
             </button>
 
             <AnimatePresence initial={false}>
@@ -85,13 +85,13 @@ const CategoryTree = ({ posts, filteredSlugs, activeTags }: CategoryTreeProps) =
                       <Link
                         key={post.slug}
                         to={`/blog/${post.slug}${tagParams}`}
-                        className={`flex items-center gap-1 px-2 py-1 pl-7 text-xs tracking-wider transition-colors hover:text-primary ${
+                        className={`flex items-center gap-1.5 px-2 py-1.5 pl-7 text-xs tracking-wider transition-colors hover:text-primary ${
                           isDimmed
                             ? "text-muted-foreground opacity-30"
-                            : "text-muted-foreground"
+                            : "text-foreground/70"
                         }`}
                       >
-                        <FileText className="h-3 w-3 flex-shrink-0" />
+                        <FileText className="h-3 w-3 flex-shrink-0 text-muted-foreground/50" />
                         <span className="truncate">{post.title}</span>
                       </Link>
                     );

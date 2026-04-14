@@ -4,7 +4,7 @@ import { introText, socialLinks } from "./data";
 
 const AboutSection = () => {
   return (
-    <section className="min-h-screen flex items-center py-24 px-4">
+    <section className="flex items-center pt-8 pb-16 px-4">
       <div className="container mx-auto max-w-4xl">
         <div className="mb-12">
           <p className="text-muted-foreground text-xs tracking-[0.3em] mb-2">

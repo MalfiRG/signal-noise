@@ -12,6 +12,13 @@ export interface BlogOutletContext {
   filteredPosts: BlogPost[];
   activeTags: string[];
   allTags: string[];
+  sidebarProps: {
+    posts: BlogPost[];
+    filteredSlugs: string[];
+    allTags: string[];
+    activeTags: string[];
+    onToggleTag: (tag: string) => void;
+  };
 }
 
 export const blogPosts: BlogPost[] = [

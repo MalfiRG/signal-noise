@@ -39,12 +39,16 @@ const ThemeSelector = () => {
     <Sheet>
       <SheetTrigger asChild>
         <button
-          className="w-5 h-5 rounded-full border-2 border-foreground"
-          style={{
-            backgroundColor: THEMES.find((t) => t.id === theme)?.color ?? THEMES[0].color,
-          }}
+          className="min-h-[44px] min-w-[44px] flex items-center justify-center"
           aria-label="Open theme selector"
-        />
+        >
+          <span
+            className="w-5 h-5 rounded-full block border-2 border-foreground"
+            style={{
+              backgroundColor: THEMES.find((t) => t.id === theme)?.color ?? THEMES[0].color,
+            }}
+          />
+        </button>
       </SheetTrigger>
       <SheetContent side="bottom" className="pb-8">
         <SheetTitle className="text-sm text-muted-foreground tracking-wider mb-4">
