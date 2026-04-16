@@ -6,7 +6,7 @@ A bug report has one job: make someone who has never seen this bug reproduce it 
 
 Every bug report I write follows six fields:
 
-- **Title** — `METHOD /endpoint - variable.path short description`. The title IS the description. No separate "Description" section needed.
+- **Title** — `METHOD /endpoint - variable.path short description`. A specific title is usually all the framing the reader needs.
 - **Severity** — Critical, Major, Minor, or Trivial
 - **Initial state** — one line, name-agnostic (no specific hostnames or lab names)
 - **Steps** — 2-4 lines maximum. Reproducible, not a narrative of your investigation
@@ -18,21 +18,17 @@ That's it. If a bug report needs more than this, you're either explaining too mu
 
 ## The Rules
 
-**No "Description" section.** I've seen bug reports where the title says "API error" and then there's a three-paragraph Description that actually explains what's happening. Put it in the title: `POST /policies - schedule.dailyType resets to "Everyday" when mode changes`. If the title is specific enough, the developer knows what they're looking at before reading the steps.
+**Description is optional — and it's a preface, not a substitute.** Title + steps + expected + actual usually tells the whole story. Reach for a description only when the bug is complex enough that the reader needs framing first, and keep it short. Don't let it secretly carry the reproduction — that belongs in steps.
 
 **Steps are reproducible, not a narrative.** "I was testing the schedule configuration and noticed that when I changed the mode..." — that's a story, not reproduction steps. Write: "1. Create resource with `schedule.type=Daily`. 2. PUT to change `mode`. 3. GET the resource." The developer should be able to copy your steps and hit the same bug.
 
-**Let logs speak.** Don't re-explain what a stack trace already shows. If the error says `NullReferenceException at ScheduleValidator.Validate()`, include the stack trace and move on. The developer reads stack traces faster than your prose description of one.
+**Let logs speak.** Don't re-explain what a stack trace already shows. If the error says `NullReferenceException at <Module>.<Method>()`, include the stack trace verbatim and move on. The developer reads stack traces faster than your prose description of one.
 
-**Name-agnostic.** Write "a Windows Server machine", not your lab hostname. The bug exists regardless of which specific machine you tested on. Hostnames make the report harder to parse and leak infrastructure details that don't matter.
+**Name-agnostic.** Write generic descriptors — "a Windows host", "a database instance", "a storage bucket", "a tenant account" — not the specific hostname, DB name, bucket name, or account ID from your environment. The bug exists regardless of which resource triggered it. Environment-specific identifiers make the report harder to parse and leak infrastructure details that don't matter.
 
 **Include the minimal request body.** For API bugs, include the smallest request body that triggers the issue — not your full test spec with 15 optional fields. Strip it down to the fields that matter.
 
-**1-2 sentence descriptions, 2-4 step reproduction.** Brevity is a feature. If your bug report is longer than your screen, the developer will skim it and miss the important part.
-
-**Never set Priority.** This is a triage team decision, not a QA decision. I set Severity (how bad is the impact), not Priority (when should it be fixed). The distinction matters organizationally — it prevents QA engineers from escalating their favorite bugs by marking everything as P1.
-
-**Log excerpts are mandatory.** No bug report without supporting evidence. Screenshots for UI bugs, log excerpts for backend bugs, response bodies for API bugs. "It returned an error" is not evidence.
+**Evidence is mandatory.** No bug report without supporting evidence. Screenshots for UI bugs, log excerpts for backend bugs, response bodies for API bugs, HAR files for frontend network issues. "It returned an error" is not evidence.
 
 ## The Verification Checklist
 
@@ -58,10 +54,10 @@ The classification is about impact, not about how annoyed you are:
 
 | Severity | Criterion | Examples |
 |----------|-----------|---------|
-| **Critical** | Feature completely unusable. Data loss or corruption. Security vulnerability | CRUD broken, auth bypass, data deleted without user action |
-| **Major** | Significant functionality broken, workarounds exist | Sorting fails, filter returns wrong results, but user can still access data |
-| **Minor** | Edge cases, lower likelihood, degraded experience | Boundary value not rejected, optional parameter ignored |
-| **Trivial** | Cosmetic issues, the feature works perfectly | Typos, alignment, tooltip text wrong |
+| **Critical** | Feature completely unusable. Data loss or corruption. Security vulnerability | CRUD broken, auth bypass or privilege escalation, silent data corruption, cross-tenant data leak |
+| **Major** | Significant functionality broken, workarounds exist | Endpoint flaky on valid input, UI missing records the API returns, validation too permissive for the contract, response shape inconsistent across related endpoints |
+| **Minor** | Edge cases, lower likelihood, degraded experience | Off-by-one in pagination counts, timezone-boundary date filter, error message too generic to debug, case-sensitive where case-insensitive expected |
+| **Trivial** | Cosmetic issues, the feature works perfectly | Typos in user-facing text, 2px misalignment, tooltip text wrong, inconsistent label capitalization |
 
 When in doubt between two levels, go higher. It's easier to downgrade a severity than to re-escalate after triage already deprioritized it.
 
