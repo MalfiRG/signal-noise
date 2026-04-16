@@ -33,14 +33,15 @@ const queryClient = new QueryClient();
 const AppContent = () => {
   const location = useLocation();
   const isReadingMode = /^\/(blog|how-i-do-it)\/[^/]+/.test(location.pathname);
+  const isTextSection = /^\/(blog|how-i-do-it)(\/|$)/.test(location.pathname);
   const isCyber = useIsCyberTheme();
   useScrollRestoration();
 
   return (
     <>
       <Navbar />
-      {/* Ambient effects — cyberpunk themes only, disabled on mobile via CSS */}
-      {isCyber && <div className="scanline-overlay scan-sweep" />}
+      {/* Ambient effects — cyberpunk themes only, suppressed in text-heavy sections to avoid distracting reading */}
+      {isCyber && !isTextSection && <div className="scanline-overlay scan-sweep" />}
       <div className={isReadingMode ? "theme-reading min-h-screen bg-background" : ""}>
         <PageTransition>
           <Routes location={location}>
