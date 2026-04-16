@@ -18,8 +18,6 @@ Configuration is the first thing that breaks in a new environment. The pattern I
 | 2 | `config.yaml` | Gitignored. Real credentials. Never committed |
 | 3 | Environment variables | Override everything. CI sets secrets this way |
 
-Server URLs get normalized once at load time — single string, list, or comma-separated env var all become `list[str]`. After normalization, config is immutable. No mutation during the test session. This prevents a subtle bug class where a test modifies config state and affects subsequent tests.
-
 ## Assertion Patterns That Actually Help
 
 The single most impactful rule: every assertion gets a diagnostic message.
@@ -90,8 +88,6 @@ def my_resource(api):
 
 **No cleanup** — for negative tests expecting 400. The resource was never created, so there's nothing to clean up. Attempting cleanup would fail with 404.
 
-And then there's the safety net: at the start and end of each test session, the framework automatically cleans up any resource with "AutoTest" in the name. This catches orphans from interrupted runs, fixture teardown failures, or any other path where per-test cleanup didn't fire.
-
 ## Known Bug Handling with xfail
 
 When a test verifies a known bug, it gets an `xfail` marker with the bug ID:
@@ -118,8 +114,6 @@ The BUG_FIXED signal is the valuable one — it means something changed and the 
 ## Dual Report Output
 
 Standard JUnit XML goes to CI — pass/fail/skip/error. But JUnit can't express KNOWN_BUG or BUG_FIXED. So the framework also produces a structured JSON report via a custom pytest plugin, mapping each test ID to one of six statuses: PASS, FAIL, SKIP, KNOWN_BUG, BUG_FIXED, ERROR.
-
-The custom plugin registers the `test_id` marker, captures results with all six status mappings, and writes `results/report.json` at session end. This JSON is the artifact that ties test results back to the test plan — every test ID in the report maps to exactly one test case in the plan.
 
 ## CI Integration
 
