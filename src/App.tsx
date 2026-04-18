@@ -17,16 +17,7 @@ import SkillsPage from "./pages/SkillsPage";
 import HowIDoItIndexPage from "./pages/HowIDoItIndexPage";
 import HowIDoItSlugPage from "./pages/HowIDoItSlugPage";
 import NotFound from "./pages/NotFound";
-import { useIsCyberTheme } from "@/lib/motion";
 import { useScrollRestoration } from "@/hooks/useScrollRestoration";
-
-// One-time migration: users who previously selected the matrix theme (removed
-// in the palette refactor) would otherwise land with a broken/no-class state.
-// Runs at module load — before React mounts and before next-themes reads
-// localStorage — so the ThemeProvider never sees the stale "matrix" value.
-if (typeof window !== "undefined" && localStorage.getItem("theme-profile") === "matrix") {
-  localStorage.setItem("theme-profile", "violet");
-}
 
 const queryClient = new QueryClient();
 
@@ -34,14 +25,13 @@ const AppContent = () => {
   const location = useLocation();
   const isReadingMode = /^\/(blog|how-i-do-it)\/[^/]+/.test(location.pathname);
   const isTextSection = /^\/(blog|how-i-do-it)(\/|$)/.test(location.pathname);
-  const isCyber = useIsCyberTheme();
   useScrollRestoration();
 
   return (
     <>
       <Navbar />
-      {/* Ambient effects — cyberpunk themes only, suppressed in text-heavy sections to avoid distracting reading */}
-      {isCyber && !isTextSection && <div className="scanline-overlay scan-sweep" />}
+      {/* Ambient effects — always on (single-theme), suppressed in text-heavy sections to avoid distracting reading */}
+      {!isTextSection && <div className="scanline-overlay scan-sweep" />}
       <div className={isReadingMode ? "theme-reading min-h-screen bg-background" : ""}>
         <PageTransition>
           <Routes location={location}>
@@ -65,10 +55,10 @@ const AppContent = () => {
 const App = () => {
   return (
     <ThemeProvider
-      themes={["violet", "amber", "cyberpunk", "cyberpunk-gold"]}
+      themes={["cyberpunk-gold"]}
       attribute="class"
-      value={{ violet: "theme-violet", amber: "theme-amber", cyberpunk: "theme-cyberpunk", "cyberpunk-gold": "theme-cyberpunk-gold" }}
-      defaultTheme="violet"
+      value={{ "cyberpunk-gold": "theme-cyberpunk-gold" }}
+      defaultTheme="cyberpunk-gold"
       storageKey="theme-profile"
       enableSystem={false}
     >

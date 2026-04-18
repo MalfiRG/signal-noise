@@ -1,14 +1,14 @@
-import { useTheme } from "next-themes";
 import { Toaster as Sonner, toast } from "sonner";
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
+// Single-theme codebase (Night City). Sonner only understands light/dark/system,
+// so we hardcode "dark" — passing "cyberpunk-gold" would silently fall back to light
+// and render toasts on a white background against our dark UI.
 const Toaster = ({ ...props }: ToasterProps) => {
-  const { theme = "system" } = useTheme();
-
   return (
     <Sonner
-      theme={theme as ToasterProps["theme"]}
+      theme="dark"
       className="toaster group"
       toastOptions={{
         classNames: {

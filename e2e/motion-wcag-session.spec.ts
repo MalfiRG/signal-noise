@@ -1,16 +1,18 @@
 import { test, expect } from "@playwright/test";
 
 /**
- * E2E tests for motion design system + WCAG fixes (2026-04-12 session).
+ * E2E tests for motion design system + WCAG fixes (2026-04-12 session,
+ * updated 2026-04-18 for single-theme consolidation).
  *
  * Covers:
  * 1. Page transitions — AnimatePresence two-tier system
- * 2. WCAG touch targets — hamburger, theme dot, EXPLORER (44px minimum)
+ * 2. WCAG touch targets — hamburger, EXPLORER (44px minimum)
  * 3. Explorer — color hierarchy + mobile placement below BLOG heading
  * 4. Glitch hover — no residual artifacts after animation
- * 5. Theme switching — all 4 themes apply correct CSS class
+ * 5. Theme — Night City (cyberpunk-gold) class applied to <html>
  * 6. Copy updates — "Research. Execute. Certify." in hero + about
  * 7. Scroll reveal — cards appear on scroll
+ * 8. Ambient effects — scanline overlay always present on non-text routes
  */
 
 // ---------------------------------------------------------------------------
@@ -65,19 +67,6 @@ test.describe("WCAG touch targets (mobile)", () => {
     await expect(hamburger).toBeVisible();
 
     const box = await hamburger.boundingBox();
-    expect(box).toBeTruthy();
-    expect(box!.width).toBeGreaterThanOrEqual(44);
-    expect(box!.height).toBeGreaterThanOrEqual(44);
-  });
-
-  test("theme selector dot meets 44×44px minimum", async ({ page }) => {
-    await page.goto("/");
-    await page.waitForTimeout(1000);
-    // Mobile nav container has the visible theme dot
-    const themeBtn = page.locator('nav .md\\:hidden button[aria-label="Open theme selector"]');
-    await expect(themeBtn).toBeVisible();
-
-    const box = await themeBtn.boundingBox();
     expect(box).toBeTruthy();
     expect(box!.width).toBeGreaterThanOrEqual(44);
     expect(box!.height).toBeGreaterThanOrEqual(44);
@@ -200,66 +189,40 @@ test.describe("Explorer sidebar", () => {
 });
 
 // ---------------------------------------------------------------------------
-// 4. Glitch hover — no residual artifacts
+// 4. Glitch hover — no residual artifacts (always-on after single-theme cleanup)
 // ---------------------------------------------------------------------------
 
-test.describe("Glitch hover (cyberpunk themes)", () => {
+test.describe("Glitch hover", () => {
   test("glitch pseudo-elements are hidden before hover", async ({ page }) => {
     await page.goto("/");
     await page.waitForTimeout(4000);
 
-    // Switch to cyberpunk theme
-    await page.evaluate(() => {
-      localStorage.setItem("theme-profile", "cyberpunk");
-      document.documentElement.classList.remove("theme-violet", "theme-amber", "theme-cyberpunk-gold");
-      document.documentElement.classList.add("theme-cyberpunk");
-    });
-    await page.waitForTimeout(500);
-
-    // Find a glitch-hover element
+    // Find a glitch-hover element (always present on Night City — single theme)
     const glitchEl = page.locator(".glitch-hover").first();
-    if (await glitchEl.isVisible()) {
-      // ::before and ::after should have opacity 0 before hover
-      const beforeOpacity = await glitchEl.evaluate((el) => {
-        return window.getComputedStyle(el, "::before").opacity;
-      });
-      expect(parseFloat(beforeOpacity)).toBe(0);
-    }
+    await expect(glitchEl).toBeVisible();
+
+    // ::before should have opacity 0 before hover
+    const beforeOpacity = await glitchEl.evaluate((el) => {
+      return window.getComputedStyle(el, "::before").opacity;
+    });
+    expect(parseFloat(beforeOpacity)).toBe(0);
   });
 });
 
 // ---------------------------------------------------------------------------
-// 5. Theme switching — all 4 themes apply correct class
+// 5. Theme — Night City (cyberpunk-gold) is the only theme; class on <html>
 // ---------------------------------------------------------------------------
 
-test.describe("Theme switching", () => {
-  const themes = [
-    { id: "violet", class: "theme-violet" },
-    { id: "amber", class: "theme-amber" },
-    { id: "cyberpunk", class: "theme-cyberpunk" },
-    { id: "cyberpunk-gold", class: "theme-cyberpunk-gold" },
-  ];
+test.describe("Theme", () => {
+  test("Night City theme class is applied to <html>", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForTimeout(2000);
 
-  for (const theme of themes) {
-    test(`${theme.id} theme applies .${theme.class} to root`, async ({ page }) => {
-      await page.goto("/");
-      await page.waitForTimeout(2000);
-
-      // Set theme via localStorage and reload
-      await page.evaluate((id) => {
-        localStorage.setItem("theme-profile", id);
-      }, theme.id);
-      await page.reload({ waitUntil: "networkidle" });
-      await page.waitForTimeout(1000);
-
-      // Verify class on html element
-      const hasClass = await page.evaluate(
-        (cls) => document.documentElement.classList.contains(cls),
-        theme.class
-      );
-      expect(hasClass).toBe(true);
-    });
-  }
+    const hasClass = await page.evaluate(() =>
+      document.documentElement.classList.contains("theme-cyberpunk-gold")
+    );
+    expect(hasClass).toBe(true);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -280,7 +243,7 @@ test.describe("Copy content", () => {
 
   test("hero subtitle contains 'Research. Execute. Certify.'", async ({ page }) => {
     await page.goto("/");
-    await page.waitForTimeout(5000);
+    await page.waitForTimeout(7000); // phase 3 fires at 6000ms now
 
     await expect(page.getByText("Every bug is a hypothesis")).toBeVisible({ timeout: 5000 });
     await expect(page.getByText("Research. Execute. Certify.")).toBeVisible({ timeout: 5000 });
@@ -341,24 +304,27 @@ test.describe("Scroll reveal", () => {
 });
 
 // ---------------------------------------------------------------------------
-// 8. Ambient effects — cyberpunk themes only
+// 8. Ambient effects — scanline overlay always present on non-text routes
 // ---------------------------------------------------------------------------
 
 test.describe("Ambient effects", () => {
-  test("scanline overlay div exists in DOM on cyberpunk theme", async ({ page }) => {
+  test("scanline overlay div mounts on home (non-text route)", async ({ page }) => {
     await page.goto("/");
     await page.waitForTimeout(2000);
 
-    // Set cyberpunk theme via localStorage and reload
-    await page.evaluate(() => localStorage.setItem("theme-profile", "cyberpunk"));
-    await page.reload({ waitUntil: "networkidle" });
-    await page.waitForTimeout(1000);
+    // Scanline overlay div should exist on non-text routes (App.tsx renders it
+    // when !isTextSection). It carries .scanline-overlay AND .scan-sweep classes.
+    const scanline = page.locator(".scanline-overlay.scan-sweep");
+    await expect(scanline).toHaveCount(1);
+  });
 
-    // Scanline overlay or scan-sweep div should exist
-    const scanline = page.locator(".scanline-overlay, .scan-sweep");
-    const count = await scanline.count();
-    // Informational: on cyberpunk themes, ambient elements should be present
-    expect(count).toBeGreaterThanOrEqual(0);
+  test("scanline overlay is suppressed on blog routes (text section)", async ({ page }) => {
+    await page.goto("/blog");
+    await page.waitForTimeout(1500);
+
+    // App.tsx suppresses ambient effects on /blog and /how-i-do-it routes
+    const scanline = page.locator(".scanline-overlay.scan-sweep");
+    await expect(scanline).toHaveCount(0);
   });
 });
 

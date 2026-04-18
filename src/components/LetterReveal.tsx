@@ -27,6 +27,8 @@ interface LetterRevealProps {
   delayPerLetter?: number;
   /** Milliseconds before the first letter starts. Default: 0 */
   startDelay?: number;
+  /** External skip — render in final state immediately (e.g., return visit). Default: false */
+  skipAnimation?: boolean;
 }
 
 const LetterReveal = ({
@@ -35,17 +37,20 @@ const LetterReveal = ({
   tag: Tag = "h1",
   delayPerLetter = 40,
   startDelay = 0,
+  skipAnimation: externalSkip = false,
 }: LetterRevealProps) => {
   const hasPlayed = useRef(false);
-  const [skipAnimation, setSkipAnimation] = useState(false);
+  const [internalSkip, setInternalSkip] = useState(false);
 
   useEffect(() => {
     if (hasPlayed.current) {
-      setSkipAnimation(true);
+      setInternalSkip(true);
     } else {
       hasPlayed.current = true;
     }
   }, []);
+
+  const effectiveSkip = externalSkip || internalSkip;
 
   return (
     <Tag className={className} aria-label={text}>
@@ -54,12 +59,12 @@ const LetterReveal = ({
           key={i}
           aria-hidden="true"
           className={
-            skipAnimation
+            effectiveSkip
               ? "inline-block"
               : `letter-reveal${char === " " ? " letter-reveal-space" : ""}`
           }
           style={
-            skipAnimation
+            effectiveSkip
               ? undefined
               : { animationDelay: `${startDelay + i * delayPerLetter}ms` }
           }

@@ -42,9 +42,9 @@ const findElementId = (href: string): string => {
   return customSlugify(linkText);
 };
 
-// Reads active CSS custom properties at call time, so Mermaid diagrams
-// pick up the correct colors regardless of which color theme is active.
-// Static values would hardcode matrix-green and look wrong in violet/amber.
+// Reads active CSS custom properties at call time so Mermaid diagrams pick
+// up the live Night City palette. Dynamic reads also leave the door open for
+// future theme additions without changing this function.
 function buildDarkMermaidThemeCSS(): string {
   if (typeof window === "undefined") {
     // SSR path — next-themes is client-only, so this branch is effectively dead,
@@ -119,36 +119,14 @@ const readingThemeCSS = `
   line { stroke: hsl(30 10% 40%) !important; }
 `;
 
-// Returns a stable signature for the active color theme, normalized so that
-// transient classes don't cause spurious re-renders. next-themes briefly adds
-// and removes a `next-themes-transition-disable` class during theme switches
-// to suppress mid-animation flash; capturing the full className string would
-// fire this signature twice per switch, causing two mermaid.initialize() calls
-// instead of one.
-function getActiveColorThemeKey(): string {
-  const cl = document.documentElement.classList;
-  if (cl.contains("theme-violet")) return "violet";
-  if (cl.contains("theme-amber")) return "amber";
-  return "default";
-}
-
 function useMermaidTheme() {
   const [isReading, setIsReading] = useState(
     () => !!document.querySelector(".theme-reading")
-  );
-  // Tracks the active color theme as a normalized key. When this changes the
-  // MutationObserver fires, we rebuild the dark theme CSS from live CSS vars
-  // so Mermaid picks up the new color palette.
-  const [colorThemeKey, setColorThemeKey] = useState(
-    () => getActiveColorThemeKey()
   );
 
   useEffect(() => {
     const observer = new MutationObserver(() => {
       setIsReading(!!document.querySelector(".theme-reading"));
-      // Use the normalized key so transient classes from next-themes don't
-      // cause double re-initialization on theme swap.
-      setColorThemeKey(getActiveColorThemeKey());
     });
     observer.observe(document.documentElement, {
       attributes: true,
@@ -162,12 +140,10 @@ function useMermaidTheme() {
       startOnLoad: false,
       theme: "dark",
       securityLevel: "loose",
-      // Reading mode uses a fixed light palette; dark themes read from live CSS vars.
+      // Reading mode uses a fixed light palette; Night City reads from live CSS vars.
       themeCSS: isReading ? readingThemeCSS : buildDarkMermaidThemeCSS(),
     });
-    // colorThemeKey is intentionally in the dep array: we need to re-initialize
-    // mermaid whenever the color theme changes, not just reading mode.
-  }, [isReading, colorThemeKey]);
+  }, [isReading]);
 
   return isReading;
 }

@@ -1,31 +1,27 @@
 /**
  * Motion Design System — The Digital Matrix
  *
- * Centralized motion variants, theme-aware hooks, and reduced-motion bridge.
+ * Centralized motion variants and reduced-motion bridge.
  *
  * Two timing systems coexist (conscious trade-off, see spec §A9/Q8):
  *   - JS constants here are source of truth for Framer Motion animations.
  *   - CSS custom properties in index.css are source of truth for hover/ambient CSS effects.
  * Both share the same design intent but are not mechanically coupled.
  * If you change durations/easings here, update the corresponding CSS tokens too.
+ *
+ * Single-theme codebase: Night City (cyberpunk-gold) is the only theme.
+ * Multi-theme branching has been collapsed; mobile/reduced-motion guards remain.
  */
 
 import { useReducedMotion } from "framer-motion";
-import { useTheme } from "next-themes";
 import type { Variants } from "framer-motion";
-
-// ---------------------------------------------------------------------------
-// Theme detection
-// ---------------------------------------------------------------------------
-
-const CYBER_THEMES = ["cyberpunk", "cyberpunk-gold"];
 
 // ---------------------------------------------------------------------------
 // Page transition variants (spec §2, amended by A1, A2, A8)
 // ---------------------------------------------------------------------------
 
 export const pageTransition = {
-  // Cyberpunk themes: horizontal glitch-cut with brightness flash
+  // Default: horizontal glitch-cut with brightness flash
   // steps(12) at 250ms ≈ 21ms/step — mechanical character, still smooth (A8)
   cyberpunk: {
     initial: { opacity: 0, x: -8, filter: "brightness(1.5)" },
@@ -40,20 +36,6 @@ export const pageTransition = {
       x: 8,
       filter: "brightness(1.5)",
       transition: { duration: 0.15 },
-    },
-  },
-  // Classic themes (violet, amber): vertical fade-slide, expo-out
-  classic: {
-    initial: { opacity: 0, y: 12 },
-    animate: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] },
-    },
-    exit: {
-      opacity: 0,
-      y: -8,
-      transition: { duration: 0.2 },
     },
   },
   // Reading mode: fast opacity-only fade (A1 — content priority)
@@ -91,7 +73,12 @@ export const staggerContainer: Variants = {
   },
 };
 
-/** Individual item — classic themes (vertical slide + blur) */
+/**
+ * Subtle stagger item — vertical slide + blur. Used by Index.tsx Phase 3 hero
+ * stagger (subtitle/buttons/scroll hint). The hero already runs heavy entrance
+ * theater (hero-glitch-entrance, hero-stamp-entrance); this subtle variant
+ * deliberately doesn't compete. Other pages use staggerItemCyber via useItemVariant().
+ */
 export const staggerItem: Variants = {
   hidden: {
     opacity: 0,
@@ -109,7 +96,7 @@ export const staggerItem: Variants = {
   },
 };
 
-/** Cyberpunk item — horizontal shift + brightness flash */
+/** Default stagger item — horizontal shift + brightness flash (cyber feel) */
 export const staggerItemCyber: Variants = {
   hidden: {
     opacity: 0,
@@ -128,7 +115,7 @@ export const staggerItemCyber: Variants = {
 };
 
 /** Mobile item — opacity only, no blur/transform (spec §8.3) */
-const staggerItemMobile: Variants = {
+export const staggerItemMobile: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -140,7 +127,7 @@ const staggerItemMobile: Variants = {
 };
 
 /** Reduced motion — instant, no animation */
-const reducedVariant: Variants = {
+export const reducedVariant: Variants = {
   hidden: { opacity: 1 },
   visible: { opacity: 1 },
 };
@@ -176,26 +163,20 @@ function isMobileViewport(): boolean {
 }
 
 // ---------------------------------------------------------------------------
-// Theme-variant bridge hooks (spec A2)
+// Variant-selection hooks (spec A2 + A4)
 // ---------------------------------------------------------------------------
 
 /**
- * Returns the correct page transition variant based on active theme
- * and reduced-motion preference. Uses Framer Motion's reactive
- * useReducedMotion hook (spec A4).
+ * Returns the page transition variant respecting reduced-motion preference.
  */
 export function usePageVariant() {
   const prefersReduced = useReducedMotion();
-  const { theme } = useTheme();
-
   if (prefersReduced) return pageTransition.reduced;
-  const isCyber = CYBER_THEMES.includes(theme ?? "");
-  return isCyber ? pageTransition.cyberpunk : pageTransition.classic;
+  return pageTransition.cyberpunk;
 }
 
 /**
- * Returns the correct reading-mode page transition.
- * 200ms opacity-only fade for content pages.
+ * Returns the reading-mode page transition (200ms opacity-only fade).
  */
 export function useReadingPageVariant() {
   const prefersReduced = useReducedMotion();
@@ -204,25 +185,24 @@ export function useReadingPageVariant() {
 }
 
 /**
- * Returns the correct item stagger variant based on active theme,
- * viewport size, and reduced-motion preference (spec A2 + A4).
+ * Default item stagger variant for non-hero pages.
+ * Respects mobile viewport + reduced-motion preference.
  */
 export function useItemVariant(): Variants {
   const prefersReduced = useReducedMotion();
-  const { theme } = useTheme();
-
   if (prefersReduced) return reducedVariant;
   if (isMobileViewport()) return staggerItemMobile;
-
-  const isCyber = CYBER_THEMES.includes(theme ?? "");
-  return isCyber ? staggerItemCyber : staggerItem;
+  return staggerItemCyber;
 }
 
 /**
- * Returns true when the active theme is a cyberpunk variant.
- * Useful for conditionally applying CSS classes (glitch-hover, scanlines).
+ * Hero stagger variant — subtle vertical slide that doesn't compete with the
+ * hero's entrance theater. Used by Index.tsx Phase 3 (subtitle/buttons/scroll hint).
+ * Respects mobile viewport + reduced-motion preference (parity with useItemVariant).
  */
-export function useIsCyberTheme(): boolean {
-  const { theme } = useTheme();
-  return CYBER_THEMES.includes(theme ?? "");
+export function useHeroStaggerVariant(): Variants {
+  const prefersReduced = useReducedMotion();
+  if (prefersReduced) return reducedVariant;
+  if (isMobileViewport()) return staggerItemMobile;
+  return staggerItem;
 }

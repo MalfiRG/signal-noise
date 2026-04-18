@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Personal technical blog by **Piotr Tarach**, QA engineer based in Prague. Four theme profiles (violet, amber, cyberpunk, cyberpunk-gold) with reading-mode toggle for blog posts. Built as a React + TypeScript SPA.
+Personal technical blog by **Piotr Tarach**, QA engineer based in Prague. Single visual identity: **Night City** (cyberpunk-gold — yellow primary `#f3e600` + cyan accent + amber learning-state). Reading-mode toggle for blog posts swaps to a cream/dark-text reading theme. Built as a React + TypeScript SPA.
 
 **Repo:** `https://github.com/MalfiRG/the-digital-matrix.git`
 **Hosting:** Vercel (auto-deploys from `main`)
@@ -147,18 +147,15 @@ Each feature folder contains its own components and data files. Cross-cutting co
 
 Route-level files in `src/pages/` are thin wrappers that import and render the actual feature component. This separates routing from feature logic.
 
-### Visual Identity & Themes
+### Visual Identity & Theme
 
-Four theme profiles driven by `next-themes` (class-based switching on `<html>`):
-- **Violet** (default) — synthwave purple, `--primary: 270 100% 65%`
-- **Amber** — retro terminal warm tones
-- **Cyberpunk** (Night City) — cyan + magenta, scanline/glitch effects
-- **Cyberpunk-Gold** — yellow + cyan, scanline/glitch effects
+**Single theme: Night City** (cyberpunk-gold). Yellow primary `#f3e600` (`hsl(57 100% 48%)`) on dark blue background `hsl(222 15% 5%)`, cyan accent `hsl(171 77% 60%)`, amber `--learning` token `hsl(25 95% 55%)` for the in-progress learning state on the Skills page. Ambient effects always on: scanline overlay, scan-sweep line (desktop only — killed on mobile), glitch-hover on nav links + buttons, hero orbs with breathing animation. Reading mode (`.theme-reading` on a descendant div) swaps to a cream/dark-text light palette for blog post bodies.
 
-Cyberpunk themes get extra ambient effects via `useIsCyberTheme()` hook. MatrixRain component was removed (PR #27) — ambient orbs cover the visual-interest role now.
-
-- **CSS Variables**: Theme colors defined in `src/index.css` per `.theme-*` class
-- All custom styles in the global CSS using Tailwind `@layer` directives
+- **CSS Variables**: Color tokens live in `:root` of `src/index.css` (single-theme — no `.theme-*` class wrappers needed). Reading mode overrides via `.theme-reading` selector.
+- **Fonts**: Body = Chakra Petch, h1/h5/h6 = Orbitron, h2/h3/h4 = Rajdhani. Reading mode swaps to Atkinson Hyperlegible.
+- **Tailwind**: All custom colors map to CSS vars via `tailwind.config.ts` (e.g., `text-primary`, `bg-learning`, `text-accent`).
+- **Stagger variants**: Index.tsx uses `staggerItem` (subtle vertical slide) via `useHeroStaggerVariant()` so the Phase 3 cascade doesn't compete with the heavy headline entrance theater. All other pages use `staggerItemCyber` (horizontal-shift) via `useItemVariant()`.
+- MatrixRain component was removed (PR #27) — ambient orbs cover the visual-interest role now.
 
 ---
 

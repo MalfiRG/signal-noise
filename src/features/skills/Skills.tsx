@@ -26,7 +26,7 @@ const Skills = () => {
               </TabsTrigger>
               <TabsTrigger
                 value="learning"
-                className="flex-1 tracking-wider text-xs data-[state=active]:text-amber-500"
+                className="flex-1 tracking-wider text-xs data-[state=active]:text-learning"
               >
                 LEARNING
               </TabsTrigger>
@@ -63,8 +63,8 @@ const Skills = () => {
                 {learning.map((item, index) => (
                   <ScrollRevealItem key={item.name} className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium text-amber-500">{item.name}</span>
-                      <span className="text-sm text-amber-500/70">{item.level}%</span>
+                      <span className="text-sm font-medium text-learning">{item.name}</span>
+                      <span className="text-sm text-learning/70">{item.level}%</span>
                     </div>
                     <AnimatedProgressBar
                       percentage={item.level}
