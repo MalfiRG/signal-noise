@@ -1,20 +1,12 @@
 /**
- * LetterReveal — CSS animation-delay character reveal (spec §6, A3).
+ * LetterReveal — per-character entrance animation. See ARCHITECTURE.md §10.
  *
- * Uses a single CSS @keyframes (letter-reveal in index.css) with per-span
- * animation-delay, NOT per-element Framer Motion instances. This avoids
- * 40+ motion instances for a typical headline.
+ * Uses a single CSS @keyframes (.letter-reveal in index.css) with per-span
+ * animation-delay, instead of N Framer Motion instances per headline.
  *
- * Accessibility (A3):
- *   - aria-label on wrapper gives screen readers the full string
- *   - Individual spans are aria-hidden
- *
- * "Once" gate (A3):
- *   - useRef tracks whether animation has played
- *   - On revisit (e.g., back navigation), spans render visible immediately
- *
- * Mobile (A5):
- *   - CSS rule in index.css disables animation-delay on <=640px
+ * Accessibility: aria-label on wrapper gives screen readers the full string;
+ * individual spans are aria-hidden. The skipAnimation prop (external) OR the
+ * internal hasPlayed ref (second mount) renders all spans in settled state.
  */
 
 import { useRef, useEffect, useState } from "react";

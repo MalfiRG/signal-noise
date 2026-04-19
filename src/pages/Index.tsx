@@ -2,32 +2,21 @@ import { useState, useEffect } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Link } from "react-router-dom";
 import AboutSection from "@/features/about/AboutSection";
-// SocialProof removed from Index — repo cards merged into ProjectsList
 import LetterReveal from "@/components/LetterReveal";
 import { useHeroStaggerVariant } from "@/lib/motion";
 
-// sessionStorage key — set after the first cascade completes; cleared on tab close.
-// "One animation per tab session" UX: first visit plays full theater, return
-// navigations (VIEW PROJECTS → back, READ BLOG → back) skip to the settled state.
+// See ARCHITECTURE.md §7 for the hero cascade state machine + skip-on-return rationale.
 const HERO_PLAYED_KEY = "hero-cascade-played";
 
 const Index = () => {
   const heroItem = useHeroStaggerVariant();
   const prefersReduced = useReducedMotion();
 
-  // Skip animation on return visit within the same tab session.
-  // Lazy initializer — runs once at mount, sets phase to 3 if already played.
   const [skipAnimation] = useState(() => {
     if (typeof window === "undefined") return false;
     return sessionStorage.getItem(HERO_PLAYED_KEY) === "1";
   });
 
-  // Three-phase hero cascade:
-  // Phase 1 (200ms):  "INITIALIZING SYSTEM..." letter reveal
-  // Phase 2 (2000ms): h1 headline — BREAK IT → BUILD IT → PROVE IT
-  // Phase 3 (6000ms): subtitle, buttons, scroll hint
-  // prefers-reduced-motion: same cascade order but faster.
-  // skipAnimation (return visit): start at phase 3, no cascade.
   const [phase, setPhase] = useState(skipAnimation ? 3 : 0);
 
   useEffect(() => {
@@ -53,9 +42,6 @@ const Index = () => {
     return () => cancelAnimationFrame(raf);
   }, [prefersReduced, skipAnimation]);
 
-  // Returns the animation class only when the phase gate is met AND we're not
-  // skipping. On skip, returns empty string — the element renders in its base
-  // (opacity:1) state without re-running the entrance keyframe on remount.
   const animClass = (gateMet: boolean, cls: string): string => {
     if (!gateMet) return "opacity-0";
     return skipAnimation ? "" : cls;
