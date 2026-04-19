@@ -33,7 +33,7 @@ for (const viewport of MOBILE_VIEWPORTS) {
           await page.waitForFunction(
             () => document.querySelectorAll("[id^='mermaid-'] svg, [id^='dmermaid-']").length > 0,
             { timeout: 15000 }
-          ).catch(() => );
+          ).catch(() => undefined);
           await page.waitForTimeout(2000);
         }
 
