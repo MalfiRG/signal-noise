@@ -105,9 +105,8 @@ const Navbar = () => {
             >
               <Github className="w-5 h-5" />
             </a>
-            {/* TODO: replace href with actual LinkedIn URL */}
             <a
-              href="#"
+              href="https://www.linkedin.com/in/piotrtarach/"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="LinkedIn profile"
