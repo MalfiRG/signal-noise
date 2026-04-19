@@ -60,8 +60,6 @@ const BlogLayout = () => {
   const isPostPage = useMatch("/blog/:slug");
   const location = useLocation();
 
-  // Intra-blog navigation uses reading variant (200ms opacity) for slug pages,
-  // full page variant for the index — second tier of two-tier transition (A1).
   const readingVariant = useReadingPageVariant();
   const pageVariant = usePageVariant();
   const outletVariant = isPostPage ? readingVariant : pageVariant;
@@ -69,7 +67,6 @@ const BlogLayout = () => {
   return (
     <div className="min-h-dvh pt-[calc(6rem_+_env(safe-area-inset-top,0px))] pb-16 bg-background">
       <div className="flex">
-        {/* Desktop: sidebar as aside (mobile EXPLORER is rendered in BlogIndex) */}
         {!isPostPage && (
           <div className="hidden md:block">
             <BlogSidebar
@@ -82,9 +79,6 @@ const BlogLayout = () => {
           </div>
         )}
         <main className="flex-1 min-w-0 px-4">
-          {/* max-w-6xl gives code blocks room to breathe while keeping layout centered.
-              BlogIndex constrains itself to max-w-3xl internally.
-              Prose elements are constrained to 680px via CSS in index.css. */}
           <div className="mx-auto max-w-6xl">
             <AnimatePresence mode="wait">
               <motion.div key={location.pathname} {...outletVariant}>
