@@ -26,13 +26,11 @@ test.describe("Headings & TOC interaction", () => {
 
   test("scrolling to a heading highlights the corresponding TOC link", async ({ page, blogPage }) => {
     const tocNav = page.locator("nav", { has: page.getByText("On this page") });
-    // Wait for TOC to be rendered before scrolling
     await expect(tocNav).toBeVisible({ timeout: 10000 });
 
     const codeBlocksHeading = page.locator(".markdown-body h2#code-blocks");
     await expect(codeBlocksHeading).toBeVisible({ timeout: 10000 });
 
-    // Scroll so the heading is near the top of the viewport (within IntersectionObserver rootMargin)
     await page.evaluate(() => {
       const el = document.getElementById("code-blocks");
       if (el) {
@@ -70,7 +68,6 @@ test.describe("Headings & TOC interaction", () => {
 
 test.describe("Code blocks", () => {
   test("syntax highlighting is applied to code blocks", async ({ page, blogPage }) => {
-    // rehype-prism-plus adds language-* classes (Prism), not hljs classes
     const highlightedCode = page.locator(".code-block-wrapper code[class*='language-']");
     const count = await highlightedCode.count();
     expect(count).toBeGreaterThan(0);
@@ -247,11 +244,9 @@ test.describe("Lists", () => {
   });
 
   test("unordered lists render with list-disc class", async ({ page, blogPage }) => {
-    // The first ul.list-disc is the inline TOC (hidden in reading mode), use a visible one
     const ul = page.locator(".markdown-body ul.list-disc");
     const count = await ul.count();
     expect(count).toBeGreaterThan(0);
-    // Find the first visible unordered list
     let foundVisible = false;
     for (let i = 0; i < count; i++) {
       const isVisible = await ul.nth(i).isVisible();

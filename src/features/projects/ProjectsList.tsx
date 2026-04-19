@@ -119,7 +119,6 @@ const ProjectsList = () => {
             </p>
           </div>
         ) : isMobile ? (
-          /* Mobile: each card has its own scroll trigger — reveals as you scroll */
           <div className="grid gap-6">
             {projects.map((project) => (
               <motion.div
@@ -134,7 +133,6 @@ const ProjectsList = () => {
             ))}
           </div>
         ) : (
-          /* Desktop: parent-orchestrated stagger, all cards cascade together */
           <motion.div
             className="grid gap-6 md:grid-cols-2"
             variants={desktopStagger}

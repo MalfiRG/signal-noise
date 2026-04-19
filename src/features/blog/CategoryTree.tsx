@@ -31,7 +31,6 @@ const CategoryTree = ({ posts, filteredSlugs, activeTags }: CategoryTreeProps) =
     setManualExpanded((prev) => ({ ...prev, [cat]: !prev[cat] }));
   };
 
-  // Auto-collapse categories with zero visible posts when filters are active
   const getIsExpanded = (cat: string) => {
     if (activeTags.length > 0) {
       const hasVisiblePosts = postsByCategory[cat].some((p) => filteredSlugs.includes(p.slug));

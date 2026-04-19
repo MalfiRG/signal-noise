@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { Terminal, Menu, ChevronDown } from "lucide-react";
+import { Terminal, Menu, ChevronDown, Github, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -16,14 +16,14 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { howIDoItPages } from "@/features/how-i-do-it/data";
-import ThemeSelector from "./ThemeSelector";
-import { useIsCyberTheme } from "@/lib/motion";
+
+const SOCIAL_ICON_CLASS =
+  "w-5 h-5 rounded-full border-2 p-2.5 box-content transition-all duration-200 border-transparent opacity-50 hover:opacity-80 inline-flex items-center justify-center text-foreground";
 
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const isCyber = useIsCyberTheme();
 
   const links = [
     { to: "/", label: "HOME" },
@@ -38,19 +38,18 @@ const Navbar = () => {
   };
 
   const navLinkClass = (path: string) =>
-    `text-sm tracking-widest transition-colors hover:text-primary nav-link-motion ${
+    `text-sm tracking-widest transition-colors hover:text-primary nav-link-motion glitch-hover ${
       isActive(path) ? "text-primary text-glow" : "text-muted-foreground"
-    }${isCyber ? " glitch-hover" : ""}`;
+    }`;
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/90 backdrop-blur-sm pt-[env(safe-area-inset-top)]">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+      <div className="w-full flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link to="/" className="font-display text-lg font-bold text-foreground text-glow tracking-wider">
           <Terminal className="inline-block mr-2 h-5 w-5" />
           SIGNAL_NOISE
         </Link>
 
-        {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-6">
           {links.map((link) => (
             <Link
@@ -64,12 +63,11 @@ const Navbar = () => {
             </Link>
           ))}
 
-          {/* How I Do It dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger
-              className={`inline-flex items-center gap-1 text-sm tracking-widest transition-colors hover:text-primary nav-link-motion ${
+              className={`inline-flex items-center gap-1 text-sm tracking-widest transition-colors hover:text-primary nav-link-motion glitch-hover ${
                 isActive("/how-i-do-it") ? "text-primary text-glow" : "text-muted-foreground"
-              }${isCyber ? " glitch-hover" : ""}`}
+              }`}
               data-text="HOW I DO IT"
               {...(isActive("/how-i-do-it") ? { "aria-current": "page" as const } : {})}
             >
@@ -95,12 +93,29 @@ const Navbar = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <ThemeSelector />
+          <div className="flex items-center gap-1.5">
+            <a
+              href="https://github.com/MalfiRG"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="GitHub profile"
+              className={SOCIAL_ICON_CLASS}
+            >
+              <Github className="w-5 h-5" />
+            </a>
+            <a
+              href="https://www.linkedin.com/in/piotrtarach/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="LinkedIn profile"
+              className={SOCIAL_ICON_CLASS}
+            >
+              <Linkedin className="w-5 h-5" />
+            </a>
+          </div>
         </div>
 
-        {/* Mobile: theme dot + hamburger */}
-        <div className="md:hidden flex items-center gap-3">
-          <ThemeSelector />
+        <div className="md:hidden flex items-center">
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="text-foreground min-h-[44px] min-w-[44px]" aria-label="Open navigation menu" data-testid="hamburger-menu">
@@ -145,6 +160,32 @@ const Navbar = () => {
                         {page.title}
                       </Link>
                     ))}
+                  </div>
+                </div>
+
+                <div className="border-t border-border pt-4">
+                  <p className="text-xs tracking-[0.2em] text-muted-foreground mb-3">CONNECT</p>
+                  <div className="flex flex-col gap-2 pl-2">
+                    <a
+                      href="https://github.com/MalfiRG"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center gap-3 text-sm tracking-wider text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      <Github className="w-4 h-4" />
+                      GitHub
+                    </a>
+                    <a
+                      href="https://www.linkedin.com/in/piotrtarach/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center gap-3 text-sm tracking-wider text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      <Linkedin className="w-4 h-4" />
+                      LinkedIn
+                    </a>
                   </div>
                 </div>
               </div>

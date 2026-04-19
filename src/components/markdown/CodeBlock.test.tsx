@@ -3,8 +3,6 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { CodeBlock } from "./CodeBlock";
 
-// userEvent.setup() installs its own Clipboard stub on navigator.clipboard.
-// We spy on the stub's writeText AFTER setup() is called so our spy wraps the stub.
 describe("CodeBlock", () => {
   it("renders children inside a code-block-wrapper", () => {
     render(
@@ -48,7 +46,6 @@ describe("CodeBlock", () => {
 
   it("copies code text to clipboard on click", async () => {
     const user = userEvent.setup();
-    // Spy AFTER setup() so we wrap the clipboard stub userEvent just installed
     const writeTextSpy = vi.spyOn(navigator.clipboard, "writeText");
     render(
       <CodeBlock language="js">

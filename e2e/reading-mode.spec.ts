@@ -78,9 +78,7 @@ test.describe("Code blocks stay dark", () => {
   test("code block elements keep dark background in reading mode", async ({ page, blogPage }) => {
     const codeEl = page.locator(".theme-reading .markdown-body .code-block-wrapper code").first();
     await expect(codeEl).toBeVisible();
-    // Wait for highlight.js + React hydration to stabilize
     await page.waitForTimeout(500);
-    // Use page.evaluate with fresh DOM query to avoid detached element from React re-renders
     const bgColor = await page.evaluate(() => {
       const el = document.querySelector(".theme-reading .markdown-body .code-block-wrapper code");
       if (!el) return "";
