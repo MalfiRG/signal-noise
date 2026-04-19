@@ -44,7 +44,7 @@ const Navbar = () => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/90 backdrop-blur-sm pt-[env(safe-area-inset-top)]">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+      <div className="w-full flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link to="/" className="font-display text-lg font-bold text-foreground text-glow tracking-wider">
           <Terminal className="inline-block mr-2 h-5 w-5" />
           SIGNAL_NOISE
@@ -95,7 +95,7 @@ const Navbar = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <div className="flex items-center gap-1.5">
+          <div className="hidden lg:flex items-center gap-1.5">
             <a
               href="https://github.com/MalfiRG"
               target="_blank"

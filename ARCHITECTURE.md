@@ -183,7 +183,7 @@ src/
 
 CSS is layered for predictable cascade resolution:
 
-1. **`@font-face`** declarations (top of `index.css`, no layer) — self-hosted woff2s for Share Tech Mono, Orbitron, Atkinson Hyperlegible. Rajdhani + Chakra Petch still on Google CDN (TODO: self-host).
+1. **`@font-face`** declarations (top of `index.css`, no layer) — all self-hosted woff2s in `public/fonts/`: Share Tech Mono, Orbitron, Atkinson Hyperlegible, Rajdhani (500/700), Chakra Petch (400). Each declared with `unicode-range` for latin + latin-ext (Polish character support).
 2. **`@layer base`** — `:root` color tokens (single-theme Night City), `.theme-reading` overrides, font scoping, scrollbar, `::selection`.
 3. **`@layer utilities`** — `.text-glow`, `.box-glow`, `.scanline`, `.theme-reading .hidden-in-reading`.
 4. **`@layer components`** — `.markdown-body` typography, code block wrappers, Prism token colors, reading-mode markdown overrides.
