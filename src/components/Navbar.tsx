@@ -50,7 +50,6 @@ const Navbar = () => {
           SIGNAL_NOISE
         </Link>
 
-        {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-6">
           {links.map((link) => (
             <Link
@@ -64,7 +63,6 @@ const Navbar = () => {
             </Link>
           ))}
 
-          {/* How I Do It dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger
               className={`inline-flex items-center gap-1 text-sm tracking-widest transition-colors hover:text-primary nav-link-motion glitch-hover ${
@@ -95,7 +93,7 @@ const Navbar = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <div className="hidden lg:flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5">
             <a
               href="https://github.com/MalfiRG"
               target="_blank"
@@ -117,7 +115,6 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile: hamburger only */}
         <div className="md:hidden flex items-center">
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
@@ -163,6 +160,32 @@ const Navbar = () => {
                         {page.title}
                       </Link>
                     ))}
+                  </div>
+                </div>
+
+                <div className="border-t border-border pt-4">
+                  <p className="text-xs tracking-[0.2em] text-muted-foreground mb-3">CONNECT</p>
+                  <div className="flex flex-col gap-2 pl-2">
+                    <a
+                      href="https://github.com/MalfiRG"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center gap-3 text-sm tracking-wider text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      <Github className="w-4 h-4" />
+                      GitHub
+                    </a>
+                    <a
+                      href="https://www.linkedin.com/in/piotrtarach/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center gap-3 text-sm tracking-wider text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      <Linkedin className="w-4 h-4" />
+                      LinkedIn
+                    </a>
                   </div>
                 </div>
               </div>

@@ -25,7 +25,6 @@ export function CodeBlock({ language, children }: CodeBlockProps) {
     try {
       await navigator.clipboard.writeText(text);
     } catch {
-      // Fallback for non-HTTPS contexts (mobile over HTTP, meshnet IPs)
       const textarea = document.createElement("textarea");
       textarea.value = text;
       textarea.style.position = "fixed";
@@ -54,13 +53,11 @@ export function CodeBlock({ language, children }: CodeBlockProps) {
 
   return (
     <>
-      {/* Inline code block — always mounted, hidden via CSS when expanded */}
       <div
         ref={wrapperRef}
         className="code-block-wrapper relative my-4 group rounded-md overflow-hidden"
         style={{ background: CODE_BG, display: expanded ? "none" : undefined }}
       >
-        {/* Top bar */}
         <div className="flex items-center justify-between px-3 py-1.5" style={{ background: CODE_BG }}>
           {language ? (
             <span className="code-lang-badge text-xs opacity-60 select-none" style={{ color: "#abb2bf" }}>
@@ -92,7 +89,6 @@ export function CodeBlock({ language, children }: CodeBlockProps) {
             </button>
           </div>
         </div>
-        {/* Code content */}
         <div
           ref={scrollRef}
           className="code-scroll-container overflow-x-auto px-3 pb-3"
@@ -102,7 +98,6 @@ export function CodeBlock({ language, children }: CodeBlockProps) {
         </div>
       </div>
 
-      {/* Fullscreen overlay — portaled to body, z-[100] above navbar z-50 */}
       {expanded && createPortal(
         <div
           className="fixed inset-0 z-[100] flex flex-col"

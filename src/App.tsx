@@ -30,7 +30,6 @@ const AppContent = () => {
   return (
     <>
       <Navbar />
-      {/* Ambient effects — always on (single-theme), suppressed in text-heavy sections to avoid distracting reading */}
       {!isTextSection && <div className="scanline-overlay scan-sweep" />}
       <div className={isReadingMode ? "theme-reading min-h-screen bg-background" : ""}>
         <PageTransition>

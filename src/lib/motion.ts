@@ -1,13 +1,3 @@
-/**
- * Motion Design System — see ARCHITECTURE.md §6 + DESIGN.md §7.
- *
- * Two timing systems coexist by design:
- *   - JS constants here drive Framer Motion variants.
- *   - CSS custom properties in index.css drive hover/ambient effects.
- * They share design intent but are not mechanically coupled — when changing
- * durations or easings, update both sides.
- */
-
 import { useReducedMotion } from "framer-motion";
 import type { Variants } from "framer-motion";
 
@@ -46,11 +36,6 @@ export const staggerContainer: Variants = {
   },
 };
 
-/**
- * Subtle entrance — used by the Index hero Phase 3 stagger so it doesn't
- * compete with the heavy headline theater above. Other pages use the
- * cyber variant via useItemVariant().
- */
 export const staggerItem: Variants = {
   hidden: { opacity: 0, y: 20, filter: "blur(4px)" },
   visible: {
@@ -123,10 +108,6 @@ export function useItemVariant(): Variants {
   return staggerItemCyber;
 }
 
-/**
- * Hero stagger — subtle variant that doesn't compete with the hero's
- * entrance theater. See ARCHITECTURE.md §6 for the cyber-vs-subtle rationale.
- */
 export function useHeroStaggerVariant(): Variants {
   const prefersReduced = useReducedMotion();
   if (prefersReduced) return reducedVariant;

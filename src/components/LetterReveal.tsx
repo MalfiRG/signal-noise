@@ -1,25 +1,11 @@
-/**
- * LetterReveal — per-character entrance animation. See ARCHITECTURE.md §10.
- *
- * Uses a single CSS @keyframes (.letter-reveal in index.css) with per-span
- * animation-delay, instead of N Framer Motion instances per headline.
- *
- * Accessibility: aria-label on wrapper gives screen readers the full string;
- * individual spans are aria-hidden. The skipAnimation prop (external) OR the
- * internal hasPlayed ref (second mount) renders all spans in settled state.
- */
-
 import { useRef, useEffect, useState } from "react";
 
 interface LetterRevealProps {
   text: string;
   className?: string;
   tag?: "h1" | "h2" | "h3" | "span";
-  /** Milliseconds between each letter. Default: 40 */
   delayPerLetter?: number;
-  /** Milliseconds before the first letter starts. Default: 0 */
   startDelay?: number;
-  /** External skip — render in final state immediately (e.g., return visit). Default: false */
   skipAnimation?: boolean;
 }
 

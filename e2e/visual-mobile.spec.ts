@@ -24,25 +24,21 @@ for (const viewport of MOBILE_VIEWPORTS) {
       test(`${route.name} renders correctly`, async ({ page }) => {
         await page.goto(route.path, { waitUntil: "networkidle" });
 
-        // Wait for content-specific selectors
         if (route.waitFor) {
           await expect(page.locator("svg.animate-spin")).toHaveCount(0, { timeout: 15000 });
           await expect(page.locator(route.waitFor)).toBeVisible({ timeout: 15000 });
         }
 
-        // Wait for Mermaid diagrams to finish rendering
         if ((route as any).hasMermaid) {
           await page.waitForFunction(
             () => document.querySelectorAll("[id^='mermaid-'] svg, [id^='dmermaid-']").length > 0,
             { timeout: 15000 }
-          ).catch(() => {/* mermaid may not be on every page */});
+          ).catch(() => );
           await page.waitForTimeout(2000);
         }
 
-        // Wait for fonts and animations to settle
         await page.waitForTimeout(1500);
 
-        // Full-page screenshot
         await expect(page).toHaveScreenshot(
           `${route.name}-${viewport.name}w.png`,
           {

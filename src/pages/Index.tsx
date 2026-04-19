@@ -5,7 +5,6 @@ import AboutSection from "@/features/about/AboutSection";
 import LetterReveal from "@/components/LetterReveal";
 import { useHeroStaggerVariant } from "@/lib/motion";
 
-// See ARCHITECTURE.md §7 for the hero cascade state machine + skip-on-return rationale.
 const HERO_PLAYED_KEY = "hero-cascade-played";
 
 const Index = () => {
@@ -20,19 +19,19 @@ const Index = () => {
   const [phase, setPhase] = useState(skipAnimation ? 3 : 0);
 
   useEffect(() => {
-    if (skipAnimation) return; // already settled; nothing to schedule
+    if (skipAnimation) return;
 
     const raf = requestAnimationFrame(() => {
       if (prefersReduced) {
         setTimeout(() => setPhase(1), 100);
-        setTimeout(() => setPhase(2), 600);
+        setTimeout(() => setPhase(2), 1100);
         setTimeout(() => {
           setPhase(3);
           sessionStorage.setItem(HERO_PLAYED_KEY, "1");
         }, 1200);
       } else {
         setTimeout(() => setPhase(1), 200);
-        setTimeout(() => setPhase(2), 2000);
+        setTimeout(() => setPhase(2), 2500);
         setTimeout(() => {
           setPhase(3);
           sessionStorage.setItem(HERO_PLAYED_KEY, "1");
@@ -51,7 +50,6 @@ const Index = () => {
     <>
       <div className="scanline fixed inset-0 z-10" />
 
-      {/* Reduced-motion guard — dev + prod visible warning */}
       {prefersReduced && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -74,7 +72,6 @@ const Index = () => {
         />
 
         <div className="text-center px-4 max-w-3xl">
-          {/* Phase 1: INITIALIZING SYSTEM... letter reveal — linear easing scoped via .letter-reveal-linear */}
           {phase >= 1 ? (
             <LetterReveal
               text="> INITIALIZING SYSTEM..."
@@ -90,7 +87,6 @@ const Index = () => {
             </p>
           )}
 
-          {/* Phase 2: Headline cascade */}
           <h1 className="font-display text-5xl md:text-7xl font-black text-foreground text-glow mb-6 flex flex-col items-center gap-1 md:gap-2">
             <span
               className={animClass(phase >= 2, "hero-glitch-entrance")}
@@ -118,8 +114,6 @@ const Index = () => {
             </span>
           </h1>
 
-          {/* Phase 3: Subtitle, buttons, scroll — staggered together.
-              On skip, initial="visible" bypasses the entrance animation entirely. */}
           <motion.div
             variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.5, delayChildren: 0.05 } } }}
             initial={skipAnimation ? "visible" : "hidden"}

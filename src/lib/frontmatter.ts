@@ -3,11 +3,6 @@ export interface FrontmatterResult {
   content: string;
 }
 
-/**
- * Lightweight YAML frontmatter parser for blog posts.
- * Handles the subset of YAML used in blog frontmatter:
- * quoted strings, unquoted scalars, JSON arrays, booleans.
- */
 export function parseFrontmatter(raw: string): FrontmatterResult {
   const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
   if (!match) {
@@ -27,20 +22,15 @@ export function parseFrontmatter(raw: string): FrontmatterResult {
     let value: unknown = line.slice(colonIdx + 1).trim();
 
     if (typeof value === "string") {
-      // Quoted string — strip quotes
       if (value.startsWith('"') && value.endsWith('"')) {
         value = value.slice(1, -1);
-      }
-      // JSON array — parse it
-      else if (value.startsWith("[")) {
+      } else if (value.startsWith("[")) {
         try {
           value = JSON.parse(value as string);
         } catch {
-          /* keep as string */
+          value = line.slice(colonIdx + 1).trim();
         }
-      }
-      // Booleans
-      else if (value === "true") value = true;
+      } else if (value === "true") value = true;
       else if (value === "false") value = false;
     }
 

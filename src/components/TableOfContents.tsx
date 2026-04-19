@@ -28,7 +28,6 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
           }
         });
 
-        // Pick the topmost visible heading (by document order)
         const firstVisible = headings.find(({ id }) => visibleIds.current.has(id));
         if (firstVisible) {
           setActiveId(firstVisible.id);

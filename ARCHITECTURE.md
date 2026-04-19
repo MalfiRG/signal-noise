@@ -484,7 +484,112 @@ See §6 above. The hook indirection (instead of importing variants directly) is 
 
 ---
 
-## 12. References
+## 12. Implementation Notes
+
+WHYs that previously lived as code comments. Code stays self-documenting; non-obvious decisions live here.
+
+### Two-tier route transition system
+
+`PageTransition` (`src/components/PageTransition.tsx`) wraps the top-level Outlet with `AnimatePresence` keyed on the **first path segment** (`/` + first path part). This means cross-section navigation (Home → Blog, Blog → Projects) triggers the outer transition, but intra-blog navigation (`/blog → /blog/some-slug`) does NOT — both share the same key (`/blog`).
+
+`BlogLayout` (`src/features/blog/BlogLayout.tsx`) provides the inner `AnimatePresence` keyed on full `location.pathname` for intra-blog navigation. It uses `useReadingPageVariant()` (200ms opacity-only fade) for `/blog/:slug` post pages and `usePageVariant()` for the index. The two-tier split avoids double-render flash on intra-section navigation.
+
+`mode="wait"` on both ensures exit completes before enter starts.
+
+### Manual scroll restoration
+
+`useScrollRestoration()` (`src/hooks/useScrollRestoration.ts`) replaces the browser's native `history.scrollRestoration` because:
+
+- Mobile browsers evict background tabs and reload the SPA when the user returns. Native restoration fires before React mounts content, so scroll position resets to 0.
+- `AnimatePresence` enter animations take 200-400ms; restoring before the animation settles produces visible jump.
+
+The hook saves `window.scrollY` to sessionStorage on `visibilitychange` (tab background) and `beforeunload`, then restores after a 500ms delay (covers both classic 400ms and reading 200ms variants with margin). `sessionStorage` key is `scroll-pos`, scoped per-pathname.
+
+### Markdown renderer — Mermaid theming
+
+`useMermaidTheme()` (`src/components/markdown/MarkdownRenderer.tsx`) reads CSS custom properties at call time via `getComputedStyle(document.documentElement)`. This means Mermaid diagrams pick up the live Night City palette without hardcoding colors, and the function automatically adapts if a future theme is added.
+
+Reading mode swaps to a fixed cream-paper Mermaid palette (`readingThemeCSS`) since reading mode uses a different background. The two paths are gated by an `isReading` MutationObserver on `<html>` class.
+
+The `typeof window === "undefined"` SSR branch in `buildDarkMermaidThemeCSS` is dead code under the current Vite client-only setup, but kept to satisfy TypeScript and any future SSR scenario.
+
+### Reading-mode CSS — `!important` usage
+
+`readingThemeCSS` (string constant in `MarkdownRenderer.tsx`) and several `.theme-reading .markdown-body` rules in `index.css` use `!important`. This is necessary because:
+
+- Mermaid SVG output sets inline `fill`/`stroke` attributes that beat regular CSS specificity
+- `rehype-prism-plus` Prism token rules need to be overridden for code-in-reading-mode
+- Hardcoded reading-mode colors must beat the layered `:root` and `@layer components` rules
+
+`!important` in this codebase is allowed ONLY for these three cases. Any new `!important` usage requires a justification at PR review.
+
+### CategoryTree auto-collapse
+
+`getIsExpanded()` (`src/features/blog/CategoryTree.tsx`) auto-collapses categories that have zero visible posts when filters are active, but respects the user's manual expand/collapse state otherwise. This keeps the sidebar tidy when filtering by tag without losing user intent.
+
+### BlogLayout `max-w-6xl` content width
+
+The blog post container uses `max-w-6xl` (72rem ≈ 1152px) so code blocks have room to breathe horizontally without wrapping. Prose elements inside are constrained to 680px via CSS in `index.css` (`.markdown-body > p, .markdown-body > h2, ...`). This produces narrow text columns inside a wider canvas — readable prose without cramped code samples.
+
+`BlogIndex.tsx` constrains itself to `max-w-3xl` separately for tighter post-list layout.
+
+### Frontmatter parser — supported subset
+
+`parseFrontmatter()` (`src/lib/frontmatter.ts`) handles the YAML subset used in blog frontmatter only:
+
+- Quoted strings (`"foo"`) — quotes stripped
+- Unquoted scalars
+- JSON arrays (`["a", "b"]`) — `JSON.parse`d
+- Booleans (`true` / `false`)
+
+Anything else (multi-line strings, anchors, complex nested objects) is unsupported. If frontmatter complexity grows beyond this, switch to a real YAML library (`yaml` or `js-yaml`).
+
+### Scroll restoration vs hero skip — different sessionStorage keys
+
+Two unrelated sessionStorage features coexist:
+
+| Key                    | Owner                       | Purpose                                              |
+|------------------------|----------------------------|------------------------------------------------------|
+| `scroll-pos`           | `useScrollRestoration`      | Per-pathname scroll position dictionary              |
+| `hero-cascade-played`  | `Index.tsx` hero cascade    | Boolean flag — first visit plays full theater       |
+
+Both clear on tab close.
+
+### CSS source order — unlayered beats layered
+
+In `index.css`, code-block selection-color rules (`pre ::selection`, `code ::selection`, etc.) live OUTSIDE any `@layer` block. This is intentional: unlayered rules always beat layered rules of identical specificity, and we need these to override Prism's syntax-highlight token colors during text selection. Moving them inside `@layer components` would lose the override.
+
+The same principle protects the `body` font swap to Chakra Petch (in `@layer base`, edited in-place rather than added unlayered).
+
+### Why we keep `next-themes` despite single-theme
+
+`ThemeProvider` (`src/App.tsx`) is configured with `themes={["cyberpunk-gold"]}` — only one theme. We keep the provider because:
+
+1. It applies `theme-cyberpunk-gold` class to `<html>` BEFORE first paint via inline `<script>`, preventing FOUC
+2. It synchronously reads `localStorage` (FOUC prevention)
+3. It preserves the wiring point if a future theme is added — re-introducing themes wouldn't require restructuring
+
+The class itself is currently a no-op (color tokens live in `:root`), but it serves as a defensive marker that hydration completed.
+
+### Sonner toast theme — hardcoded "dark"
+
+Sonner's `Toaster` accepts `theme="light" | "dark" | "system"`. Passing the next-themes value (`"cyberpunk-gold"`) silently falls back to `"light"` and renders toasts on a white background against our dark UI. We hardcode `theme="dark"` in `src/components/ui/sonner.tsx` to avoid this.
+
+If a future theme adds a light reading-mode for toasts (currently reading mode is descendant-scoped only), this needs a swap.
+
+### Hero glitch entrance — `data-text` requirement
+
+Elements using `.hero-glitch-entrance` or `.glitch-hover` CSS classes MUST also set the `data-text="..."` attribute matching their visible text. The pseudo-elements (`::before`, `::after`) read `content: attr(data-text)` to render the chromatic-aberration overlays.
+
+Forgetting `data-text` produces silent failure: animation runs, but the overlay layers are blank.
+
+### Mobile orb override scope
+
+`@media (max-width: 640px)` in `index.css` redefines `.animate-hero-glow-slow` and `.animate-hero-glow-slower` to use the `hero-glow-mobile` keyframe. This keyframe has tighter scale (1.04 vs 1.12 desktop) and tighter opacity (0.75-0.85 vs 0.6-1.0), at slower tempo (16s/22s vs 8s/11s). Reason: on mobile the orbs sit closer to the eye and compete with the hero entrance cascade if they breathe too actively.
+
+---
+
+## 13. References
 
 - **Design system:** `DESIGN.md` (visual identity, color palette, motion grammar)
 - **Voice & content guide:** `skills/voice-to-blog/references/voice-style-guide.md`
