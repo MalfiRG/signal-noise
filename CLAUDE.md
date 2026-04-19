@@ -7,6 +7,11 @@ Personal technical blog by **Piotr Tarach**, QA engineer based in Prague. Single
 **Repo:** `https://github.com/MalfiRG/the-digital-matrix.git`
 **Hosting:** Vercel (auto-deploys from `main`)
 
+## Authoritative documents (lazy-load when relevant)
+
+- **`DESIGN.md`** — visual identity spec (palette HSLs, typography, components, motion grammar, do's/don'ts). Read for ANY UI/styling work before generating code.
+- **`ARCHITECTURE.md`** — engineering architecture (routing, content pipeline, motion system internals, hero cascade state machine, testing layers). Read for structural changes.
+
 ---
 
 ## Git Conventions
