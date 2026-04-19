@@ -4,7 +4,6 @@ import { MemoryRouter, Routes, Route, Outlet } from "react-router-dom";
 import BlogIndex from "./BlogIndex";
 import type { BlogPost, BlogOutletContext } from "./data";
 
-// Mock framer-motion to avoid animation issues in tests
 vi.mock("framer-motion", () => ({
   motion: {
     div: ({ children, ...props }: Record<string, unknown>) => <div {...props}>{children}</div>,
@@ -17,7 +16,6 @@ const mockPosts: BlogPost[] = [
   { slug: "post-b", title: "Beta Post", date: "2026-01-02", tags: ["automation"], category: "DevOps", excerpt: "Excerpt B" },
 ];
 
-// Layout component that provides outlet context to child routes
 const ContextProvider = ({ context }: { context: BlogOutletContext }) => (
   <Outlet context={context} />
 );

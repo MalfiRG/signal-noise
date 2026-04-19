@@ -42,13 +42,8 @@ const findElementId = (href: string): string => {
   return customSlugify(linkText);
 };
 
-// Reads active CSS custom properties at call time, so Mermaid diagrams
-// pick up the correct colors regardless of which color theme is active.
-// Static values would hardcode matrix-green and look wrong in violet/amber.
 function buildDarkMermaidThemeCSS(): string {
   if (typeof window === "undefined") {
-    // SSR path — next-themes is client-only, so this branch is effectively dead,
-    // but keep it to satisfy TypeScript and future SSR scenarios.
     return "";
   }
   const style = getComputedStyle(document.documentElement);
@@ -69,23 +64,23 @@ function buildDarkMermaidThemeCSS(): string {
 }
 
 const readingThemeCSS = `
-  /* Flowchart nodes */
+  
   .node rect, .node circle, .node ellipse, .node polygon, .node path {
     fill: hsl(30 10% 95%);
     stroke: hsl(30 15% 35%);
     stroke-width: 1.5px;
   }
-  /* Arrows and edges — darker for contrast */
+  
   .edgePath .path { stroke: hsl(30 10% 25%) !important; stroke-width: 2px !important; }
   .edgePath marker path { fill: hsl(30 10% 25%) !important; }
-  /* Clusters */
+  
   .cluster rect { fill: hsl(30 10% 93%); stroke: hsl(30 15% 45%); }
-  /* All text labels */
+  
   .label, .nodeLabel, .edgeLabel, .labelText {
     color: hsl(30 10% 10%) !important;
     fill: hsl(30 10% 10%) !important;
   }
-  /* Edge label background — transparent looks cleanest against cream */
+  
   .labelBkg, .edgeLabel {
     background-color: transparent !important;
     background: transparent !important;
@@ -97,7 +92,7 @@ const readingThemeCSS = `
     background-color: transparent !important;
     background: transparent !important;
   }
-  /* Sequence diagram — !important needed to override inline SVG attributes */
+  
   rect.actor { fill: hsl(30 10% 95%) !important; stroke: hsl(30 15% 35%) !important; }
   .actor-line { stroke: hsl(30 10% 50%) !important; }
   text.actor > tspan { fill: hsl(30 10% 10%) !important; }
@@ -110,45 +105,23 @@ const readingThemeCSS = `
   .loopText, .loopText > tspan { fill: hsl(30 10% 10%) !important; }
   .loopLine { stroke: hsl(30 10% 50%) !important; }
   .labelBox { fill: hsl(30 10% 92%) !important; stroke: hsl(30 15% 45%) !important; }
-  /* State diagram */
+  
   .state-note-edge .path { stroke: hsl(30 10% 40%) !important; }
   .statediagram-state rect.basic { fill: hsl(30 10% 95%) !important; stroke: hsl(30 15% 35%) !important; }
   .statediagram-state .nodeLabel { color: hsl(30 10% 10%) !important; }
-  /* Alt/opt/loop sections */
+  
   .labelText { fill: hsl(30 10% 10%) !important; }
   line { stroke: hsl(30 10% 40%) !important; }
 `;
-
-// Returns a stable signature for the active color theme, normalized so that
-// transient classes don't cause spurious re-renders. next-themes briefly adds
-// and removes a `next-themes-transition-disable` class during theme switches
-// to suppress mid-animation flash; capturing the full className string would
-// fire this signature twice per switch, causing two mermaid.initialize() calls
-// instead of one.
-function getActiveColorThemeKey(): string {
-  const cl = document.documentElement.classList;
-  if (cl.contains("theme-violet")) return "violet";
-  if (cl.contains("theme-amber")) return "amber";
-  return "default";
-}
 
 function useMermaidTheme() {
   const [isReading, setIsReading] = useState(
     () => !!document.querySelector(".theme-reading")
   );
-  // Tracks the active color theme as a normalized key. When this changes the
-  // MutationObserver fires, we rebuild the dark theme CSS from live CSS vars
-  // so Mermaid picks up the new color palette.
-  const [colorThemeKey, setColorThemeKey] = useState(
-    () => getActiveColorThemeKey()
-  );
 
   useEffect(() => {
     const observer = new MutationObserver(() => {
       setIsReading(!!document.querySelector(".theme-reading"));
-      // Use the normalized key so transient classes from next-themes don't
-      // cause double re-initialization on theme swap.
-      setColorThemeKey(getActiveColorThemeKey());
     });
     observer.observe(document.documentElement, {
       attributes: true,
@@ -162,12 +135,9 @@ function useMermaidTheme() {
       startOnLoad: false,
       theme: "dark",
       securityLevel: "loose",
-      // Reading mode uses a fixed light palette; dark themes read from live CSS vars.
       themeCSS: isReading ? readingThemeCSS : buildDarkMermaidThemeCSS(),
     });
-    // colorThemeKey is intentionally in the dep array: we need to re-initialize
-    // mermaid whenever the color theme changes, not just reading mode.
-  }, [isReading, colorThemeKey]);
+  }, [isReading]);
 
   return isReading;
 }
@@ -385,7 +355,6 @@ export function MarkdownRenderer({ content, className = "", onHeadingsExtracted 
           tr: ({ ...props }) => <tr className="even:bg-card odd:bg-background" {...props} />,
 
           pre({ children, className: preClassName, ...preProps }) {
-            // Extract language from code child's className or pre's className
             const codeEl = React.Children.toArray(children).find(
               (child) => React.isValidElement(child)
             );
@@ -395,7 +364,6 @@ export function MarkdownRenderer({ content, className = "", onHeadingsExtracted 
 
             const allClasses = `${preClassName || ""} ${codeClassName}`;
 
-            // Mermaid blocks are handled by the code handler
             if (allClasses.includes("mermaid")) {
               return <>{children}</>;
             }
@@ -409,7 +377,6 @@ export function MarkdownRenderer({ content, className = "", onHeadingsExtracted 
             const language = match ? match[1] : "";
 
             if (language === "mermaid") {
-              // Extract plain text from potentially tokenized React children
               const extractText = (node: React.ReactNode): string => {
                 if (typeof node === "string") return node;
                 if (typeof node === "number") return String(node);
@@ -422,7 +389,6 @@ export function MarkdownRenderer({ content, className = "", onHeadingsExtracted 
               return <MermaidRenderer code={extractText(children).replace(/\n$/, "")} />;
             }
 
-            // Block code — CSS handles styling via .code-block-wrapper rules
             if (className) {
               return (
                 <code className={className} {...props}>
@@ -431,7 +397,6 @@ export function MarkdownRenderer({ content, className = "", onHeadingsExtracted 
               );
             }
 
-            // Inline code
             return (
               <code className="bg-secondary text-foreground px-1 rounded" {...props}>
                 {children}

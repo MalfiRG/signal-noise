@@ -16,7 +16,6 @@ const ROUTES = [
   { path: "/how-i-do-it/test-plan", name: "how-i-do-it-post", waitFor: ".markdown-body" },
 ];
 
-// Test 1: Detect horizontal overflow on each route
 for (const viewport of VIEWPORTS) {
   test.describe(`Overflow check ${viewport.name}px`, () => {
     test.use({ viewport: { width: viewport.width, height: viewport.height } });
@@ -36,14 +35,12 @@ for (const viewport of VIEWPORTS) {
           await page.waitForTimeout(1000);
         }
 
-        // Check for horizontal overflow
         const overflowInfo = await page.evaluate(() => {
           const docWidth = document.documentElement.clientWidth;
           const bodyScrollWidth = document.body.scrollWidth;
           const htmlScrollWidth = document.documentElement.scrollWidth;
           const maxScroll = Math.max(bodyScrollWidth, htmlScrollWidth);
 
-          // Find elements that overflow
           const overflowingElements: { tag: string; class: string; scrollW: number; clientW: number; text: string }[] = [];
           const allElements = document.querySelectorAll("*");
 
@@ -61,7 +58,6 @@ for (const viewport of VIEWPORTS) {
             }
           });
 
-          // Deduplicate by class
           const seen = new Set<string>();
           const unique = overflowingElements.filter((el) => {
             const key = `${el.tag}.${el.class}`;
@@ -100,14 +96,12 @@ for (const viewport of VIEWPORTS) {
           });
         }
 
-        // Don't fail — this is diagnostic
         expect(true).toBe(true);
       });
     }
   });
 }
 
-// Test 2: Blog post section screenshots at 375px for detailed inspection
 test.describe("Blog post section screenshots (375px)", () => {
   test.use({ viewport: { width: 375, height: 812 } });
 
@@ -117,12 +111,10 @@ test.describe("Blog post section screenshots (375px)", () => {
     await expect(page.locator(".markdown-body")).toBeVisible({ timeout: 15000 });
     await page.waitForTimeout(3000);
 
-    // Screenshot specific areas
     const sections = [
       { name: "header-and-meta", selector: ".markdown-body", scrollY: 0 },
     ];
 
-    // Take viewport-sized screenshots at different scroll positions
     const scrollPositions = [0, 800, 1600, 2400, 3200, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000, 13000];
 
     for (const scrollY of scrollPositions) {
@@ -133,7 +125,6 @@ test.describe("Blog post section screenshots (375px)", () => {
       });
     }
 
-    // Also screenshot specific elements if they exist
     const codeBlocks = page.locator(".code-block-wrapper");
     const codeBlockCount = await codeBlocks.count();
     for (let i = 0; i < Math.min(codeBlockCount, 3); i++) {
@@ -142,7 +133,6 @@ test.describe("Blog post section screenshots (375px)", () => {
       });
     }
 
-    // Screenshot tables
     const tables = page.locator(".overflow-x-auto");
     const tableCount = await tables.count();
     for (let i = 0; i < Math.min(tableCount, 3); i++) {
@@ -151,7 +141,6 @@ test.describe("Blog post section screenshots (375px)", () => {
       });
     }
 
-    // Screenshot mermaid diagrams
     const mermaidDivs = page.locator(".my-6.max-w-full.overflow-x-auto");
     const mermaidCount = await mermaidDivs.count();
     for (let i = 0; i < Math.min(mermaidCount, 3); i++) {

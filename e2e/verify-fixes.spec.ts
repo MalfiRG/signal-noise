@@ -8,7 +8,6 @@ test.describe("Verify blog index tags (375px)", () => {
     await page.waitForTimeout(1000);
     await page.screenshot({ path: "test-results/verify-blog-index-375.png" });
 
-    // Verify no horizontal overflow
     const overflow = await page.evaluate(() => {
       return document.documentElement.scrollWidth > document.documentElement.clientWidth;
     });
@@ -40,7 +39,6 @@ test.describe("Verify code blocks preserve formatting (375px)", () => {
     await expect(page.locator(".markdown-body")).toBeVisible({ timeout: 15000 });
     await page.waitForTimeout(2000);
 
-    // Check that code blocks have white-space: pre
     const codeBlocks = page.locator(".code-block-wrapper code");
     const count = await codeBlocks.count();
     expect(count).toBeGreaterThan(0);

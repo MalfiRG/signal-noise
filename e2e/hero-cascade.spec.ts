@@ -1,19 +1,5 @@
 import { test, expect, Page } from "@playwright/test";
 
-/**
- * Hero cascade animation tests — three scenarios:
- * 1. Desktop: full animations, full viewport
- * 2. Mobile (animations ON): full animations, 375px viewport
- * 3. Mobile (animations OFF): reduced motion, instant cascade with delays
- *
- * Uses Playwright's Animation API via CDP to observe running animations.
- */
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-/** Collect CSS animation names currently running on the page */
 async function getRunningAnimations(page: Page): Promise<string[]> {
   return page.evaluate(() => {
     const animations = document.getAnimations();
@@ -30,7 +16,6 @@ async function getRunningAnimations(page: Page): Promise<string[]> {
   });
 }
 
-/** Wait for an element to become visible (opacity > 0) */
 async function waitForVisible(page: Page, selector: string, timeoutMs = 10000) {
   await page.waitForFunction(
     ({ sel }) => {
@@ -44,7 +29,6 @@ async function waitForVisible(page: Page, selector: string, timeoutMs = 10000) {
   );
 }
 
-/** Get computed opacity of an element */
 async function getOpacity(page: Page, selector: string): Promise<number> {
   return page.evaluate((sel) => {
     const el = document.querySelector(sel);
@@ -52,10 +36,6 @@ async function getOpacity(page: Page, selector: string): Promise<number> {
     return parseFloat(window.getComputedStyle(el).opacity);
   }, selector);
 }
-
-// ---------------------------------------------------------------------------
-// Selectors
-// ---------------------------------------------------------------------------
 
 const SEL = {
   initText: "p.tracking-\\[0\\.3em\\]",
@@ -69,36 +49,26 @@ const SEL = {
   reducedBanner: "text=reduce-motion: on",
 };
 
-// ---------------------------------------------------------------------------
-// Scenario 1: Desktop — full animations
-// ---------------------------------------------------------------------------
-
 test.describe("Desktop — full animations", () => {
   test.use({ viewport: { width: 1280, height: 720 } });
 
   test("hero cascade plays in correct phase order", async ({ page }) => {
     await page.goto("/");
 
-    // Phase 0: everything hidden initially
     const breakOpacity = await getOpacity(page, SEL.breakIt);
     expect(breakOpacity).toBe(0);
 
-    // Phase 1 (~200ms): INITIALIZING SYSTEM appears
     await waitForVisible(page, SEL.initText, 3000);
 
-    // Phase 2 (~2000ms): headline appears
     await waitForVisible(page, SEL.breakIt, 5000);
 
-    // Verify BREAK IT has glitch entrance class
     const hasGlitch = await page.locator(SEL.breakIt).evaluate((el) =>
       el.classList.contains("hero-glitch-entrance")
     );
     expect(hasGlitch).toBe(true);
 
-    // Phase 2 + delay: BUILD IT appears
     await waitForVisible(page, 'h1 span[aria-label="BUILD IT"]', 5000);
 
-    // Phase 3 (~5000ms): subtitle + buttons + scroll hint
     await waitForVisible(page, SEL.subtitle, 8000);
     await waitForVisible(page, SEL.buttons, 8000);
     await waitForVisible(page, SEL.scrollHint, 8000);
@@ -107,13 +77,9 @@ test.describe("Desktop — full animations", () => {
   test("CSS animations fire on BREAK IT", async ({ page }) => {
     await page.goto("/");
 
-    // Wait for phase 2
     await waitForVisible(page, SEL.breakIt, 5000);
 
-    // Check for running animations (within the glitch window)
     const animations = await getRunningAnimations(page);
-    // At least hero-glitch-flash should be present (or already finished)
-    // Check pseudo-elements exist
     const hasPseudo = await page.evaluate(() => {
       const el = document.querySelector('[data-text="BREAK IT"]');
       if (!el) return false;
@@ -129,10 +95,6 @@ test.describe("Desktop — full animations", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// Scenario 2: Mobile — animations ON
-// ---------------------------------------------------------------------------
-
 test.describe("Mobile — animations ON", () => {
   test.use({
     viewport: { width: 375, height: 812 },
@@ -143,13 +105,10 @@ test.describe("Mobile — animations ON", () => {
   test("hero cascade plays on mobile", async ({ page }) => {
     await page.goto("/");
 
-    // Phase 1
     await waitForVisible(page, SEL.initText, 3000);
 
-    // Phase 2
     await waitForVisible(page, SEL.breakIt, 5000);
 
-    // Glitch pseudo-elements should be present (not display:none)
     const pseudoVisible = await page.evaluate(() => {
       const el = document.querySelector('[data-text="BREAK IT"]');
       if (!el) return false;
@@ -158,7 +117,6 @@ test.describe("Mobile — animations ON", () => {
     });
     expect(pseudoVisible).toBe(true);
 
-    // Phase 3
     await waitForVisible(page, SEL.subtitle, 8000);
     await waitForVisible(page, SEL.buttons, 8000);
   });
@@ -169,10 +127,6 @@ test.describe("Mobile — animations ON", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// Scenario 3: Mobile — reduced motion
-// ---------------------------------------------------------------------------
-
 test.describe("Mobile — reduced motion", () => {
   test.use({
     viewport: { width: 375, height: 812 },
@@ -181,17 +135,13 @@ test.describe("Mobile — reduced motion", () => {
   });
 
   test("hero cascade appears instantly with short delays", async ({ page }) => {
-    // Emulate prefers-reduced-motion
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
 
-    // Phase 1 — much faster (100ms)
     await waitForVisible(page, SEL.initText, 1000);
 
-    // Phase 2 — fast (600ms)
     await waitForVisible(page, SEL.breakIt, 2000);
 
-    // Phase 3 — fast (1200ms)
     await waitForVisible(page, SEL.subtitle, 3000);
     await waitForVisible(page, SEL.buttons, 3000);
   });
@@ -200,7 +150,6 @@ test.describe("Mobile — reduced motion", () => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
 
-    // Small indicator in bottom-right
     const banner = page.locator("text=reduce-motion: on");
     await expect(banner).toBeVisible({ timeout: 5000 });
   });
@@ -209,10 +158,8 @@ test.describe("Mobile — reduced motion", () => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
 
-    // Wait for all phases
     await waitForVisible(page, SEL.subtitle, 3000);
 
-    // Check: hero entrance animations specifically should be killed
     const heroAnimations = await page.evaluate(() => {
       const heroNames = [
         "hero-glitch-flash", "hero-glitch-cyan", "hero-glitch-magenta",

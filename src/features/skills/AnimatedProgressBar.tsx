@@ -13,7 +13,7 @@ const AnimatedProgressBar = ({ percentage, variant, delay }: AnimatedProgressBar
       animate={{ width: `${percentage}%` }}
       transition={{ duration: 1, delay }}
       className={`h-full rounded-sm ${
-        variant === "primary" ? "bg-primary" : "bg-amber-500"
+        variant === "primary" ? "bg-primary" : "bg-learning"
       }`}
     />
   </div>

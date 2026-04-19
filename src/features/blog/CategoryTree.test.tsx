@@ -5,7 +5,6 @@ import { MemoryRouter } from "react-router-dom";
 import CategoryTree from "./CategoryTree";
 import type { BlogPost } from "./data";
 
-// Mock framer-motion to avoid AnimatePresence timing issues in tests
 vi.mock("framer-motion", () => ({
   motion: {
     div: ({ children, ...props }: Record<string, unknown>) => <div {...props}>{children}</div>,
@@ -66,11 +65,8 @@ describe("CategoryTree", () => {
   });
 
   it("auto-collapses categories with zero visible posts when filters active", () => {
-    // Only post-3 (DevOps) matches — QA category has zero visible posts
     renderTree({ filteredSlugs: ["post-3"], activeTags: ["devops"] });
-    // QA posts should not be visible (category auto-collapsed)
     expect(screen.queryByText("Post One")).not.toBeInTheDocument();
-    // DevOps posts should be visible
     expect(screen.getByText("Post Three")).toBeVisible();
   });
 

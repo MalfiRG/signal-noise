@@ -17,7 +17,6 @@ const BlogIndex = () => {
         <h1 className="font-display text-4xl font-bold text-foreground text-glow">BLOG</h1>
       </div>
 
-      {/* Mobile: EXPLORER below heading, inside content flow */}
       <div className="md:hidden mb-8">
         <BlogSidebar {...sidebarProps} />
       </div>
