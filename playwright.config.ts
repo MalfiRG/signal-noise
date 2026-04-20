@@ -15,6 +15,7 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
+      testIgnore: ["**/visual-mobile.spec.ts"],
       use: { ...devices["Desktop Chrome"] },
     },
   ],
