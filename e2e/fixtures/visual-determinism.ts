@@ -55,7 +55,7 @@ export async function skipHeroCascadeViaInitScript(page: Page) {
  * Fix L1: watchdog so a stalled FontFaceSet cannot hang the run indefinitely.
  */
 export async function waitForFonts(page: Page, timeoutMs = 10_000) {
-  await page.evaluate(async (timeout) => {
+  await page.evaluate(async (timeout: number) => {
     await Promise.race([
       document.fonts.ready,
       new Promise<never>((_, reject) =>
@@ -66,10 +66,14 @@ export async function waitForFonts(page: Page, timeoutMs = 10_000) {
 }
 
 /**
- * Mermaid diagrams render via an async observer. Wait for every
- * placeholder to have a corresponding non-zero-bbox <svg>. The previous
- * `length > 0` check returned true after the FIRST diagram rendered;
- * style-test has multiple, so screenshots captured a partial render.
+ * Mermaid diagrams render via an async observer. Wait for every rendered
+ * <svg> (one per MermaidRenderer in MarkdownRenderer.tsx:145-171) to
+ * have a measurable bbox.
+ *
+ * DOM shape post-render: <div class="my-6 …"><svg id="mermaid-<9chars>">…</svg></div>
+ * — the `mermaid-*` id lives on the svg ITSELF, not on a parent element.
+ * So the selector is `svg[id^='mermaid-']` (svg with that id), NOT
+ * `[id^='mermaid-'] svg` (svg nested inside such an element).
  *
  * Fix M6: getBBox() throws on hidden/detached SVGs — wrap in try/catch
  * and treat as not-yet-measurable so the polling loop continues instead
@@ -78,11 +82,8 @@ export async function waitForFonts(page: Page, timeoutMs = 10_000) {
 export async function waitForMermaid(page: Page) {
   await page.waitForFunction(
     () => {
-      const placeholders = document.querySelectorAll(
-        "pre.mermaid, [id^='mermaid-']"
-      );
-      const svgs = document.querySelectorAll("[id^='mermaid-'] svg");
-      if (svgs.length === 0 || svgs.length < placeholders.length) return false;
+      const svgs = document.querySelectorAll("svg[id^='mermaid-']");
+      if (svgs.length === 0) return false;
       return Array.from(svgs).every((s) => {
         try {
           return (s as SVGGraphicsElement).getBBox().width > 0;
