@@ -1,4 +1,9 @@
 import { test, expect } from "@playwright/test";
+import { prepareContext } from "./fixtures/visual-determinism";
+
+test.beforeEach(async ({ page }) => {
+  await prepareContext(page);
+});
 
 test.describe("How I Do It — methodology pages", () => {
   const pages = [
@@ -196,7 +201,6 @@ test.describe("Mobile scroll-reveal", () => {
     expect(count).toBeGreaterThan(1);
 
     await page.evaluate(() => window.scrollTo({ top: document.body.scrollHeight, behavior: "instant" }));
-    await page.waitForTimeout(2000);
 
     for (let i = 0; i < count; i++) {
       await expect(cards.nth(i)).toBeVisible({ timeout: 5000 });
@@ -209,9 +213,9 @@ test.describe("Mobile scroll-reveal", () => {
     await page.waitForTimeout(500);
 
     await page.evaluate(() => window.scrollTo({ top: document.body.scrollHeight, behavior: "instant" }));
-    await page.waitForTimeout(2000);
 
     const cards = page.locator(".grid > div");
+    await expect(cards).toHaveCount(5);
     const count = await cards.count();
     expect(count).toBe(5);
 
