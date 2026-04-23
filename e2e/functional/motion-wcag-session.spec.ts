@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { prepareContext } from "./fixtures/visual-determinism";
+import { prepareContext } from "../fixtures/visual-determinism";
 
 test.beforeEach(async ({ page }) => {
   await prepareContext(page);

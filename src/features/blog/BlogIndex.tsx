@@ -35,8 +35,12 @@ const BlogIndex = () => {
                   </span>
                   {post.tags.length > 0 && (
                     <>
-                      <span className="text-border">|</span>
-                      {post.tags.map((tag) => (
+                      <span className="text-border text-xs">|</span>
+                      <span
+                        data-testid="blog-tag-list"
+                        className="inline-flex flex-wrap items-center gap-2 text-xs"
+                      >
+                        {post.tags.map((tag) => (
                         <span
                           key={tag}
                           role="link"
@@ -57,7 +61,8 @@ const BlogIndex = () => {
                         >
                           #{tag}
                         </span>
-                      ))}
+                        ))}
+                      </span>
                     </>
                   )}
                 </div>
