@@ -29,7 +29,10 @@ const BlogIndex = () => {
                 to={`/blog/${post.slug}${tagParams}`}
                 className="block border border-border bg-card/50 p-6 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/15 transition-all duration-200 group"
               >
-                <div className="flex flex-wrap items-center gap-2 mb-3">
+                <div
+                  data-testid="blog-tag-list"
+                  className="flex flex-wrap items-center gap-2 mb-3"
+                >
                   <span className="text-muted-foreground text-xs tracking-wider">
                     {post.date}
                   </span>
