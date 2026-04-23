@@ -1,4 +1,9 @@
 import { test, expect } from "@playwright/test";
+import { prepareContext, stabilizeForLayout } from "./fixtures/visual-determinism";
+
+test.beforeEach(async ({ page }) => {
+  await prepareContext(page);
+});
 
 const VIEWPORTS = [
   { width: 375, height: 812, name: "375" },
@@ -22,18 +27,14 @@ for (const viewport of VIEWPORTS) {
 
     for (const route of ROUTES) {
       test(`${route.name} has no horizontal overflow`, async ({ page }) => {
-        await page.goto(route.path, { waitUntil: "networkidle" });
+        await page.goto(route.path);
 
         if (route.waitFor) {
           await expect(page.locator("svg.animate-spin")).toHaveCount(0, { timeout: 15000 });
           await expect(page.locator(route.waitFor)).toBeVisible({ timeout: 15000 });
         }
 
-        if (route.hasMermaid) {
-          await page.waitForTimeout(3000);
-        } else {
-          await page.waitForTimeout(1000);
-        }
+        await stabilizeForLayout(page, { mermaid: !!route.hasMermaid });
 
         const overflowInfo = await page.evaluate(() => {
           const docWidth = document.documentElement.clientWidth;
@@ -106,10 +107,10 @@ test.describe("Blog post section screenshots (375px)", () => {
   test.use({ viewport: { width: 375, height: 812 } });
 
   test("capture blog post sections", async ({ page }) => {
-    await page.goto("/blog/style-test", { waitUntil: "networkidle" });
+    await page.goto("/blog/style-test");
     await expect(page.locator("svg.animate-spin")).toHaveCount(0, { timeout: 15000 });
     await expect(page.locator(".markdown-body")).toBeVisible({ timeout: 15000 });
-    await page.waitForTimeout(3000);
+    await stabilizeForLayout(page, { mermaid: true });
 
     const sections = [
       { name: "header-and-meta", selector: ".markdown-body", scrollY: 0 },
