@@ -8,6 +8,7 @@
     "build": "tsx scripts/update-github-stats.ts && vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
+    "lint:e2e": "eslint 'e2e/**/*.{ts,tsx}' --max-warnings 0",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
