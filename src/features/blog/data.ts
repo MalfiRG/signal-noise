@@ -23,6 +23,25 @@ export interface BlogOutletContext {
 
 export const blogPosts: BlogPost[] = [
   {
+    slug: "claude-code-cache-ttl-worktree-trap",
+    title:
+      "Two Independent Causes of Claude Code's 5-Minute-TTL Cache Drift — Session Size and Git Worktrees (an ANCOVA)",
+    date: "2026-04-22",
+    tags: [
+      "AI",
+      "Claude",
+      "prompt-caching",
+      "git-worktrees",
+      "cost-optimization",
+      "statistics",
+      "ANCOVA",
+    ],
+    category: "AI & Automation",
+    excerpt:
+      "Parsed 30 days of my Claude Code JSONL transcripts and ran an ANCOVA. Two factors independently drive prompt-cache TTL drift: session length and whether the session ran inside a git worktree. +39 percentage points at any session size, p = 2×10⁻⁵, partial η² = 0.156 — with graphs, hypotheses, and a primer on Analysis of Covariance because it somehow didn't come up in my biotech PhD.",
+    draft: true,
+  },
+  {
     slug: "rag-retrieval-harness",
     title: "I Didn't Read Any RAG Papers. I Just Built a Test Harness.",
     date: "2026-04-11",
