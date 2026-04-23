@@ -56,14 +56,15 @@ The alternative would be to bucket session length into ordinal bins (tiny / shor
 
 ### Model
 
-```
-Response:   share_5m           (continuous, bounded [0, 1])
-Predictors: log10(events)      (continuous covariate)
-            location           (2-level nominal factor: Main | Worktree)
-n = 110 sessions
-```
+The **response variable** is `share_5m`, a continuous ratio bounded to *[0, 1]*.
 
-Additive model: `share_5m ~ log10(events) + C(location)`. The interaction `log10(events) × C(location)` was also fitted and tested — if non-significant, the additive model is the right summary.
+The **continuous covariate** is `log10(events)` — the log-base-10 of how many events the session contained, which handles the three-orders-of-magnitude range (4 events to ~7 000) without letting the few very-long sessions dominate the fit.
+
+The **nominal factor** is `location`, with two levels — *Main* (session ran from the main checkout of the repo) and *Worktree* (session ran from inside a git worktree of that repo).
+
+**Sample size:** *n = 110* sessions over the 30-day window.
+
+The additive model is `share_5m ~ log10(events) + C(location)`. I also fitted the interaction term `log10(events) × C(location)` separately as a parallel-lines test — if it comes back non-significant, the two regression lines have the same slope and the additive summary is the right one.
 
 ## Results
 
