@@ -8,10 +8,15 @@
     "build": "tsx scripts/update-github-stats.ts && vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
+    "lint:e2e": "eslint 'e2e/**/*.{ts,tsx}' --max-warnings 0",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "npx playwright test"
+    "test:e2e": "playwright test",
+    "test:e2e:smoke": "playwright test --project=smoke",
+    "test:e2e:functional": "playwright test --project=functional",
+    "test:e2e:visual": "playwright test --config playwright.visual.config.ts",
+    "test:e2e:update-baselines": "docker run --rm -v \"$PWD:/work\" -w /work mcr.microsoft.com/playwright:v1.58.2-jammy sh -c 'npm ci --legacy-peer-deps && npx playwright install --with-deps chromium && npm run build && npx playwright test --config playwright.visual.config.ts --update-snapshots=changed'"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

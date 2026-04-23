@@ -1,4 +1,4 @@
-import { test, expect } from "./fixtures/blog-page";
+import { test, expect } from "../fixtures/blog-page";
 
 test.describe("Headings & TOC interaction", () => {
   test("all h2/h3 headings are rendered with id attributes", async ({ page, blogPage }) => {

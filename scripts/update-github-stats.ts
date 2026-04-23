@@ -9,6 +9,14 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+// Honors spec §2.2: visual webServer's `npm run build` step must not hit
+// the GitHub API. The visual config sets env { SKIP_GITHUB_FETCH: "1" };
+// this guard short-circuits the script when that env var is set.
+if (process.env.SKIP_GITHUB_FETCH === "1") {
+  console.log("[update-github-stats] SKIP_GITHUB_FETCH=1 set, exiting without fetching");
+  process.exit(0);
+}
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DATA_PATH = resolve(__dirname, '../src/features/projects/data.ts');
 
