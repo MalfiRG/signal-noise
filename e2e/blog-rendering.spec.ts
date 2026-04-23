@@ -50,7 +50,6 @@ test.describe("Headings & TOC interaction", () => {
     const tocNav = page.locator("nav", { has: page.getByText("On this page") });
     const tablesLink = tocNav.locator("a", { hasText: "Tables" });
     await tablesLink.click();
-    await page.waitForTimeout(1000);
 
     const tablesHeading = page.locator(".markdown-body h2#tables");
     await expect(tablesHeading).toBeInViewport();
