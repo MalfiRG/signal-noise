@@ -1,12 +1,19 @@
 import { test as base, expect } from "@playwright/test";
+import { prepareContext, stabilizeForLayout } from "./visual-determinism";
 
-export const test = base.extend<{ blogPage: void }>({
+type BlogPageFixtures = {
+  blogPage: import("@playwright/test").Page;
+};
+
+export const test = base.extend<BlogPageFixtures>({
   blogPage: async ({ page }, use) => {
+    await prepareContext(page);
     await page.goto("/blog/style-test");
-    await expect(page.locator("svg.animate-spin")).toHaveCount(0, { timeout: 10000 });
-    await expect(page.locator(".markdown-body")).toBeVisible({ timeout: 10000 });
-    await use();
+    await stabilizeForLayout(page, {
+      readyLocator: page.locator(".markdown-body"),
+    });
+    await use(page);
   },
 });
 
-export { expect } from "@playwright/test";
+export { expect };
