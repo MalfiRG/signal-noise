@@ -381,37 +381,15 @@ GitHub Actions: see `.github/workflows/`.
 
 ## 9. Testing Architecture
 
-Three test layers, each at a different cost/feedback ratio:
+The Playwright suite is organized into three tiers under `e2e/`, each with its own signal contract and wall-clock budget. Placement is enforced via file-scoped overrides in `eslint.config.js` so the structure cannot drift.
 
-| Layer       | Tool       | Location              | Purpose                                          |
-|------------|------------|-----------------------|--------------------------------------------------|
-| Unit       | Vitest     | `src/**/*.test.tsx`   | Component logic, hooks, utility functions        |
-| E2E        | Playwright | `e2e/*.spec.ts`       | Real browser, full user flows                    |
-| Visual     | Playwright | `e2e/visual-mobile.spec.ts` (snapshots) | Mobile viewport visual regression                |
+The smoke tier (`e2e/smoke/`) covers route load + key element renders and runs in <60s wall-clock as a PR gate on every push and PR. The functional tier (`e2e/functional/`) covers DOM/structural, interactions, and computed-style assertions, runs in <5min, and also gates every PR. The visual tier (`e2e/visual/`) covers pixel-diff via `toHaveScreenshot`, runs only on `main` push + `workflow_dispatch`, and is informational rather than gating (see spec §2.0 for the full placement rubric).
 
-### Vitest
+The visual tier uses a separate `playwright.visual.config.ts` that runs against `npm run preview` (not the dev server) inside a webServer with `--strictPort` and `SKIP_GITHUB_FETCH=1`. Baselines are regenerated only inside the pinned Docker image `mcr.microsoft.com/playwright:v1.58.2-jammy` via `npm run test:e2e:update-baselines`. The `kitchen-sink.spec.ts` `beforeAll` guard hard-fails on host-machine `--update-snapshots` (override with `ALLOW_HOST_SNAPSHOT_UPDATE=1`).
 
-- Configured via `vite.config.ts` + `tsconfig.test.json`
-- Watch mode disabled (WSL2 inotify issues)
-- E2E specs excluded from Vitest run
-- React Testing Library v16+ for React 19 compat (we're on React 18 — no compat hack needed)
+Dependabot Playwright bumps are handled via the manual `.github/workflows/regen-visual-baselines.yml` `workflow_dispatch` workflow: the maintainer triggers it against the Dependabot branch, the workflow runs regen in the same Docker image, and opens an auto-PR with the new baselines for review. `e2e/visual/__snapshots__/**` is covered by `.github/CODEOWNERS` so baseline changes always require explicit maintainer approval.
 
-### Playwright
-
-- `playwright.config.ts`: `fullyParallel: true`, `workers: undefined` locally, `workers: 1` in CI, retries: 1 in CI
-- Each test gets a fresh BrowserContext (no `storageState` configured globally) → sessionStorage isolated per test
-- `webServer.command: "npm run dev"`, `reuseExistingServer: !CI`
-- Custom fixture `e2e/fixtures/blog-page.ts` navigates to `/blog/style-test` and waits for content load
-
-### Visual snapshot baselines
-
-`visual-mobile.spec.ts` runs at 375/390/428px viewports. First-run "writing actual" mode generates baselines at `e2e/visual-mobile.spec.ts-snapshots/*.png`. Commit baselines after any visual-affecting change.
-
-### Known caveats
-
-- **WSL2 + Playwright:** uses headless Chromium with extracted libs + `LD_LIBRARY_PATH`. See `reference_playwright_wsl2` memory.
-- **Test parallelism + dynamic markdown:** rare flake on `/blog/style-test` when many tests hit it simultaneously (markdown loads asynchronously). Single retry usually clears.
-- **HMR-stale state in test runs:** if tests run against a long-lived dev server that's been HMR'd over many edits, stale state can cause non-reproducible failures. Hard-restart vite before running the full suite.
+Determinism patterns live in `e2e/fixtures/visual-determinism.ts`: `prepareContext(page)` (pre-`goto`, addInitScript-based) + `stabilizeForLayout(page, opts)` (post-`goto`). Full rationale and the helper API: `docs/superpowers/specs/2026-04-19-e2e-flakiness-remediation-design.md`.
 
 ---
 
