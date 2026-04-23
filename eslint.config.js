@@ -44,7 +44,6 @@ export default tseslint.config(
   // CallExpression, NOT an Identifier named 'expect').
   {
     files: ["e2e/smoke/**/*.ts"],
-    ignores: ["e2e/_stopgap/**", "e2e/_verification/**"],
     rules: {
       "no-restricted-syntax": [
         "error",
@@ -89,7 +88,6 @@ export default tseslint.config(
   // Functional tier — e2e/functional/**/*.ts
   {
     files: ["e2e/functional/**/*.ts"],
-    ignores: ["e2e/_stopgap/**", "e2e/_verification/**"],
     rules: {
       "no-restricted-syntax": [
         "error",

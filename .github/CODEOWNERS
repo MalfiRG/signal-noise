@@ -1,0 +1,7 @@
+# Visual baselines require explicit approval — they're consumed as test oracles
+# and a wrong baseline silently encodes a regression as "expected".
+# Per spec §4 path-based protection.
+# Recursive glob — snapshots live one level deeper at
+# e2e/visual/__snapshots__/<spec-file>/<image>.png; the bare directory
+# pattern only matches direct children.
+e2e/visual/__snapshots__/**    @MalfiRG

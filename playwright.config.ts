@@ -30,13 +30,6 @@ export default defineConfig({
       testDir: "./e2e/functional",
       use: { ...devices["Desktop Chrome"] },
     },
-    // Fix C7: keep the Wave 1 stopgap discoverable as its own project for
-    // Wave 3 only. Removed in Wave 4 Task 4.3 Step 4 along with the directory.
-    {
-      name: "stopgap",
-      testDir: "./e2e/_stopgap",
-      use: { ...devices["Desktop Chrome"] },
-    },
   ],
   webServer: {
     command: "npm run dev",
