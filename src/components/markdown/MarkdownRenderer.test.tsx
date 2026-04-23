@@ -14,3 +14,21 @@ describe("MarkdownRenderer inline code", () => {
     expect(inlineCode.className).toContain("bg-secondary");
   });
 });
+
+describe("MarkdownRenderer Polish slugify", () => {
+  it("strips Polish diacritics from heading IDs (current behavior — see follow-up)", () => {
+    const { container } = render(
+      <MarkdownRenderer content={"# Książka i ćwiczenia\n\nbody"} />
+    );
+    const heading = container.querySelector("h1");
+    expect(heading, "h1 not found").not.toBeNull();
+    if (!heading) throw new Error("unreachable");
+    const id = heading.getAttribute("id");
+    // customSlugify uses .replace(/[^\w-]/g, "") — \w is [A-Za-z0-9_] so
+    // Polish diacritics (ą, ć, ż, ś, ź, ł, ó, ę, ń) are DELETED, not
+    // transliterated. książka → ksika; ćwiczenia → wiczenia.
+    // True transliteration table is a separate spec — track outside this migration.
+    expect(id).toMatch(/^[a-z0-9-]+$/);
+    expect(id).toBe("ksika-i-wiczenia");
+  });
+});
