@@ -6,12 +6,22 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      update_snapshots:
+        type: boolean
+        default: false
+        description: "Regenerate visual baselines in this run"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  e2e:
+  setup:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-
+    timeout-minutes: 10
+    outputs:
+      cache-hit: ${{ steps.cache-deps.outputs.cache-hit }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -22,30 +32,131 @@ jobs:
           node-version: 20
           cache: npm
 
+      - name: Cache node_modules + Playwright browsers
+        id: cache-deps
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            ~/.cache/ms-playwright
+          key: deps-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-playwright-1.58.2
+
       - name: Install dependencies
+        if: steps.cache-deps.outputs.cache-hit != 'true'
         run: npm ci --legacy-peer-deps
 
       - name: Install Playwright browsers
+        if: steps.cache-deps.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
 
-      - name: Run Playwright tests
-        run: npx playwright test
-
-      # Upload on success and failure (!cancelled) — Playwright best practice
-      # so reports are available for debugging even on green runs
-      - name: Upload Playwright report
+  e2e-smoke:
+    needs: setup
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            ~/.cache/ms-playwright
+          key: deps-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-playwright-1.58.2
+      - name: Install dependencies (cache miss fallback)
+        if: needs.setup.outputs.cache-hit != 'true'
+        run: npm ci --legacy-peer-deps && npx playwright install --with-deps chromium
+      - name: Lint e2e (tier rules)
+        run: npm run lint:e2e
+      - name: Run smoke tests
+        run: npx playwright test --project=smoke
+      - name: Assert smoke wall-clock < 60s
+        if: always()
+        run: |
+          if [ ! -f playwright-report/results.json ]; then
+            echo "::error::results.json missing — JSON reporter not configured"
+            exit 1
+          fi
+          duration=$(jq '.stats.duration' playwright-report/results.json)
+          duration_int=${duration%.*}
+          echo "smoke duration: ${duration_int}ms"
+          if [ "$duration_int" -gt 60000 ]; then
+            echo "::error::Smoke wall-clock ${duration_int}ms exceeds 60s budget"
+            exit 1
+          fi
+      - name: Upload report
         uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: playwright-report
+          name: smoke-playwright-report
           path: playwright-report/
           retention-days: 14
 
-      - name: Upload Playwright test-results
+  e2e-functional:
+    needs: setup
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            ~/.cache/ms-playwright
+          key: deps-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-playwright-1.58.2
+      - name: Install dependencies (cache miss fallback)
+        if: needs.setup.outputs.cache-hit != 'true'
+        run: npm ci --legacy-peer-deps && npx playwright install --with-deps chromium
+      - name: Run functional tests
+        run: npx playwright test --project=functional
+      - name: Upload report
         uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: playwright-test-results
-          path: test-results/
+          name: functional-playwright-report
+          path: playwright-report/
           retention-days: 14
-          if-no-files-found: ignore
+
+  e2e-visual:
+    needs: setup
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            ~/.cache/ms-playwright
+          key: deps-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-playwright-1.58.2
+      - name: Install dependencies (cache miss fallback)
+        if: needs.setup.outputs.cache-hit != 'true'
+        run: npm ci --legacy-peer-deps && npx playwright install --with-deps chromium
+      - name: Build for preview
+        run: SKIP_GITHUB_FETCH=1 npm run build
+      - name: Run visual tests
+        run: |
+          UPDATE_FLAG=""
+          if [ "${{ github.event.inputs.update_snapshots }}" = "true" ]; then
+            UPDATE_FLAG="--update-snapshots=changed"
+          fi
+          npx playwright test --config playwright.visual.config.ts $UPDATE_FLAG
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: visual-playwright-report
+          path: playwright-report/
+          retention-days: 14

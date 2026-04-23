@@ -1,4 +1,4 @@
-import { test, expect } from "./fixtures/blog-page";
+import { test, expect } from "../fixtures/blog-page";
 
 test.describe("Theme activation", () => {
   test("reading mode is active on article pages", async ({ page, blogPage }) => {
