@@ -1,21 +1,10 @@
 import { test, expect } from "../fixtures/blog-page";
 
-test.describe("Theme activation", () => {
-  test("reading mode is active on article pages", async ({ page, blogPage }) => {
-    const themeWrapper = page.locator(".theme-reading");
-    await expect(themeWrapper).toBeVisible();
-  });
-
-  test("reading mode is NOT active on blog index", async ({ page }) => {
-    await page.goto("/blog");
-    await expect(page.locator(".theme-reading")).toHaveCount(0);
-  });
-
-  test("reading mode is NOT active on homepage", async ({ page }) => {
-    await page.goto("/");
-    await expect(page.locator(".theme-reading")).toHaveCount(0);
-  });
-});
+// Theme-activation class-presence checks (previously here as 3 tests) moved
+// to src/App.test.tsx for jsdom-based unit coverage. This file retains the
+// CSS-variable computed-style assertions that require real browser CSSOM —
+// jsdom does not resolve CSS-variable cascades, so those must stay in
+// Playwright.
 
 test.describe("CSS variable overrides", () => {
   test("background color is warm, not dark green", async ({ page, blogPage }) => {
