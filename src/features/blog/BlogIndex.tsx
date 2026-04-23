@@ -34,12 +34,13 @@ const BlogIndex = () => {
                     {post.date}
                   </span>
                   {post.tags.length > 0 && (
-                    <span
-                      data-testid="blog-tag-list"
-                      className="inline-flex flex-wrap items-center gap-2"
-                    >
-                      <span className="text-border">|</span>
-                      {post.tags.map((tag) => (
+                    <>
+                      <span className="text-border text-xs">|</span>
+                      <span
+                        data-testid="blog-tag-list"
+                        className="inline-flex flex-wrap items-center gap-2 text-xs"
+                      >
+                        {post.tags.map((tag) => (
                         <span
                           key={tag}
                           role="link"
@@ -60,8 +61,9 @@ const BlogIndex = () => {
                         >
                           #{tag}
                         </span>
-                      ))}
-                    </span>
+                        ))}
+                      </span>
+                    </>
                   )}
                 </div>
                 <h2 className="font-display text-xl font-bold text-foreground group-hover:text-glow mb-2">
