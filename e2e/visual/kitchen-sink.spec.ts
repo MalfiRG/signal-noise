@@ -10,7 +10,13 @@ import { prepareContext, stabilizeForLayout } from "../fixtures/visual-determini
 // empty destructure is the only legal form when we don't need fixtures.
 // eslint-disable-next-line no-empty-pattern
 test.beforeAll(({}, testInfo) => {
-  if (testInfo.config.updateSnapshots !== "none") {
+  // Playwright's updateSnapshots default is "missing" (writes only when the
+  // baseline file is absent). Only "all" and "changed" actually overwrite an
+  // existing baseline, so the Docker-pin guard must trigger on those values
+  // specifically — NOT on "!== 'none'", which falsely trips every verify-only
+  // CI run where the default "missing" mode is in effect.
+  const updateMode = testInfo.config.updateSnapshots;
+  if (updateMode === "all" || updateMode === "changed") {
     const isDocker = existsSync("/.dockerenv");
     if (!isDocker && !process.env.ALLOW_HOST_SNAPSHOT_UPDATE) {
       throw new Error(
