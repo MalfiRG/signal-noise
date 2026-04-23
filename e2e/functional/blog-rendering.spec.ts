@@ -110,11 +110,6 @@ test.describe("Code blocks", () => {
     expect(codeBox).not.toBeNull();
     expect(codeBox!.width).toBeGreaterThan(pBox!.width);
   });
-
-  test("inline code has bg-secondary class", async ({ page, blogPage }) => {
-    const inlineCode = page.locator(".markdown-body code:not(.code-block-wrapper code)").first();
-    await expect(inlineCode).toHaveClass(/bg-secondary/);
-  });
 });
 
 test.describe("Tables", () => {

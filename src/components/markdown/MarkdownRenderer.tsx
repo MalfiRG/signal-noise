@@ -13,7 +13,7 @@ interface MarkdownRendererProps {
   onHeadingsExtracted?: (headings: { id: string; text: string; level: number }[]) => void;
 }
 
-const customSlugify = (text: string): string => {
+export const customSlugify = (text: string): string => {
   const customIdMatch = text.match(/{#([a-z0-9-]+)}/i);
   if (customIdMatch) {
     return customIdMatch[1];

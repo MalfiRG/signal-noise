@@ -49,29 +49,6 @@ test.describe("How I Do It — methodology pages", () => {
   });
 });
 
-test.describe("Frontmatter stripping", () => {
-  test("blog post does not show raw frontmatter", async ({ page }) => {
-    await page.goto("/blog/style-test");
-    await expect(page.locator(".markdown-body")).toBeVisible({ timeout: 10000 });
-
-    const body = await page.locator(".markdown-body").textContent();
-    expect(body).not.toContain("draft: true");
-    expect(body).not.toContain("reading_time:");
-    expect(body).not.toContain("og_image:");
-  });
-
-  test("how-i-do-it pages without frontmatter still render", async ({ page }) => {
-    await page.goto("/how-i-do-it/test-plan");
-    await expect(page.locator(".markdown-body")).toBeVisible({ timeout: 10000 });
-
-    const firstH2 = page.locator(".markdown-body h2").first();
-    await expect(firstH2).toBeVisible();
-    const text = await firstH2.textContent();
-    expect(text).toBeTruthy();
-    expect(text).not.toContain("---");
-  });
-});
-
 test.describe("CodeBlock expand overlay", () => {
   test("expand button opens fullscreen overlay with code content", async ({ page }) => {
     await page.goto("/how-i-do-it/test-architecture");

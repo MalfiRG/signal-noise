@@ -21,7 +21,7 @@ import { useScrollRestoration } from "@/hooks/useScrollRestoration";
 
 const queryClient = new QueryClient();
 
-const AppContent = () => {
+export const AppContent = () => {
   const location = useLocation();
   const isReadingMode = /^\/(blog|how-i-do-it)\/[^/]+/.test(location.pathname);
   const isTextSection = /^\/(blog|how-i-do-it)(\/|$)/.test(location.pathname);
