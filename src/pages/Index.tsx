@@ -167,6 +167,8 @@ const Index = () => {
               SKIP ›
             </button>
           )}
+          {/* LetterReveal skipAnimation receives animationsDisabled (which composes
+              heroReplaySkip via useMotionPolicy) — no double-pass needed per §5.3. */}
           {phase >= 1 ? (
             <LetterReveal
               text="> INITIALIZING SYSTEM..."
