@@ -109,10 +109,21 @@ export interface MotionPolicy {
 
 const AUTHOR_OVERRIDE_KEY = "digital-matrix-motion-override";
 
+// Module-level latch so the console.info fires once per page load, not on
+// every hook call. Prevents log spam when several components use useMotionPolicy.
+let authorOverrideWarned = false;
+
 function readAuthorOverride(): boolean {
   if (typeof window === "undefined") return false;
   try {
-    return localStorage.getItem(AUTHOR_OVERRIDE_KEY) === "on";
+    const active = localStorage.getItem(AUTHOR_OVERRIDE_KEY) === "on";
+    if (active && !authorOverrideWarned) {
+      authorOverrideWarned = true;
+      console.info(
+        "[digital-matrix] motion override active: localStorage['digital-matrix-motion-override'] = 'on'",
+      );
+    }
+    return active;
   } catch {
     return false;
   }
