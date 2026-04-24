@@ -1,56 +1,96 @@
-import { useState, useEffect } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import AboutSection from "@/features/about/AboutSection";
 import LetterReveal from "@/components/LetterReveal";
-import { useHeroStaggerVariant } from "@/lib/motion";
+import { useHeroStaggerVariant, useMotionPolicy } from "@/lib/motion";
 
 const HERO_PLAYED_KEY = "hero-cascade-played";
 
+function isDevHost(): boolean {
+  if (typeof window === "undefined") return false;
+  const h = window.location.hostname;
+  return h === "localhost" || h === "127.0.0.1" || h.endsWith(".vercel.app");
+}
+
+function readHeroReplaySkip(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return sessionStorage.getItem(HERO_PLAYED_KEY) === "1";
+  } catch (err) {
+    console.warn("[hero] sessionStorage read failed; replay-skip defaulted to false", err);
+    return false;
+  }
+}
+
+function writeHeroReplayFlag(): void {
+  if (isDevHost()) return;
+  try {
+    sessionStorage.setItem(HERO_PLAYED_KEY, "1");
+  } catch (err) {
+    console.warn("[hero] sessionStorage write failed; cascade may replay next visit", err);
+  }
+}
+
 const Index = () => {
   const heroItem = useHeroStaggerVariant();
-  const prefersReduced = useReducedMotion();
 
-  const [skipAnimation] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return sessionStorage.getItem(HERO_PLAYED_KEY) === "1";
-  });
+  const [heroReplaySkip] = useState(() => readHeroReplaySkip());
+  const policy = useMotionPolicy({ heroReplaySkip });
+  const { animationsDisabled, prefersReducedMotion, tier } = policy;
 
-  const [phase, setPhase] = useState(skipAnimation ? 3 : 0);
+  const [phase, setPhase] = useState(animationsDisabled ? 3 : 0);
+  const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   useEffect(() => {
-    if (skipAnimation) return;
+    timeoutsRef.current.forEach(clearTimeout);
+    timeoutsRef.current = [];
+
+    if (animationsDisabled) {
+      setPhase(3);
+      return;
+    }
+
+    setPhase(0);
+    const schedule = (ms: number, fn: () => void) => {
+      const id = setTimeout(fn, ms);
+      timeoutsRef.current.push(id);
+    };
 
     const raf = requestAnimationFrame(() => {
-      if (prefersReduced) {
-        setTimeout(() => setPhase(1), 100);
-        setTimeout(() => setPhase(2), 1100);
-        setTimeout(() => {
+      if (prefersReducedMotion) {
+        schedule(100, () => setPhase(1));
+        schedule(1100, () => setPhase(2));
+        schedule(1200, () => {
           setPhase(3);
-          sessionStorage.setItem(HERO_PLAYED_KEY, "1");
-        }, 1200);
+          writeHeroReplayFlag();
+        });
       } else {
-        setTimeout(() => setPhase(1), 200);
-        setTimeout(() => setPhase(2), 2500);
-        setTimeout(() => {
+        schedule(200, () => setPhase(1));
+        schedule(2500, () => setPhase(2));
+        schedule(6000, () => {
           setPhase(3);
-          sessionStorage.setItem(HERO_PLAYED_KEY, "1");
-        }, 6000);
+          writeHeroReplayFlag();
+        });
       }
     });
-    return () => cancelAnimationFrame(raf);
-  }, [prefersReduced, skipAnimation]);
+    return () => {
+      cancelAnimationFrame(raf);
+      timeoutsRef.current.forEach(clearTimeout);
+      timeoutsRef.current = [];
+    };
+  }, [animationsDisabled, prefersReducedMotion, tier]);
 
   const animClass = (gateMet: boolean, cls: string): string => {
     if (!gateMet) return "opacity-0";
-    return skipAnimation ? "" : cls;
+    return animationsDisabled ? "" : cls;
   };
 
   return (
     <>
       <div className="scanline fixed inset-0 z-10" />
 
-      {prefersReduced && (
+      {prefersReducedMotion && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 0.6 }}
@@ -79,7 +119,7 @@ const Index = () => {
               className="text-muted-foreground text-sm tracking-[0.3em] mb-4 letter-reveal-linear"
               delayPerLetter={40}
               startDelay={0}
-              skipAnimation={skipAnimation}
+              skipAnimation={animationsDisabled}
             />
           ) : (
             <p className="text-muted-foreground text-sm tracking-[0.3em] mb-4 opacity-0">
@@ -101,14 +141,14 @@ const Index = () => {
                 className="block"
                 delayPerLetter={70}
                 startDelay={1000}
-                skipAnimation={skipAnimation}
+                skipAnimation={animationsDisabled}
               />
             ) : (
               <span className="block opacity-0" aria-label="BUILD IT">BUILD IT</span>
             )}
             <span
               className={animClass(phase >= 2, "hero-stamp-entrance")}
-              style={phase >= 2 && !skipAnimation ? { animationDelay: "2.2s" } : undefined}
+              style={phase >= 2 && !animationsDisabled ? { animationDelay: "2.2s" } : undefined}
             >
               PROVE IT
             </span>
@@ -116,7 +156,7 @@ const Index = () => {
 
           <motion.div
             variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.5, delayChildren: 0.05 } } }}
-            initial={skipAnimation ? "visible" : "hidden"}
+            initial={animationsDisabled ? "visible" : "hidden"}
             animate={phase >= 3 ? "visible" : "hidden"}
           >
             <motion.div variants={heroItem}>
