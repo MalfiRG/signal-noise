@@ -27,16 +27,37 @@ Object.defineProperty(navigator, "clipboard", {
   value: { writeText: () => Promise.resolve() },
 });
 
+let __mockViewportWidth__ = 1440;
+
+export function setMockViewportWidth(width: number): void {
+  __mockViewportWidth__ = width;
+}
+
 Object.defineProperty(window, "matchMedia", {
   writable: true,
-  value: (query: string) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: () => {},
-    removeListener: () => {},
-    addEventListener: () => {},
-    removeEventListener: () => {},
-    dispatchEvent: () => {},
-  }),
+  value: (query: string) => {
+    const minWidthMatch = query.match(/\(min-width:\s*(\d+)px\)/);
+    const maxWidthMatch = query.match(/\(max-width:\s*(\d+)px\)/);
+    const reducedMotionMatch = query.match(/prefers-reduced-motion:\s*reduce/);
+
+    let matches = false;
+    if (minWidthMatch) {
+      matches = __mockViewportWidth__ >= parseInt(minWidthMatch[1], 10);
+    } else if (maxWidthMatch) {
+      matches = __mockViewportWidth__ <= parseInt(maxWidthMatch[1], 10);
+    } else if (reducedMotionMatch) {
+      matches = false; // tests opt-in via Framer's useReducedMotion override if needed
+    }
+
+    return {
+      matches,
+      media: query,
+      onchange: null,
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: () => true,
+    };
+  },
 });
