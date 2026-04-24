@@ -62,3 +62,57 @@ describe("useMotionPolicy", () => {
     expect(b.current.animationsDisabled).toBe(true); // reduced-motion still wins
   });
 });
+
+import { useItemVariant, useHeroStaggerVariant, staggerItemCyber, staggerItem, reducedVariant } from "./motion";
+
+describe("useItemVariant (delegated)", () => {
+  beforeEach(() => {
+    setMockViewportWidth(1440);
+    (useReducedMotion as unknown as ReturnType<typeof vi.fn>).mockReturnValue(false);
+    localStorage.removeItem("digital-matrix-motion-override");
+  });
+
+  it("returns staggerItemCyber on desktop with animations enabled", () => {
+    setMockViewportWidth(1440);
+    const { result } = renderHook(() => useItemVariant());
+    expect(result.current).toBe(staggerItemCyber);
+  });
+
+  it("returns reducedVariant on tablet (animationsDisabled=true)", () => {
+    setMockViewportWidth(900);
+    const { result } = renderHook(() => useItemVariant());
+    expect(result.current).toBe(reducedVariant);
+  });
+
+  it("returns reducedVariant on mobile", () => {
+    setMockViewportWidth(375);
+    const { result } = renderHook(() => useItemVariant());
+    expect(result.current).toBe(reducedVariant);
+  });
+
+  it("returns reducedVariant on desktop with reduced-motion", () => {
+    setMockViewportWidth(1440);
+    (useReducedMotion as unknown as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    const { result } = renderHook(() => useItemVariant());
+    expect(result.current).toBe(reducedVariant);
+  });
+});
+
+describe("useHeroStaggerVariant (delegated)", () => {
+  beforeEach(() => {
+    setMockViewportWidth(1440);
+    (useReducedMotion as unknown as ReturnType<typeof vi.fn>).mockReturnValue(false);
+  });
+
+  it("returns staggerItem on desktop", () => {
+    setMockViewportWidth(1440);
+    const { result } = renderHook(() => useHeroStaggerVariant());
+    expect(result.current).toBe(staggerItem);
+  });
+
+  it("returns reducedVariant on tablet", () => {
+    setMockViewportWidth(900);
+    const { result } = renderHook(() => useHeroStaggerVariant());
+    expect(result.current).toBe(reducedVariant);
+  });
+});

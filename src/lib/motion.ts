@@ -1,5 +1,6 @@
 import { useReducedMotion } from "framer-motion";
 import type { Variants } from "framer-motion";
+import { useDeviceTier, type DeviceTier } from "@/hooks/use-device-tier";
 
 export const pageTransition = {
   cyberpunk: {
@@ -56,14 +57,6 @@ export const staggerItemCyber: Variants = {
   },
 };
 
-export const staggerItemMobile: Variants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] },
-  },
-};
-
 export const reducedVariant: Variants = {
   hidden: { opacity: 1 },
   visible: { opacity: 1 },
@@ -84,11 +77,6 @@ export const wordRevealItem: Variants = {
   },
 };
 
-function isMobileViewport(): boolean {
-  if (typeof window === "undefined") return false;
-  return window.innerWidth <= 640;
-}
-
 export function usePageVariant() {
   const prefersReduced = useReducedMotion();
   if (prefersReduced) return pageTransition.reduced;
@@ -102,20 +90,16 @@ export function useReadingPageVariant() {
 }
 
 export function useItemVariant(): Variants {
-  const prefersReduced = useReducedMotion();
-  if (prefersReduced) return reducedVariant;
-  if (isMobileViewport()) return staggerItemMobile;
+  const { animationsDisabled } = useMotionPolicy();
+  if (animationsDisabled) return reducedVariant;
   return staggerItemCyber;
 }
 
 export function useHeroStaggerVariant(): Variants {
-  const prefersReduced = useReducedMotion();
-  if (prefersReduced) return reducedVariant;
-  if (isMobileViewport()) return staggerItemMobile;
+  const { animationsDisabled } = useMotionPolicy();
+  if (animationsDisabled) return reducedVariant;
   return staggerItem;
 }
-
-import { useDeviceTier, type DeviceTier } from "@/hooks/use-device-tier";
 
 export interface MotionPolicy {
   tier: DeviceTier;
