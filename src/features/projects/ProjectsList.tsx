@@ -1,9 +1,7 @@
 import { ExternalLink, Github, Star, GitFork, Clock } from "lucide-react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { projects, type Project } from "./data";
-import { useItemVariant } from "@/lib/motion";
-
-const MOBILE_BREAKPOINT = 640;
+import { useItemVariant, useMotionPolicy } from "@/lib/motion";
 
 const desktopStagger = {
   hidden: {},
@@ -101,8 +99,7 @@ const ProjectCard = ({ project }: { project: Project }) => (
 
 const ProjectsList = () => {
   const itemVariant = useItemVariant();
-  const prefersReduced = useReducedMotion();
-  const isMobile = typeof window !== "undefined" && window.innerWidth <= MOBILE_BREAKPOINT;
+  const { animationsDisabled } = useMotionPolicy();
 
   return (
     <div className="min-h-screen pt-24 pb-16 px-4">
@@ -118,14 +115,14 @@ const ProjectsList = () => {
               {">"} NO PROJECTS FOUND. INITIALIZING...
             </p>
           </div>
-        ) : isMobile ? (
+        ) : animationsDisabled ? (
           <div className="grid gap-6">
             {projects.map((project) => (
               <motion.div
                 key={project.title}
-                variants={prefersReduced ? undefined : mobileItemReveal}
-                initial={prefersReduced ? undefined : "hidden"}
-                whileInView={prefersReduced ? undefined : "visible"}
+                variants={animationsDisabled ? undefined : mobileItemReveal}
+                initial={animationsDisabled ? undefined : "hidden"}
+                whileInView={animationsDisabled ? undefined : "visible"}
                 viewport={{ once: true, margin: "-80px" }}
               >
                 <ProjectCard project={project} />
