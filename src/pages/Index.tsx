@@ -86,6 +86,20 @@ const Index = () => {
     return animationsDisabled ? "" : cls;
   };
 
+  const skipToPhase3 = () => {
+    if (phase >= 3) return;
+    timeoutsRef.current.forEach(clearTimeout);
+    timeoutsRef.current = [];
+    setPhase(3);
+    writeHeroReplayFlag();
+  };
+
+  const onSectionKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+    if (e.key === "Enter" || e.key === " ") {
+      skipToPhase3();
+    }
+  };
+
   return (
     <>
       <div className="scanline fixed inset-0 z-10" />
@@ -101,7 +115,13 @@ const Index = () => {
         </motion.div>
       )}
 
-      <section className="relative z-20 min-h-screen flex items-center justify-center overflow-hidden">
+      <section
+        className="relative z-20 min-h-screen flex items-center justify-center overflow-hidden"
+        onPointerDown={phase < 3 ? skipToPhase3 : undefined}
+        onKeyDown={phase < 3 ? onSectionKeyDown : undefined}
+        tabIndex={phase < 3 ? -1 : undefined}
+        data-testid={phase >= 3 ? "hero-phase3" : "hero-cascading"}
+      >
         <div
           className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full blur-3xl -translate-y-1/3 translate-x-1/3 block animate-hero-glow-slow pointer-events-none"
           style={{ backgroundColor: 'hsl(var(--hero-orb-primary))', mixBlendMode: 'screen' }}
@@ -112,6 +132,16 @@ const Index = () => {
         />
 
         <div className="text-center px-4 max-w-3xl">
+          {phase >= 1 && phase < 3 && !animationsDisabled && (
+            <button
+              type="button"
+              onClick={skipToPhase3}
+              aria-label="Skip intro"
+              className="fixed bottom-4 right-4 z-40 border border-border px-3 py-1 text-xs tracking-widest text-muted-foreground hover:border-primary/50 hover:text-foreground transition-all bg-background/60 backdrop-blur-sm"
+            >
+              SKIP ›
+            </button>
+          )}
           {phase >= 1 ? (
             <LetterReveal
               text="> INITIALIZING SYSTEM..."
@@ -122,7 +152,7 @@ const Index = () => {
               skipAnimation={animationsDisabled}
             />
           ) : (
-            <p className="text-muted-foreground text-sm tracking-[0.3em] mb-4 opacity-0">
+            <p aria-hidden="true" className="text-muted-foreground text-sm tracking-[0.3em] mb-4 opacity-0">
               {">"} INITIALIZING SYSTEM...
             </p>
           )}
@@ -144,7 +174,7 @@ const Index = () => {
                 skipAnimation={animationsDisabled}
               />
             ) : (
-              <span className="block opacity-0" aria-label="BUILD IT">BUILD IT</span>
+              <span className="block opacity-0" aria-hidden="true" aria-label="BUILD IT">BUILD IT</span>
             )}
             <span
               className={animClass(phase >= 2, "hero-stamp-entrance")}
@@ -158,6 +188,7 @@ const Index = () => {
             variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.5, delayChildren: 0.05 } } }}
             initial={animationsDisabled ? "visible" : "hidden"}
             animate={phase >= 3 ? "visible" : "hidden"}
+            aria-hidden={phase < 3 ? true : undefined}
           >
             <motion.div variants={heroItem}>
               <p className="text-foreground/80 text-lg mb-8 leading-relaxed">
