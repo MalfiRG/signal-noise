@@ -228,6 +228,7 @@ Natural closing (no "Conclusion" header)
 - Use CSS variables for Matrix colors (never hardcode hex in components)
 - Use Tailwind utility classes for layout, spacing, responsiveness
 - Use `framer-motion` for animations
+- **Gate animations via `useMotionPolicy()`**, not raw viewport checks. New components needing motion gating MUST destructure `animationsDisabled` from `useMotionPolicy()` in `@/lib/motion`. Do NOT re-implement device detection inline (`window.innerWidth < 768` style). Do NOT compare to literal breakpoint values in component code. Spec: `docs/superpowers/specs/2026-04-24-device-tier-motion-policy-design.md`.
 
 ---
 

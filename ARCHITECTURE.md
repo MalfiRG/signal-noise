@@ -240,7 +240,7 @@ After consolidation, `next-themes` is technically vestigial — there's only one
 ## 6. Motion Design System
 
 > **Device-tier policy → `docs/superpowers/specs/2026-04-24-device-tier-motion-policy-design.md`** (HARD SPEC, not yet implemented).
-> Canonical three-tier policy (mobile / tablet / desktop) with the public flag `animationsDisabled`. Replaces the current 2-tier 640px cutoff in `motion.ts:87-90` once implemented. All future motion work MUST cite that spec by filename in the plan.
+> Canonical three-tier policy (mobile / tablet / desktop) with the public flag `animationsDisabled`. Replaces the inconsistent 640/768px breakpoints (no tablet tier) that existed across `motion.ts` and `use-mobile.tsx` pre-migration. All future motion work MUST cite that spec by filename in the plan.
 
 **Two coexisting timing systems** — by deliberate design (see `motion.ts` header comment):
 
