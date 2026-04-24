@@ -220,6 +220,9 @@ This is a flat design with **glow as the depth metaphor**. No traditional shadow
 
 ## 7. Motion Design
 
+> **Device-tier policy → `docs/superpowers/specs/2026-04-24-device-tier-motion-policy-design.md`** (HARD SPEC).
+> Three tiers (mobile `<768`, tablet `768–1023`, desktop `≥1024`) + one public flag `animationsDisabled`. Desktop defaults to animations-on; mobile/tablet default to animations-off. OS reduced-motion and per-session replay-skip override on top. Current code uses inconsistent 640/768 breakpoints with no tablet tier — see the spec for the migration contract.
+
 Two timing systems coexist (deliberate trade-off, see ARCHITECTURE.md §Motion):
 - **JS constants** (`src/lib/motion.ts`) — Framer Motion variants for entrance/transition
 - **CSS custom properties** (`src/index.css`) — `--motion-instant`, `--motion-fast`, `--motion-normal` for hover/ambient effects
