@@ -89,18 +89,6 @@ export function useReadingPageVariant() {
   return pageTransition.reading;
 }
 
-export function useItemVariant(): Variants {
-  const { animationsDisabled } = useMotionPolicy();
-  if (animationsDisabled) return reducedVariant;
-  return staggerItemCyber;
-}
-
-export function useHeroStaggerVariant(): Variants {
-  const { animationsDisabled } = useMotionPolicy();
-  if (animationsDisabled) return reducedVariant;
-  return staggerItem;
-}
-
 export interface MotionPolicy {
   tier: DeviceTier;
   prefersReducedMotion: boolean;
@@ -159,4 +147,16 @@ export function useMotionPolicy(
   else animationsDisabled = true;
 
   return { tier, prefersReducedMotion, animationsDisabled };
+}
+
+export function useItemVariant(): Variants {
+  const { animationsDisabled } = useMotionPolicy();
+  if (animationsDisabled) return reducedVariant;
+  return staggerItemCyber;
+}
+
+export function useHeroStaggerVariant(): Variants {
+  const { animationsDisabled } = useMotionPolicy();
+  if (animationsDisabled) return reducedVariant;
+  return staggerItem;
 }
