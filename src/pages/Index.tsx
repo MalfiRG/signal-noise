@@ -215,6 +215,7 @@ const Index = () => {
           </h1>
 
           <motion.div
+            className={phase < 3 ? "pointer-events-none" : ""}
             variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.5, delayChildren: 0.05 } } }}
             initial={animationsDisabled ? "visible" : "hidden"}
             animate={phase >= 3 ? "visible" : "hidden"}
