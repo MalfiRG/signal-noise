@@ -42,6 +42,7 @@ const Index = () => {
   const [phase, setPhase] = useState(animationsDisabled ? 3 : 0);
   const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const rafRef = useRef<number | null>(null);
+  const viewProjectsRef = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
     if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
@@ -99,6 +100,9 @@ const Index = () => {
     timeoutsRef.current = [];
     setPhase(3);
     writeHeroReplayFlag();
+    // Move focus to the first CTA so keyboard users aren't stranded on an
+    // unmounted SKIP button (a11y — Wave 3 review B5 / F-UX-05).
+    setTimeout(() => viewProjectsRef.current?.focus(), 0);
   };
 
   const BADGE_DISMISS_KEY = "hero-badge-dismissed";
@@ -230,6 +234,7 @@ const Index = () => {
 
             <motion.div variants={heroItem} className="flex gap-4 justify-center">
               <Link
+                ref={viewProjectsRef}
                 to="/projects"
                 className={`border border-primary/50 bg-primary/10 px-8 py-3 text-sm tracking-widest text-primary hover:bg-primary/20 hover:border-primary transition-all box-glow btn-interactive glitch-hover`}
                 data-text="VIEW PROJECTS"
