@@ -147,6 +147,21 @@ const Index = () => {
         </motion.button>
       )}
 
+      {/* SKIP button MUST be a direct child of the top-level fragment to avoid
+          stacking-context traps. Sibling <section> and <div className="relative
+          z-20"> around AboutSection each create later stacking contexts that
+          would paint over a nested z-40 button. See Wave 3 review B2. */}
+      {phase >= 1 && phase < 3 && !animationsDisabled && (
+        <button
+          type="button"
+          onClick={skipToPhase3}
+          aria-label="Skip intro"
+          className="fixed bottom-4 right-4 z-40 border border-border px-3 py-1 text-xs tracking-widest text-muted-foreground hover:border-primary/50 hover:text-foreground transition-all bg-background/60 backdrop-blur-sm"
+        >
+          SKIP ›
+        </button>
+      )}
+
       <section
         className="relative z-20 min-h-screen flex items-center justify-center overflow-hidden"
         onPointerDown={phase < 3 ? skipToPhase3 : undefined}
@@ -164,16 +179,6 @@ const Index = () => {
         />
 
         <div className="text-center px-4 max-w-3xl">
-          {phase >= 1 && phase < 3 && !animationsDisabled && (
-            <button
-              type="button"
-              onClick={skipToPhase3}
-              aria-label="Skip intro"
-              className="fixed bottom-4 right-4 z-40 border border-border px-3 py-1 text-xs tracking-widest text-muted-foreground hover:border-primary/50 hover:text-foreground transition-all bg-background/60 backdrop-blur-sm"
-            >
-              SKIP ›
-            </button>
-          )}
           {/* LetterReveal skipAnimation receives animationsDisabled (which composes
               heroReplaySkip via useMotionPolicy) — no double-pass needed per §5.3. */}
           {phase >= 1 ? (
