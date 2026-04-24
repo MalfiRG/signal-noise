@@ -227,7 +227,7 @@ Expected result: empty except for `src/hooks/use-mobile.tsx` (retained at 768 fo
 
 #### Vitest
 
-Three Vitest cases at minimum (see `DESIGN.md:348` and the blog's existing `src/test/` setup):
+Four Vitest cases at minimum (see `DESIGN.md:348` and the blog's existing `src/test/` setup):
 
 1. `useMotionPolicy` returns `animationsDisabled: false` on desktop with no reduced-motion.
 2. `useMotionPolicy` returns `animationsDisabled: true` on tablet regardless of reduced-motion.
@@ -249,7 +249,7 @@ vi.stubGlobal("matchMedia", (query: string) => ({
 }));
 ```
 
-Test cases MUST set `mockViewportWidth` before each case to control the returned tier. The factory `createMediaQueryMock(width)` handles the three tiers explicitly.
+Test cases MUST call the exported `setMockViewportWidth(width: number)` helper before each case to control the returned tier. The mock parses `(min-width: Npx)` queries against the shared width global; no separate factory function is needed.
 
 #### Playwright
 
@@ -268,7 +268,7 @@ Because the full cascade is 6 seconds (phase 3 at 6000ms) and the CTAs render wi
 Minimum implementation:
 
 1. Any `pointerdown` or `keydown` (Enter/Space) on the `<section>` element during phases 0-2 sets `phase=3` immediately, cancels pending timeouts via `clearTimeout`, and writes `sessionStorage["hero-cascade-played"] = "1"`.
-2. A visually-hidden "Skip intro" button (`aria-label="Skip intro"`, `tabIndex=0`) appears after phase 1 (2500ms) in the bottom-right corner. Focusable, keyboard-activatable, semantically equivalent to the pointer-down skip.
+2. A **visible** "SKIP ›" button (`aria-label="Skip intro"`) appears as soon as phase 1 is reached (~200ms after mount, well before the 2.5s phase-2 transition). Bottom-right corner, focusable via native button semantics (no explicit `tabIndex` needed), keyboard-activatable via Enter/Space on focus. The button renders OUTSIDE the hero `<section>` to avoid stacking-context traps — see §5.6 fix-cycle commit `6fa19c4`.
 3. The button is removed from the DOM once phase reaches 3.
 
 Rationale: this resolves (a) the interaction-lockout accessibility issue and (b) the keyboard-navigation gap where invisible focusable elements (the CTAs under `animate="hidden"`) appear in tab order before phase 3.
@@ -279,12 +279,12 @@ All `sessionStorage.getItem` and `sessionStorage.setItem` calls MUST be wrapped 
 
 The existing "reduce-motion: on" badge (`Index.tsx:53-62`) fires only when `prefersReducedMotion` is true. With the new tier-based suppression path, this creates an asymmetric feedback model: tablet users get identical flat visuals but no badge.
 
-Extend the badge to:
+Tri-state badge (final, post-Wave-3 F-UX-03 + F-CONS-05 convergence):
 
-- "reduce-motion: on" when OS preference is active (existing behavior).
-- "animations: off (device)" when tier alone triggers suppression.
-- Badge is NOT shown when session-replay-skip is the only active signal (that path is dev-iteration, not a user policy).
-- Badge is dismissible (click sets a localStorage flag to suppress for the session; does NOT persist cross-session).
+- `reduce-motion: on` when OS preference is active.
+- `motion: off (session)` when `heroReplaySkip` is the active cause (session replay-skip) — informs returning visitors why the cascade is skipped.
+- `motion: off (device)` when tier (mobile/tablet) is the active cause — informs first-time visitors why the page rendered flat.
+- Badge is dismissible. Click sets a `localStorage` flag (`hero-badge-dismissed`) to suppress cross-session. Persists until `localStorage` is cleared. Rationale: the states it communicates (OS preference, device class) are long-lived, not session-transient.
 
 ### 5.8 Accessibility during the cascade (phases 0-2)
 
