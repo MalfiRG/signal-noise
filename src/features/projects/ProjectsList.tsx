@@ -8,15 +8,6 @@ const desktopStagger = {
   visible: { transition: { staggerChildren: 0.5, delayChildren: 0.3 } },
 };
 
-const mobileItemReveal = {
-  hidden: { opacity: 0, y: 16 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 1.2, delay: 0.3, ease: [0.16, 1, 0.3, 1] },
-  },
-};
-
 const ProjectCard = ({ project }: { project: Project }) => (
   <div className="border border-border bg-card/50 p-6 hover:border-primary/50 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/15 transition-all duration-200 group neon-border-trace">
     <h3 className="font-display text-xl font-bold text-foreground group-hover:text-glow mb-3">
@@ -118,15 +109,9 @@ const ProjectsList = () => {
         ) : animationsDisabled ? (
           <div className="grid gap-6">
             {projects.map((project) => (
-              <motion.div
-                key={project.title}
-                variants={animationsDisabled ? undefined : mobileItemReveal}
-                initial={animationsDisabled ? undefined : "hidden"}
-                whileInView={animationsDisabled ? undefined : "visible"}
-                viewport={{ once: true, margin: "-80px" }}
-              >
+              <div key={project.title}>
                 <ProjectCard project={project} />
-              </motion.div>
+              </div>
             ))}
           </div>
         ) : (
