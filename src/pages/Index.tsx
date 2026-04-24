@@ -100,19 +100,44 @@ const Index = () => {
     }
   };
 
+  const BADGE_DISMISS_KEY = "hero-badge-dismissed";
+  const [badgeDismissed, setBadgeDismissed] = useState(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      return sessionStorage.getItem(BADGE_DISMISS_KEY) === "1";
+    } catch {
+      return false;
+    }
+  });
+  const dismissBadge = () => {
+    setBadgeDismissed(true);
+    try {
+      sessionStorage.setItem(BADGE_DISMISS_KEY, "1");
+    } catch {
+      /* ignore — dismissal is cosmetic */
+    }
+  };
+
+  const showReducedMotionBadge = prefersReducedMotion && !badgeDismissed;
+  const showTierBadge = !prefersReducedMotion && animationsDisabled && !heroReplaySkip && !badgeDismissed;
+
   return (
     <>
       <div className="scanline fixed inset-0 z-10" />
 
-      {prefersReducedMotion && (
-        <motion.div
+      {(showReducedMotionBadge || showTierBadge) && (
+        <motion.button
+          type="button"
+          onClick={dismissBadge}
           initial={{ opacity: 0 }}
           animate={{ opacity: 0.6 }}
           transition={{ duration: 1, delay: 0.5 }}
-          className="fixed bottom-4 right-4 z-50 text-orange-400/80 text-[10px] font-mono px-2 py-1 rounded border border-orange-400/30 bg-background/50 backdrop-blur-sm"
+          className="fixed bottom-4 right-4 z-50 text-orange-400/80 text-[10px] font-mono px-2 py-1 rounded border border-orange-400/30 bg-background/50 backdrop-blur-sm cursor-pointer hover:opacity-100"
+          aria-label={showReducedMotionBadge ? "Reduced motion is on. Click to dismiss." : "Animations disabled for this device. Click to dismiss."}
+          data-testid={showReducedMotionBadge ? "badge-reduced-motion" : "badge-animations-off-device"}
         >
-          reduce-motion: on
-        </motion.div>
+          {showReducedMotionBadge ? "reduce-motion: on" : "animations: off (device)"}
+        </motion.button>
       )}
 
       <section
