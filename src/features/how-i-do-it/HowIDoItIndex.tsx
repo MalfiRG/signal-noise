@@ -9,15 +9,6 @@ const desktopStagger = {
   visible: { transition: { staggerChildren: 0.5, delayChildren: 0.2 } },
 };
 
-const mobileItemReveal = {
-  hidden: { opacity: 0, y: 16 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 1.2, delay: 0.3, ease: [0.16, 1, 0.3, 1] },
-  },
-};
-
 const MethodologyCard = ({ slug, title, description }: { slug: string; title: string; description: string }) => (
   <Link
     to={`/how-i-do-it/${slug}`}
@@ -58,15 +49,9 @@ const HowIDoItIndex = () => {
         {animationsDisabled ? (
           <div className="grid gap-6">
             {howIDoItPages.map((page) => (
-              <motion.div
-                key={page.slug}
-                variants={animationsDisabled ? undefined : mobileItemReveal}
-                initial={animationsDisabled ? undefined : "hidden"}
-                whileInView={animationsDisabled ? undefined : "visible"}
-                viewport={{ once: true, margin: "-80px" }}
-              >
+              <div key={page.slug}>
                 <MethodologyCard {...page} />
-              </motion.div>
+              </div>
             ))}
           </div>
         ) : (
