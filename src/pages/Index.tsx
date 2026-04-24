@@ -41,8 +41,11 @@ const Index = () => {
 
   const [phase, setPhase] = useState(animationsDisabled ? 3 : 0);
   const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
+    if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    rafRef.current = null;
     timeoutsRef.current.forEach(clearTimeout);
     timeoutsRef.current = [];
 
@@ -57,7 +60,8 @@ const Index = () => {
       timeoutsRef.current.push(id);
     };
 
-    const raf = requestAnimationFrame(() => {
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = null;
       if (prefersReducedMotion) {
         schedule(100, () => setPhase(1));
         schedule(1100, () => setPhase(2));
@@ -75,7 +79,8 @@ const Index = () => {
       }
     });
     return () => {
-      cancelAnimationFrame(raf);
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
       timeoutsRef.current.forEach(clearTimeout);
       timeoutsRef.current = [];
     };
@@ -88,6 +93,8 @@ const Index = () => {
 
   const skipToPhase3 = () => {
     if (phase >= 3) return;
+    if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    rafRef.current = null;
     timeoutsRef.current.forEach(clearTimeout);
     timeoutsRef.current = [];
     setPhase(3);
