@@ -29,3 +29,10 @@ test-results/
 playwright-report/
 blob-report/
 .playwright/
+
+# Local tooling / config (never commit)
+.claude/
+.mcp.json
+.vercel/
+sessions/
+unsubscribe.js
