@@ -254,13 +254,16 @@ test.describe("Hero keyboard-focus accessibility (spec §5.8)", () => {
     // Wait briefly so the cascade has started but not finished.
     await page.waitForTimeout(300);
 
-    // At this point phase < 3 — the motion.div container holding VIEW PROJECTS /
-    // READ BLOG should carry aria-hidden=true. Scope to the FIRST <section>
-    // (hero) since AboutSection is also a <section> on this page.
+    // Scope to the hero <section> via its data-testid so we don't accidentally
+    // match a Toaster/Sonner <section aria-label="Notifications"> that sits
+    // earlier in the DOM (they're injected by the shadcn Toaster providers in
+    // App.tsx and would otherwise be the first <section> the query returns).
     const hiddenCount = await page.evaluate(() => {
-      const section = document.querySelector("section");
-      if (!section) return -1;
-      const hiddenContainers = section.querySelectorAll('[aria-hidden="true"]');
+      const hero = document.querySelector(
+        '[data-testid="hero-cascading"], [data-testid="hero-phase3"]',
+      );
+      if (!hero) return -1;
+      const hiddenContainers = hero.querySelectorAll('[aria-hidden="true"]');
       // At least one aria-hidden wrapper must be present during phases 0-2.
       return hiddenContainers.length;
     });
