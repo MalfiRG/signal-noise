@@ -35,5 +35,9 @@ export default defineConfig({
     command: "npm run dev",
     url: "http://127.0.0.1:8080",
     reuseExistingServer: !process.env.CI,
+    // WSL2 + NTFS cross-mount: Vite's first cold start scans src/ and
+    // node_modules/ over a slow filesystem and can take 30–60 seconds.
+    // Default 60s timeout is too tight; bump to 120s to avoid flake.
+    timeout: 120_000,
   },
 });

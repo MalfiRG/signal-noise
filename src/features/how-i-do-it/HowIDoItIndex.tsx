@@ -1,23 +1,12 @@
 import { Link } from "react-router-dom";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { FileText } from "lucide-react";
 import { howIDoItPages } from "./data";
-import { useItemVariant } from "@/lib/motion";
-
-const MOBILE_BREAKPOINT = 640;
+import { useItemVariant, useMotionPolicy } from "@/lib/motion";
 
 const desktopStagger = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.5, delayChildren: 0.2 } },
-};
-
-const mobileItemReveal = {
-  hidden: { opacity: 0, y: 16 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 1.2, delay: 0.3, ease: [0.16, 1, 0.3, 1] },
-  },
 };
 
 const MethodologyCard = ({ slug, title, description }: { slug: string; title: string; description: string }) => (
@@ -39,8 +28,7 @@ const MethodologyCard = ({ slug, title, description }: { slug: string; title: st
 
 const HowIDoItIndex = () => {
   const itemVariant = useItemVariant();
-  const prefersReduced = useReducedMotion();
-  const isMobile = typeof window !== "undefined" && window.innerWidth <= MOBILE_BREAKPOINT;
+  const { animationsDisabled } = useMotionPolicy();
 
   return (
     <div className="min-h-screen pt-24 pb-16 px-4">
@@ -58,18 +46,12 @@ const HowIDoItIndex = () => {
           </p>
         </div>
 
-        {isMobile ? (
+        {animationsDisabled ? (
           <div className="grid gap-6">
             {howIDoItPages.map((page) => (
-              <motion.div
-                key={page.slug}
-                variants={prefersReduced ? undefined : mobileItemReveal}
-                initial={prefersReduced ? undefined : "hidden"}
-                whileInView={prefersReduced ? undefined : "visible"}
-                viewport={{ once: true, margin: "-80px" }}
-              >
+              <div key={page.slug}>
                 <MethodologyCard {...page} />
-              </motion.div>
+              </div>
             ))}
           </div>
         ) : (
