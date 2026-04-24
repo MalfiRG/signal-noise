@@ -145,11 +145,12 @@ export function useMotionPolicy(
   const heroReplaySkip = !!opts?.heroReplaySkip;
   const authorOverride = readAuthorOverride();
 
-  // Evaluation order per spec §4:
-  //   (1) OS reduced-motion wins   → disabled
-  //   (2) hero replay-skip         → disabled
-  //   (4) author override          → enabled on mobile/tablet (still below OS+session)
-  //   (3) tier default             → desktop enabled, else disabled
+  // Evaluation order per spec §4 pseudocode + §10 H7 resolution.
+  // Numbers match spec §4 override numbering (NOT execution order):
+  //   prefersReducedMotion → disabled (§4 item 1; highest priority)
+  //   heroReplaySkip       → disabled (§4 item 2)
+  //   authorOverride       → enabled  (§4 item 4; checked 3rd per H7)
+  //   tier default         → desktop=false else=true (§4 item 3; checked 4th per H7)
   let animationsDisabled: boolean;
   if (prefersReducedMotion) animationsDisabled = true;
   else if (heroReplaySkip) animationsDisabled = true;
