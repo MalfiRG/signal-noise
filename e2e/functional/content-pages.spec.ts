@@ -137,6 +137,7 @@ test.describe("Blog tag filtering", () => {
     await backLink.click();
 
     const returnedPosts = page.locator("a[href^='/blog/']").filter({ hasText: /.{10,}/ });
+    await expect(returnedPosts.first()).toBeVisible({ timeout: 5000 });
     const returnedCount = await returnedPosts.count();
     expect(returnedCount).toBeGreaterThan(0);
   });
