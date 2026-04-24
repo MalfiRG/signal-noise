@@ -101,12 +101,6 @@ const Index = () => {
     writeHeroReplayFlag();
   };
 
-  const onSectionKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
-    if (e.key === "Enter" || e.key === " ") {
-      skipToPhase3();
-    }
-  };
-
   const BADGE_DISMISS_KEY = "hero-badge-dismissed";
   const [badgeDismissed, setBadgeDismissed] = useState(() => {
     if (typeof window === "undefined") return false;
@@ -164,9 +158,6 @@ const Index = () => {
 
       <section
         className="relative z-20 min-h-screen flex items-center justify-center overflow-hidden"
-        onPointerDown={phase < 3 ? skipToPhase3 : undefined}
-        onKeyDown={phase < 3 ? onSectionKeyDown : undefined}
-        tabIndex={phase < 3 ? -1 : undefined}
         data-testid={phase >= 3 ? "hero-phase3" : "hero-cascading"}
       >
         <div
