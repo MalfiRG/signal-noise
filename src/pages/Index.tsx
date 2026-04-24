@@ -124,7 +124,9 @@ const Index = () => {
   };
 
   const showReducedMotionBadge = prefersReducedMotion && !badgeDismissed;
-  const showTierBadge = !prefersReducedMotion && animationsDisabled && !heroReplaySkip && !badgeDismissed;
+  // Tier-based suppression is a permanent device state (not session-transient),
+  // so the badge should fire on return visits too — until the user dismisses it.
+  const showTierBadge = !prefersReducedMotion && animationsDisabled && !badgeDismissed;
 
   return (
     <>
