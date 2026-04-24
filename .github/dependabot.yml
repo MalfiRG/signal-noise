@@ -6,9 +6,13 @@ updates:
       interval: "weekly"
       day: "monday"
     groups:
-      all-dependencies:
+      all-minor-patch:
+        applies-to: version-updates
         patterns:
           - "*"
+        update-types:
+          - "minor"
+          - "patch"
     ignore:
       - dependency-name: "tailwindcss"
         update-types: ["version-update:semver-major"]
@@ -17,5 +21,7 @@ updates:
       - dependency-name: "@vitejs/*"
         update-types: ["version-update:semver-major"]
       - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "lucide-react"
         update-types: ["version-update:semver-major"]
     open-pull-requests-limit: 5
