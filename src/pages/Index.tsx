@@ -23,8 +23,16 @@ function readHeroReplaySkip(): boolean {
   }
 }
 
+let devHostWriteSkipWarned = false;
+
 function writeHeroReplayFlag(): void {
-  if (isDevHost()) return;
+  if (isDevHost()) {
+    if (!devHostWriteSkipWarned) {
+      console.info("[digital-matrix] dev mode: cascade replay flag NOT persisted (localhost/127.0.0.1/*.vercel.app)");
+      devHostWriteSkipWarned = true;
+    }
+    return;
+  }
   try {
     sessionStorage.setItem(HERO_PLAYED_KEY, "1");
   } catch (err) {
@@ -73,7 +81,7 @@ const Index = () => {
       } else {
         schedule(200, () => setPhase(1));
         schedule(2500, () => setPhase(2));
-        schedule(6000, () => {
+        schedule(5800, () => {
           setPhase(3);
           writeHeroReplayFlag();
         });
@@ -109,7 +117,7 @@ const Index = () => {
   const [badgeDismissed, setBadgeDismissed] = useState(() => {
     if (typeof window === "undefined") return false;
     try {
-      return sessionStorage.getItem(BADGE_DISMISS_KEY) === "1";
+      return localStorage.getItem(BADGE_DISMISS_KEY) === "1";
     } catch {
       return false;
     }
@@ -117,33 +125,54 @@ const Index = () => {
   const dismissBadge = () => {
     setBadgeDismissed(true);
     try {
-      sessionStorage.setItem(BADGE_DISMISS_KEY, "1");
+      localStorage.setItem(BADGE_DISMISS_KEY, "1");
     } catch {
       /* ignore — dismissal is cosmetic */
     }
   };
 
+  // Tri-state badge per F-UX-03 + F-CONS-05 convergence. animationsDisabled can
+  // be caused by (1) OS reduced-motion, (2) session replay-skip, or (3) tier
+  // default. The cause determines the label so the user understands WHY motion
+  // is off. Priority: OS > session > tier (matches §4 evaluation chain order).
   const showReducedMotionBadge = prefersReducedMotion && !badgeDismissed;
-  // Tier-based suppression is a permanent device state (not session-transient),
-  // so the badge should fire on return visits too — until the user dismisses it.
-  const showTierBadge = !prefersReducedMotion && animationsDisabled && !badgeDismissed;
+  const showSessionBadge =
+    !prefersReducedMotion && animationsDisabled && heroReplaySkip && !badgeDismissed;
+  const showTierBadge =
+    !prefersReducedMotion && animationsDisabled && !heroReplaySkip && !badgeDismissed;
 
   return (
     <>
       <div className="scanline fixed inset-0 z-10" />
 
-      {(showReducedMotionBadge || showTierBadge) && (
+      {(showReducedMotionBadge || showSessionBadge || showTierBadge) && (
         <motion.button
           type="button"
           onClick={dismissBadge}
           initial={{ opacity: 0 }}
           animate={{ opacity: 0.6 }}
           transition={{ duration: 1, delay: 0.5 }}
-          className="fixed bottom-4 right-4 z-50 text-orange-400/80 text-[10px] font-mono px-2 py-1 rounded border border-orange-400/30 bg-background/50 backdrop-blur-sm cursor-pointer hover:opacity-100"
-          aria-label={showReducedMotionBadge ? "Reduced motion is on. Click to dismiss." : "Animations disabled for this device. Click to dismiss."}
-          data-testid={showReducedMotionBadge ? "badge-reduced-motion" : "badge-animations-off-device"}
+          className="fixed bottom-4 right-4 z-50 min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-muted-foreground text-[10px] font-mono px-3 py-2 rounded border border-border bg-background/60 backdrop-blur-sm cursor-pointer hover:opacity-100 hover:border-primary/50"
+          aria-label={
+            showReducedMotionBadge
+              ? "Reduced motion is on. Click to dismiss."
+              : showSessionBadge
+                ? "Motion off for this session. Click to dismiss."
+                : "Motion off for this device. Click to dismiss."
+          }
+          data-testid={
+            showReducedMotionBadge
+              ? "badge-reduced-motion"
+              : showSessionBadge
+                ? "badge-animations-off-session"
+                : "badge-animations-off-device"
+          }
         >
-          {showReducedMotionBadge ? "reduce-motion: on" : "animations: off (device)"}
+          {showReducedMotionBadge
+            ? "reduce-motion: on"
+            : showSessionBadge
+              ? "motion: off (session)"
+              : "motion: off (device)"}
         </motion.button>
       )}
 
