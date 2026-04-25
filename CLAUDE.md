@@ -253,6 +253,30 @@ Natural closing (no "Conclusion" header)
 | Variable | Purpose | Required |
 |----------|---------|----------|
 | `VITE_MOTION_OVERRIDE` | Forces motion policy to `on`/`off` for every visitor (build-time default). Per-browser `localStorage["digital-matrix-motion-override"]` wins over this. See `src/lib/motion-config.ts` for the layered precedence and `.env` for usage notes. | No |
+| `VITE_VERCEL_ENV` | Bridged from Vercel's `VERCEL_ENV` by the build script. Drives the three-tier blog visibility logic (`production` hides drafts; `preview` shows them; `development` shows them). Do not set manually — the bridge is handled automatically. | No (set by build script) |
+
+### Blog post visibility tiers
+
+Posts marked `draft: true` in `src/features/blog/data.ts` are gated by **three** environments:
+
+| Environment | `import.meta.env.PROD` | `VITE_VERCEL_ENV` | Drafts visible? |
+|---|---|---|---|
+| `npm run dev` | `false` | (anything) | Yes |
+| `npm run build` (local) | `true` | unset | Yes (treated as preview) |
+| Vercel preview deploy (PR URLs) | `true` | `preview` | Yes |
+| Vercel production deploy (main domain) | `true` | `production` | **No** |
+
+Implementation: `detectVisibilityMode` in `src/features/blog/data.ts` maps the env to a mode, `getVisiblePosts` filters drafts only when mode === "production". The `package.json` build script bridges `VERCEL_ENV` (Vercel-injected) to `VITE_VERCEL_ENV` (Vite-readable) at build time.
+
+### Author override — quick reference
+
+To preview animations on mobile/tablet from your own browser without changing config or redeploying:
+
+1. Open the site (any environment), F12 → Console
+2. `localStorage.setItem("digital-matrix-motion-override", "on")` then reload
+3. To revert: `localStorage.removeItem("digital-matrix-motion-override")` then reload
+
+This is a per-browser, per-origin tool — it never affects other visitors.
 
 ### Author override — quick reference
 
