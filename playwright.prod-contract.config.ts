@@ -35,9 +35,14 @@ export default defineConfig({
     },
   ],
   webServer: {
-    // `vite build` produces dist/, then `vite preview` serves it on 4173.
+    // Simulates a Vercel main-domain production deploy by setting
+    // VERCEL_ENV=production before the build, which the build script bridges
+    // to VITE_VERCEL_ENV. This drives detectVisibilityMode → "production",
+    // which is the only tier that hides drafts.
+    //
     // Distinct from dev port 8080 so the two configs cannot collide.
-    command: "npm run build && npx vite preview --port 4173 --strictPort",
+    command:
+      "VERCEL_ENV=production npm run build && npx vite preview --port 4173 --strictPort",
     url: "http://127.0.0.1:4173",
     reuseExistingServer: !process.env.CI,
     // Build + cold preview boot is heavier than dev; allow up to 3 minutes
