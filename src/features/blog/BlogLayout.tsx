@@ -1,7 +1,7 @@
 import { useMemo, useCallback } from "react";
 import { Outlet, useSearchParams, useMatch, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { blogPosts } from "./data";
+import { visiblePosts } from "./data";
 import type { BlogOutletContext } from "./data";
 import BlogSidebar from "./BlogSidebar";
 import { useReadingPageVariant, usePageVariant } from "@/lib/motion";
@@ -16,13 +16,13 @@ const BlogLayout = () => {
   }, [searchParams]);
 
   const allTags = useMemo(
-    () => [...new Set(blogPosts.flatMap((p) => p.tags))].sort(),
+    () => [...new Set(visiblePosts.flatMap((p) => p.tags))].sort(),
     []
   );
 
   const filteredPosts = useMemo(() => {
-    if (activeTags.length === 0) return blogPosts;
-    return blogPosts.filter((post) =>
+    if (activeTags.length === 0) return visiblePosts;
+    return visiblePosts.filter((post) =>
       activeTags.every((tag) =>
         post.tags.some((t) => t.toLowerCase() === tag.toLowerCase())
       )
@@ -50,7 +50,7 @@ const BlogLayout = () => {
   );
 
   const sidebarProps = {
-    posts: blogPosts,
+    posts: visiblePosts,
     filteredSlugs,
     allTags,
     activeTags,
@@ -70,7 +70,7 @@ const BlogLayout = () => {
         {!isPostPage && (
           <div className="hidden md:block">
             <BlogSidebar
-              posts={blogPosts}
+              posts={visiblePosts}
               filteredSlugs={filteredSlugs}
               allTags={allTags}
               activeTags={activeTags}
