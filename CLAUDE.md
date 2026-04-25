@@ -252,7 +252,17 @@ Natural closing (no "Conclusion" header)
 
 | Variable | Purpose | Required |
 |----------|---------|----------|
-| (none currently) | | |
+| `VITE_MOTION_OVERRIDE` | Forces motion policy to `on`/`off` for every visitor (build-time default). Per-browser `localStorage["digital-matrix-motion-override"]` wins over this. See `src/lib/motion-config.ts` for the layered precedence and `.env` for usage notes. | No |
+
+### Author override — quick reference
+
+To preview animations on mobile/tablet from your own browser without changing config or redeploying:
+
+1. Open the site (any environment), F12 → Console
+2. `localStorage.setItem("digital-matrix-motion-override", "on")` then reload
+3. To revert: `localStorage.removeItem("digital-matrix-motion-override")` then reload
+
+This is a per-browser, per-origin tool — it never affects other visitors.
 
 ---
 
