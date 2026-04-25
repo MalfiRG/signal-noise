@@ -21,6 +21,25 @@ export interface BlogOutletContext {
   };
 }
 
+/**
+ * Filter draft posts out of a post list when running in a production build.
+ * Pure function — exported for unit testing. The runtime decision uses the
+ * `visiblePosts` constant below, which calls this with `import.meta.env.PROD`.
+ *
+ * Contract:
+ *   - isProd=true  → drops every post with `draft: true`. Posts without the
+ *                    `draft` field (undefined) are kept.
+ *   - isProd=false → returns the input list unchanged so authors can preview
+ *                    drafts during `npm run dev`.
+ */
+export function getVisiblePosts(
+  posts: BlogPost[],
+  isProd: boolean,
+): BlogPost[] {
+  if (!isProd) return posts;
+  return posts.filter((p) => !p.draft);
+}
+
 export const blogPosts: BlogPost[] = [
   {
     slug: "claude-code-cache-ttl-worktree-trap",
@@ -72,3 +91,17 @@ export const blogPosts: BlogPost[] = [
     draft: true,
   },
 ];
+
+/**
+ * The post list as exposed to consumers. In production builds, posts marked
+ * `draft: true` are filtered out. In development (`npm run dev`), all posts
+ * are visible so authors can preview drafts.
+ *
+ * `import.meta.env.PROD` is statically substituted by Vite at build time:
+ * the dev bundle inlines `false`, the prod bundle inlines `true`, and the
+ * dead branch is tree-shaken.
+ */
+export const visiblePosts: BlogPost[] = getVisiblePosts(
+  blogPosts,
+  import.meta.env.PROD,
+);
