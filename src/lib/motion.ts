@@ -1,6 +1,7 @@
 import { useReducedMotion } from "framer-motion";
 import type { Variants } from "framer-motion";
 import { useDeviceTier, type DeviceTier } from "@/hooks/use-device-tier";
+import { motionConfig } from "@/lib/motion-config";
 
 export const pageTransition = {
   cyberpunk: {
@@ -95,26 +96,31 @@ export interface MotionPolicy {
   animationsDisabled: boolean;
 }
 
-const AUTHOR_OVERRIDE_KEY = "digital-matrix-motion-override";
-
 // Module-level latch so the console.info fires once per page load, not on
 // every hook call. Prevents log spam when several components use useMotionPolicy.
 let authorOverrideWarned = false;
 
 function readAuthorOverride(): boolean {
-  if (typeof window === "undefined") return false;
-  try {
-    const active = localStorage.getItem(AUTHOR_OVERRIDE_KEY) === "on";
-    if (active && !authorOverrideWarned) {
-      authorOverrideWarned = true;
-      console.info(
-        "[digital-matrix] motion override active: localStorage['digital-matrix-motion-override'] = 'on'",
-      );
+  // Layer 1 — per-browser localStorage. Wins over build-time default when set.
+  if (typeof window !== "undefined") {
+    try {
+      const stored = localStorage.getItem(motionConfig.storageKey);
+      if (stored === "on") {
+        if (!authorOverrideWarned) {
+          authorOverrideWarned = true;
+          console.info(
+            `[digital-matrix] motion override active (localStorage): ${motionConfig.storageKey} = 'on'`,
+          );
+        }
+        return true;
+      }
+      if (stored === "off") return false;
+    } catch {
+      // localStorage may throw in private mode; fall through to env var.
     }
-    return active;
-  } catch {
-    return false;
   }
+  // Layer 2 — build-time env var (VITE_MOTION_OVERRIDE).
+  return motionConfig.buildTimeOverride === "on";
 }
 
 /**
