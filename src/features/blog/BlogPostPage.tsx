@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import { useMarkdownContent } from "@/hooks/useMarkdownContent";
 import { MarkdownRenderer } from "@/components/markdown/MarkdownRenderer";
 import { TableOfContents, TocHeading } from "@/components/TableOfContents";
-import { blogPosts } from "./data";
+import { visiblePosts } from "./data";
 import type { BlogOutletContext } from "./data";
 
 const BlogPostPage = () => {
@@ -14,7 +14,7 @@ const BlogPostPage = () => {
 
   const contentMap = useMemo(() => {
     const map: Record<string, () => Promise<string>> = {};
-    for (const post of blogPosts) {
+    for (const post of visiblePosts) {
       map[post.slug] = () =>
         import(`../../pages/content/blog/${post.slug}.md?raw`).then((mod) => mod.default);
     }
@@ -29,7 +29,7 @@ const BlogPostPage = () => {
 
   const [headings, setHeadings] = useState<TocHeading[]>([]);
 
-  const postInfo = blogPosts.find((p) => p.slug === slug);
+  const postInfo = visiblePosts.find((p) => p.slug === slug);
 
   const backParams = activeTags.length > 0 ? `?tags=${activeTags.join(",")}` : "";
 
