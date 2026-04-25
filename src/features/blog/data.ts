@@ -22,21 +22,55 @@ export interface BlogOutletContext {
 }
 
 /**
- * Filter draft posts out of a post list when running in a production build.
- * Pure function — exported for unit testing. The runtime decision uses the
- * `visiblePosts` constant below, which calls this with `import.meta.env.PROD`.
+ * Three-tier visibility model for blog posts.
  *
- * Contract:
- *   - isProd=true  → drops every post with `draft: true`. Posts without the
- *                    `draft` field (undefined) are kept.
- *   - isProd=false → returns the input list unchanged so authors can preview
- *                    drafts during `npm run dev`.
+ *   "production"  — Vercel deploy on the main domain. Drafts are hidden so
+ *                   end users never see unpublished work.
+ *   "preview"     — Vercel preview deploys (PR URLs, branch URLs) and any
+ *                   non-Vercel prod build. Drafts are visible so the author
+ *                   can review unpublished content on the share-able URL.
+ *   "development" — `npm run dev`. Everything visible.
+ */
+export type VisibilityMode = "production" | "preview" | "development";
+
+/**
+ * Pure environment-shape contract used by detectVisibilityMode. Accepts a
+ * minimal subset of import.meta.env so unit tests can pass plain objects
+ * without constructing the full Vite ImportMetaEnv type.
+ */
+export interface VisibilityModeEnv {
+  PROD: boolean;
+  VITE_VERCEL_ENV?: string;
+}
+
+/**
+ * Maps a Vite env snapshot to a visibility tier. Pure function — exported
+ * for unit testing.
+ *
+ *   PROD=false                                  → development
+ *   PROD=true,  VITE_VERCEL_ENV="production"    → production
+ *   PROD=true,  VITE_VERCEL_ENV="preview"       → preview
+ *   PROD=true,  VITE_VERCEL_ENV="development"   → preview (Vercel-local dev)
+ *   PROD=true,  VITE_VERCEL_ENV=""|undefined    → preview (local prod build)
+ */
+export function detectVisibilityMode(env: VisibilityModeEnv): VisibilityMode {
+  if (!env.PROD) return "development";
+  if (env.VITE_VERCEL_ENV === "production") return "production";
+  return "preview";
+}
+
+/**
+ * Filter draft posts out of a post list according to the three-tier
+ * visibility model. Pure function — exported for unit testing.
+ *
+ *   mode = "production"           → drops every post with draft:true
+ *   mode = "preview"|"development" → returns the input list unchanged
  */
 export function getVisiblePosts(
   posts: BlogPost[],
-  isProd: boolean,
+  mode: VisibilityMode,
 ): BlogPost[] {
-  if (!isProd) return posts;
+  if (mode !== "production") return posts;
   return posts.filter((p) => !p.draft);
 }
 
@@ -93,15 +127,24 @@ export const blogPosts: BlogPost[] = [
 ];
 
 /**
- * The post list as exposed to consumers. In production builds, posts marked
- * `draft: true` are filtered out. In development (`npm run dev`), all posts
- * are visible so authors can preview drafts.
+ * The post list as exposed to consumers. The visibility tier is derived
+ * from Vite's build-time env (PROD + VITE_VERCEL_ENV), so the dead branches
+ * are tree-shaken from each bundle.
  *
- * `import.meta.env.PROD` is statically substituted by Vite at build time:
- * the dev bundle inlines `false`, the prod bundle inlines `true`, and the
- * dead branch is tree-shaken.
+ * Mode resolution at build time:
+ *   - npm run dev                              → "development"
+ *   - npm run build (no Vercel env)            → "preview"
+ *   - Vercel deploy with VERCEL_ENV=preview    → "preview"
+ *   - Vercel deploy with VERCEL_ENV=production → "production" (drafts hidden)
+ *
+ * VERCEL_ENV is bridged to VITE_VERCEL_ENV by the package.json build script.
  */
+export const visibilityMode: VisibilityMode = detectVisibilityMode({
+  PROD: import.meta.env.PROD,
+  VITE_VERCEL_ENV: import.meta.env.VITE_VERCEL_ENV as string | undefined,
+});
+
 export const visiblePosts: BlogPost[] = getVisiblePosts(
   blogPosts,
-  import.meta.env.PROD,
+  visibilityMode,
 );

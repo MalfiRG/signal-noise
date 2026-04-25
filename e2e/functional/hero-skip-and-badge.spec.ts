@@ -36,7 +36,7 @@ async function gotoFreshCascade(page: import("@playwright/test").Page) {
   await page.evaluate(() => {
     try {
       sessionStorage.clear();
-    } catch {}
+    } catch { /* storage may throw in private mode; ignore */ }
   });
   await page.reload();
 }
@@ -112,7 +112,7 @@ test.describe("Hero skip-intro paths (spec §5.6)", () => {
     await page.evaluate(() => {
       try {
         sessionStorage.clear();
-      } catch {}
+      } catch { /* storage may throw in private mode; ignore */ }
     });
     await page.reload();
 
@@ -181,7 +181,7 @@ test.describe("Hero feedback badge (spec §5.7)", () => {
     await page.evaluate(() => {
       try {
         sessionStorage.clear();
-      } catch {}
+      } catch { /* storage may throw in private mode; ignore */ }
     });
     await page.reload();
 
@@ -198,7 +198,7 @@ test.describe("Hero feedback badge (spec §5.7)", () => {
     await page.evaluate(() => {
       try {
         sessionStorage.clear();
-      } catch {}
+      } catch { /* storage may throw in private mode; ignore */ }
     });
     await page.reload();
 
@@ -229,7 +229,7 @@ test.describe("Hero feedback badge (spec §5.7)", () => {
     await page.evaluate(() => {
       try {
         sessionStorage.clear();
-      } catch {}
+      } catch { /* storage may throw in private mode; ignore */ }
     });
     await page.reload();
 

@@ -20,8 +20,8 @@ async function gotoFreshCascade(page: import("@playwright/test").Page) {
   await page.goto("/");
   // Can't clear storage until after the first navigation (no origin before).
   await page.evaluate(() => {
-    try { sessionStorage.clear(); } catch {}
-    try { localStorage.removeItem("hero-badge-dismissed"); } catch {}
+    try { sessionStorage.clear(); } catch { /* storage may throw in private mode; ignore */ }
+    try { localStorage.removeItem("hero-badge-dismissed"); } catch { /* storage may throw in private mode; ignore */ }
   });
   await page.reload();
   // Wait until the initial "INITIALIZING SYSTEM" render has mounted.
