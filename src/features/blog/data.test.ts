@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { getVisiblePosts, type BlogPost } from "./data";
+import {
+  detectVisibilityMode,
+  getVisiblePosts,
+  type BlogPost,
+} from "./data";
 
 const fixturePosts: BlogPost[] = [
   {
@@ -39,15 +43,58 @@ const fixturePosts: BlogPost[] = [
   },
 ];
 
+describe("detectVisibilityMode", () => {
+  it("returns 'development' when PROD is false (regardless of VERCEL_ENV)", () => {
+    expect(detectVisibilityMode({ PROD: false })).toBe("development");
+    expect(
+      detectVisibilityMode({ PROD: false, VITE_VERCEL_ENV: "production" }),
+    ).toBe("development");
+    expect(
+      detectVisibilityMode({ PROD: false, VITE_VERCEL_ENV: "preview" }),
+    ).toBe("development");
+  });
+
+  it("returns 'production' only when PROD=true AND VERCEL_ENV='production'", () => {
+    expect(
+      detectVisibilityMode({ PROD: true, VITE_VERCEL_ENV: "production" }),
+    ).toBe("production");
+  });
+
+  it("returns 'preview' for Vercel preview deploys", () => {
+    expect(
+      detectVisibilityMode({ PROD: true, VITE_VERCEL_ENV: "preview" }),
+    ).toBe("preview");
+  });
+
+  it("returns 'preview' for Vercel `vercel dev` (VERCEL_ENV='development')", () => {
+    expect(
+      detectVisibilityMode({ PROD: true, VITE_VERCEL_ENV: "development" }),
+    ).toBe("preview");
+  });
+
+  it("returns 'preview' for local prod builds where VERCEL_ENV is unset", () => {
+    expect(detectVisibilityMode({ PROD: true })).toBe("preview");
+    expect(
+      detectVisibilityMode({ PROD: true, VITE_VERCEL_ENV: "" }),
+    ).toBe("preview");
+  });
+});
+
 describe("getVisiblePosts", () => {
-  it("hides draft posts when isProd=true", () => {
-    const visible = getVisiblePosts(fixturePosts, true);
+  it("hides draft posts when mode='production'", () => {
+    const visible = getVisiblePosts(fixturePosts, "production");
     expect(visible).toHaveLength(2);
     expect(visible.map((p) => p.slug)).toEqual(["published-a", "published-b"]);
   });
 
-  it("returns all posts unchanged when isProd=false (dev preview)", () => {
-    const visible = getVisiblePosts(fixturePosts, false);
+  it("returns all posts when mode='preview' (drafts visible on preview deploys)", () => {
+    const visible = getVisiblePosts(fixturePosts, "preview");
+    expect(visible).toHaveLength(4);
+    expect(visible).toEqual(fixturePosts);
+  });
+
+  it("returns all posts when mode='development' (npm run dev)", () => {
+    const visible = getVisiblePosts(fixturePosts, "development");
     expect(visible).toHaveLength(4);
     expect(visible).toEqual(fixturePosts);
   });
@@ -56,7 +103,7 @@ describe("getVisiblePosts", () => {
     const posts: BlogPost[] = [
       { slug: "p", title: "P", date: "2026", tags: [], category: "c", excerpt: "x" },
     ];
-    expect(getVisiblePosts(posts, true)).toEqual(posts);
+    expect(getVisiblePosts(posts, "production")).toEqual(posts);
   });
 
   it("treats explicit draft:false as not-a-draft", () => {
@@ -71,18 +118,24 @@ describe("getVisiblePosts", () => {
         draft: false,
       },
     ];
-    expect(getVisiblePosts(posts, true)).toEqual(posts);
+    expect(getVisiblePosts(posts, "production")).toEqual(posts);
   });
 
-  it("returns a new array — does not mutate the input in either mode", () => {
+  it("does not mutate the input in any mode", () => {
     const inputCopy = [...fixturePosts];
-    getVisiblePosts(fixturePosts, true);
-    getVisiblePosts(fixturePosts, false);
+    getVisiblePosts(fixturePosts, "production");
+    getVisiblePosts(fixturePosts, "preview");
+    getVisiblePosts(fixturePosts, "development");
     expect(fixturePosts).toEqual(inputCopy);
   });
 
-  it("returns empty array when every post is a draft and isProd=true", () => {
+  it("returns empty array when every post is a draft and mode='production'", () => {
     const allDrafts = fixturePosts.map((p) => ({ ...p, draft: true }));
-    expect(getVisiblePosts(allDrafts, true)).toEqual([]);
+    expect(getVisiblePosts(allDrafts, "production")).toEqual([]);
+  });
+
+  it("returns the full list when every post is a draft and mode='preview'", () => {
+    const allDrafts = fixturePosts.map((p) => ({ ...p, draft: true }));
+    expect(getVisiblePosts(allDrafts, "preview")).toEqual(allDrafts);
   });
 });
