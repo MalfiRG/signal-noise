@@ -122,7 +122,7 @@ export const blogPosts: BlogPost[] = [
     category: "QA Engineering",
     excerpt:
       "A comprehensive preview of every content element — headings, code blocks, tables, Mermaid diagrams, images, GIFs, callouts, and more.",
-    draft: false,
+    draft: true,
   },
 ];
 
