@@ -7,7 +7,7 @@ category: "AI & Automation"
 reading_time: "~9 min"
 description: "How a QA engineer approached AI memory optimization the only way he knows — by building a regression test harness first, then iterating until the numbers moved. No papers, no theory, just hypothesis-driven experimentation."
 og_image: "<!-- PLACEHOLDER: Terminal showing 61/61 passed, MRR 0.960 -->"
-draft: true
+draft: false
 ---
 
 My AI agents were eating 40% of their context window before they even started working. Each agent in my orchestration pipeline loads the same 40,000 tokens of project context — routing rules, memory files, lessons learned from previous sessions. Spawn ten agents for a feature implementation, and you've burned 400K tokens out of a million just on orientation.
