@@ -27,20 +27,18 @@ const BlogIndex = () => {
             <ScrollRevealItem key={post.slug}>
               <Link
                 to={`/blog/${post.slug}${tagParams}`}
-                className="block border border-border bg-card/50 p-6 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/15 transition-all duration-200 group"
+                className="block border border-border bg-card/50 p-6 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/15 transition-all duration-200 group overflow-hidden"
               >
-                <div className="flex flex-wrap items-center gap-2 mb-3">
-                  <span className="text-muted-foreground text-xs tracking-wider">
+                <div className="mb-3 space-y-2">
+                  <span className="block text-muted-foreground text-xs tracking-wider">
                     {post.date}
                   </span>
                   {post.tags.length > 0 && (
-                    <>
-                      <span className="text-border text-xs">|</span>
-                      <span
-                        data-testid="blog-tag-list"
-                        className="inline-flex flex-wrap items-center gap-2 text-xs"
-                      >
-                        {post.tags.map((tag) => (
+                    <div
+                      data-testid="blog-tag-list"
+                      className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs"
+                    >
+                      {post.tags.map((tag) => (
                         <span
                           key={tag}
                           role="link"
@@ -57,20 +55,19 @@ const BlogIndex = () => {
                               navigate(`/blog?tags=${tag}`);
                             }
                           }}
-                          className="text-xs text-primary/60 tracking-wider hover:text-primary transition-colors cursor-pointer"
+                          className="text-xs text-primary/60 tracking-wider hover:text-primary transition-colors cursor-pointer break-all"
                         >
                           #{tag}
                         </span>
-                        ))}
-                      </span>
-                    </>
+                      ))}
+                    </div>
                   )}
                 </div>
-                <h2 className="font-display text-xl font-bold text-foreground group-hover:text-glow mb-2">
+                <h2 className="font-display text-xl font-bold text-foreground group-hover:text-glow mb-2 break-words [overflow-wrap:anywhere]">
                   {post.title}
                 </h2>
                 {post.excerpt && (
-                  <p className="text-muted-foreground text-sm leading-relaxed">
+                  <p className="text-muted-foreground text-sm leading-relaxed break-words">
                     {post.excerpt}
                   </p>
                 )}
