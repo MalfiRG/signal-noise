@@ -7,10 +7,17 @@ import { useHeroStaggerVariant, useMotionPolicy } from "@/lib/motion";
 
 const HERO_PLAYED_KEY = "hero-cascade-played";
 
-function isDevHost(): boolean {
-  if (typeof window === "undefined") return false;
-  const h = window.location.hostname;
-  return h === "localhost" || h === "127.0.0.1" || h.endsWith(".vercel.app");
+/**
+ * True only while the Vite dev server is running (`npm run dev`). Vercel
+ * preview AND production both run `vite build`, so `import.meta.env.DEV` is
+ * false for them and the cascade-replay flag persists as designed.
+ *
+ * Earlier hostname-based gate (`*.vercel.app`) accidentally treated the live
+ * production subdomain as dev, so the back-button suppression never armed
+ * for actual visitors. Build-time DEV is the durable signal.
+ */
+function isDevBuild(): boolean {
+  return import.meta.env.DEV === true;
 }
 
 function readHeroReplaySkip(): boolean {
@@ -26,9 +33,9 @@ function readHeroReplaySkip(): boolean {
 let devHostWriteSkipWarned = false;
 
 function writeHeroReplayFlag(): void {
-  if (isDevHost()) {
+  if (isDevBuild()) {
     if (!devHostWriteSkipWarned) {
-      console.info("[digital-matrix] dev mode: cascade replay flag NOT persisted (localhost/127.0.0.1/*.vercel.app)");
+      console.info("[digital-matrix] dev build: cascade replay flag NOT persisted (import.meta.env.DEV is true)");
       devHostWriteSkipWarned = true;
     }
     return;
