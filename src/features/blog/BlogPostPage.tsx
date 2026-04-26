@@ -44,23 +44,27 @@ const BlogPostPage = () => {
       </Link>
 
       {postInfo && (
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <span className="text-muted-foreground text-xs tracking-wider">
-              {postInfo.date}
-            </span>
-            {postInfo.tags.length > 0 &&
-              postInfo.tags.map((tag) => (
+        <div className="mb-8 space-y-2">
+          <span className="block text-muted-foreground text-xs tracking-wider">
+            {postInfo.date}
+          </span>
+          {postInfo.tags.length > 0 && (
+            <div
+              data-testid="blog-post-tag-list"
+              className="flex flex-wrap items-center gap-x-3 gap-y-1"
+            >
+              {postInfo.tags.map((tag) => (
                 <Link
                   key={tag}
                   to={`/blog?tags=${tag}`}
-                  className="text-xs text-primary/60 tracking-wider hover:text-primary transition-colors"
+                  className="text-xs text-primary/60 tracking-wider hover:text-primary transition-colors break-all"
                 >
                   #{tag}
                 </Link>
               ))}
-          </div>
-          <h1 className="font-display text-3xl font-bold text-foreground text-glow">
+            </div>
+          )}
+          <h1 className="font-display text-3xl font-bold text-foreground text-glow break-words [overflow-wrap:anywhere]">
             {postInfo.title}
           </h1>
         </div>

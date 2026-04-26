@@ -133,20 +133,25 @@ test.describe("Hero sessionStorage round-trip (spec §5.6 + §5.9)", () => {
     await skipButton.click();
     await expect(page.locator('[data-testid="hero-phase3"]')).toBeVisible({ timeout: 2000 });
 
-    // Note: spec §5.9 says sessionStorage write is SKIPPED on localhost/
-    // 127.0.0.1/vercel.app. Playwright runs against 127.0.0.1:8080, so the
-    // flag is NOT written — this is the DEV ESCAPE HATCH behavior.
+    // Note: the dev-build gate (`import.meta.env.DEV === true`) suppresses
+    // the sessionStorage write while Vite's dev server is running. Playwright
+    // runs against `npm run dev`, so the flag is NOT written — this is the
+    // DEV ESCAPE HATCH that lets the developer iterate on the cascade without
+    // having to clear storage between reloads. Vercel preview/production
+    // builds (DEV === false) DO write the flag.
     const flagValue = await page.evaluate(() =>
       sessionStorage.getItem("hero-cascade-played"),
     );
-    // On 127.0.0.1, the dev escape hatch should suppress the write.
     expect(flagValue).toBeNull();
   });
 
-  test("dev-host detection: sessionStorage flag is NOT written on 127.0.0.1", async ({ page }) => {
-    // Direct assertion of §5.9 — the single most auditable dev-host behavior.
-    // If the implementation's isDevHost() check is missing or wrong, production-
-    // only users would get an unexpected reload experience.
+  test("dev-build detection: sessionStorage flag is NOT written on the Vite dev server", async ({ page }) => {
+    // The build-time gate (`import.meta.env.DEV`) replaces the older hostname-
+    // based dev-host list. Vercel preview AND production run `vite build`
+    // (DEV === false) and persist the flag for back-button suppression. Only
+    // `npm run dev` (DEV === true) skips the write — which is what this spec
+    // exercises. Production-build behavior is covered by the prod-contract
+    // suite once a corresponding spec lands.
     await gotoFreshCascade(page);
 
     // Skip via the SKIP button.
@@ -155,21 +160,12 @@ test.describe("Hero sessionStorage round-trip (spec §5.6 + §5.9)", () => {
     await skipButton.click();
     await expect(page.locator('[data-testid="hero-phase3"]')).toBeVisible({ timeout: 2000 });
 
-    const hostname = await page.evaluate(() => location.hostname);
     const flagValue = await page.evaluate(() =>
       sessionStorage.getItem("hero-cascade-played"),
     );
-
-    // Spec §5.9 dev-host list: localhost, 127.0.0.1, *.vercel.app
-    const isDevHost =
-      hostname === "localhost" ||
-      hostname === "127.0.0.1" ||
-      hostname.endsWith(".vercel.app");
-    if (isDevHost) {
-      expect(flagValue).toBeNull();
-    } else {
-      expect(flagValue).toBe("1");
-    }
+    // This spec only runs against `npm run dev`, where DEV === true → write
+    // is suppressed unconditionally. No need to branch on hostname.
+    expect(flagValue).toBeNull();
   });
 });
 
