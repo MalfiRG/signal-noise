@@ -472,6 +472,23 @@
     opacity: 1;
   }
 
+  /* Containment + inline-code wrap (theme-agnostic).
+     Without these, a long unbreakable identifier inside inline `code`
+     (e.g. `message.usage.cache_creation.ephemeral_5m_input_tokens`) punches
+     past the column on mobile, document width exceeds viewport, and the
+     whole page becomes horizontally scrollable — clipping the navbar,
+     title, and tags off-screen. overflow-wrap:anywhere lets the identifier
+     break inside the pill; overflow-x:hidden on the article container is
+     defensive — any future unbreakable element clips instead of forcing
+     page scroll. Fenced code blocks have their own internal scroll
+     (.code-block-wrapper) and are unaffected. */
+  .markdown-body {
+    overflow-x: hidden;
+  }
+  .markdown-body code:not(pre code) {
+    overflow-wrap: anywhere;
+  }
+
   .theme-reading .markdown-body {
     color: hsl(30 10% 20%);
     font-size: 1.05rem;
@@ -552,8 +569,20 @@
   .token.italic { font-style: italic; }
 
   .theme-reading .markdown-body code:not(pre code) {
-    background-color: hsl(30 12% 82%);
+    /* Pill is LIGHTER than the cream page (L=92 vs page L=88) with a faint
+       border for edge definition. Earlier value (L=82) sat darker than the
+       page and read as a dingy stripe. Saturation bumped 12% → 30% so the
+       warm-cream feel is intentional, not muddy. Padding/radius/font-size
+       are the GitHub-style inline pill convention — they were missing
+       entirely, so each <code> rendered as a flat rectangle the full height
+       of the line. Foreground unchanged (already passes contrast). Fenced
+       code blocks (pre code) keep their dark wrapper via line 509-541. */
+    background-color: hsl(30 30% 92%);
     color: hsl(30 10% 20%);
+    border: 1px solid hsl(30 15% 82%);
+    padding: 0.1em 0.4em;
+    border-radius: 0.3rem;
+    font-size: 0.9em;
   }
 
   .theme-reading .markdown-body a {
