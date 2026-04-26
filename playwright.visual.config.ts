@@ -16,8 +16,7 @@ export default defineConfig({
       name: "visual",
       testDir: "./e2e/visual",
       use: { ...devices["Desktop Chrome"] },
-      // Fix H10: include the platform token so baseline filenames carry the
-      // -chromium-linux suffix that every Wave 4 path reference assumes.
+      // Include {platform} token — baselines must carry -chromium-linux suffix
       snapshotPathTemplate:
         "{testDir}/__snapshots__/{testFileName}/{arg}-{platform}{ext}",
     },

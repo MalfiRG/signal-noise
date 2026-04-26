@@ -1,18 +1,3 @@
-/**
- * Supplementary coverage for useMotionPolicy — integration-level composition
- * checks and edge cases the Wave 2 motion.test.ts does not cover.
- *
- * Scope:
- *  - sessionStorage exception handling (spec §5.6)
- *  - localStorage author override with missing / invalid values (spec §4 point 4)
- *  - All four downstream consumers agree on the same animationsDisabled value
- *    (spec §5.2, §5.3 — cross-consumer coherence)
- *
- * This file sits in src/test/ and imports public exports from @/lib/motion
- * (plus the variant hooks). It does NOT overlap the Wave 2 plan's
- * src/lib/motion.test.ts file — that covers the 5 primary evaluation-chain
- * cases. These are the gap-filling edge cases.
- */
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { renderHook } from "@testing-library/react";
 import { setMockViewportWidth } from "@/test/setup";
@@ -58,7 +43,7 @@ describe("useMotionPolicy — localStorage author override edge cases", () => {
 
     localStorage.setItem("digital-matrix-motion-override", "ON");
     const { result: c } = renderHook(() => useMotionPolicy());
-    // Spec §4 point 4 says exactly "on" — case-sensitive. "ON" must NOT activate.
+    // spec §4 point 4 — exact "on" only, case-sensitive
     expect(c.current.animationsDisabled).toBe(true);
   });
 
@@ -79,9 +64,7 @@ describe("useMotionPolicy — localStorage author override edge cases", () => {
     setMockViewportWidth(1440);
     localStorage.setItem("digital-matrix-motion-override", "on");
     const { result } = renderHook(() => useMotionPolicy({ heroReplaySkip: true }));
-    // heroReplaySkip=true forces animationsDisabled=true even on desktop.
-    // With override=on, the pseudocode in spec §4 orders heroReplaySkip BEFORE
-    // authorOverride, so replay-skip still wins. Regression guard.
+    // spec §4 H7 — heroReplaySkip wins over authorOverride
     expect(result.current.animationsDisabled).toBe(true);
   });
 });
@@ -104,24 +87,13 @@ describe("useMotionPolicy — localStorage read failure (private mode simulation
       throw new Error("The operation is insecure (Safari private browsing)");
     });
 
-    // Must not throw. Hook should treat override as off → desktop default applies.
     const { result } = renderHook(() => useMotionPolicy());
     expect(result.current.tier).toBe("desktop");
     expect(result.current.animationsDisabled).toBe(false);
   });
 });
 
-/**
- * Cross-consumer coherence — spec §5.3 mandates that all downstream consumers
- * of the policy (heroItem variant, itemVariant, animClass gating, LetterReveal
- * skipAnimation) agree on the SAME animationsDisabled value. A bug where they
- * disagree would be visible only via integration — each individual hook test
- * would pass.
- *
- * The Wave 2 plan asserts each variant hook in isolation. This block calls
- * them together in a single render and asserts every surface reads the same
- * underlying policy state.
- */
+// spec §5.3 — all downstream consumers must agree on animationsDisabled
 describe("useMotionPolicy — cross-consumer coherence", () => {
   beforeEach(() => {
     mockUseReducedMotion.mockReturnValue(false);

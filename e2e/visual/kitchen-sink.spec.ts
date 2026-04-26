@@ -2,19 +2,11 @@ import { test, expect } from "@playwright/test";
 import { existsSync } from "node:fs";
 import { prepareContext, stabilizeForLayout } from "../fixtures/visual-determinism";
 
-// Per spec §4: hard-fail if --update-snapshots runs outside the pinned
-// Docker image. The ALLOW_HOST_SNAPSHOT_UPDATE env var is an explicit
-// emergency escape hatch.
-// Playwright 1.58.2 enforces a destructuring pattern on the first arg of
-// beforeAll; single-arg (testInfo) => ... is rejected at parse time. The
-// empty destructure is the only legal form when we don't need fixtures.
+// spec §4 — hard-fail --update-snapshots outside pinned Docker image
+// Playwright 1.58.2 — beforeAll requires destructuring pattern on first arg
 // eslint-disable-next-line no-empty-pattern
 test.beforeAll(({}, testInfo) => {
-  // Playwright's updateSnapshots default is "missing" (writes only when the
-  // baseline file is absent). Only "all" and "changed" actually overwrite an
-  // existing baseline, so the Docker-pin guard must trigger on those values
-  // specifically — NOT on "!== 'none'", which falsely trips every verify-only
-  // CI run where the default "missing" mode is in effect.
+  // Playwright 1.58.2 updateSnapshots default is "missing"; only "all"/"changed" overwrite
   const updateMode = testInfo.config.updateSnapshots;
   if (updateMode === "all" || updateMode === "changed") {
     const isDocker = existsSync("/.dockerenv");

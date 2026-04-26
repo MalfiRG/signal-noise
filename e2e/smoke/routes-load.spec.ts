@@ -1,10 +1,6 @@
 import { test, expect, Page } from "@playwright/test";
 import { prepareContext } from "../fixtures/visual-determinism";
 
-// Note: prepareContext strips animations and seeds hero-cascade sessionStorage.
-// For non-/ routes, the sessionStorage seed is harmless overhead. Animation kill
-// is universally beneficial for smoke tier (no motion to test in 5s). (Fix L5)
-
 const ROUTES: Array<{
   path: string;
   check: (page: Page) => ReturnType<Page["locator"]> | ReturnType<Page["getByRole"]>;
@@ -24,8 +20,7 @@ test.describe("Routes load (smoke)", () => {
       await prepareContext(page);
       const response = await page.goto(path);
       expect(response?.status()).toBe(200);
-      // Catch client-side redirects to NotFound — without this, a soft 200 to a
-      // SPA NotFound page passes the status check but is not the route under test.
+      // SPA NotFound returns 200 — assert URL match to detect client-side redirect
       await expect(page).toHaveURL(new RegExp(path.replace(/\//g, "\\/") + "$"));
       await expect(check(page)).toBeVisible({ timeout: 5000 });
     });
