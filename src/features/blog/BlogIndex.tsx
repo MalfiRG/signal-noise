@@ -27,6 +27,7 @@ const BlogIndex = () => {
             <ScrollRevealItem key={post.slug}>
               <Link
                 to={`/blog/${post.slug}${tagParams}`}
+                data-testid="blog-post-tile"
                 className="block border border-border bg-card/50 p-6 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/15 transition-all duration-200 group overflow-hidden"
               >
                 <div className="mb-3 space-y-2">
