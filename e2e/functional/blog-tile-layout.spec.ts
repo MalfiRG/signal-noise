@@ -1,39 +1,6 @@
 import { test, expect, type Locator, type Page } from "@playwright/test";
 
-/**
- * Geometric regression guard for blog tag/title overflow on TWO surfaces:
- *
- *   1. The blog index tile (`BlogIndex.tsx`) — list view at `/blog`.
- *   2. The blog post header (`BlogPostPage.tsx`) — single-post view at
- *      `/blog/:slug`.
- *
- * Both surfaces render `(date · tags · title)` independently. The original
- * bugs:
- *
- *   - Index tile: tag list was `inline-flex flex-wrap`, sized to content,
- *     never wrapped → overflowed at narrow widths.
- *   - Post header: tag row was `flex` with NO `flex-wrap` directive at
- *     all → tags stayed in one row and overflowed past the content area.
- *
- * Why Playwright (not Vitest + jsdom):
- *   jsdom has no layout engine. `getBoundingClientRect()` returns zeros,
- *   so geometric containment can't be tested there. The bug is geometric,
- *   so the test must run in a real browser.
- *
- * Why functional suite (not visual-regression snapshots):
- *   Snapshots fail on font hinting, scrollbar widths, subpixel rendering.
- *   Geometric containment of a child rect inside a parent rect is the
- *   actual user-visible invariant we care about, expressed as one numeric
- *   comparison.
- *
- * Selector scope:
- *   `BlogIndex.tsx` renders an inline `BlogSidebar` (`md:hidden`) for
- *   mobile, AND `BlogLayout.tsx` renders a separate sidebar for desktop
- *   (`md:block`). Both contain `<a href="/blog/{slug}">` post links that
- *   could collide with a tile selector. Tiles carry an explicit
- *   `data-testid="blog-post-tile"` so the spec doesn't have to reason
- *   about CSS-driven visibility or DOM order.
- */
+// jsdom has no layout engine; geometric containment must run in a real browser
 
 const VIEWPORTS = [
   { name: "mobile-narrow", width: 360, height: 800 },
@@ -42,8 +9,7 @@ const VIEWPORTS = [
   { name: "desktop", width: 1280, height: 800 },
 ] as const;
 
-// Sub-pixel rounding margin. Browser layout can place a child at e.g.
-// card.right + 0.4px without a real visual overflow.
+// Sub-pixel rounding margin — browser layout may round to ±0.5px
 const TOLERANCE_PX = 1;
 
 interface Rect {
@@ -68,25 +34,18 @@ function horizontallyContained(child: Rect, parent: Rect): boolean {
 
 async function gotoBlogIndex(page: Page): Promise<void> {
   await page.goto("/blog");
-  // Scoped to `main` so the desktop sidebar's per-post links don't satisfy
-  // this locator before the actual tiles do.
   const firstTile = page.locator('[data-testid="blog-post-tile"]').first();
   await expect(firstTile).toBeVisible({ timeout: 5000 });
 }
 
 async function gotoAncovaPost(page: Page): Promise<void> {
   await page.goto("/blog/claude-code-cache-ttl-worktree-trap");
-  // Wait for the post-page tag list to render (we know it has tags).
   await expect(
     page.locator('[data-testid="blog-post-tag-list"]'),
   ).toBeVisible({ timeout: 5000 });
 }
 
 test.describe("Blog tile (index) — content stays inside card boundaries", () => {
-  // Reduced motion makes layout deterministic — Framer Motion snaps to
-  // the final state immediately, so `boundingBox()` returns stable
-  // numbers without timing windows. Motion-policy behavior is exercised
-  // in `motion-wcag-session.spec.ts` and the hero specs.
   test.use({ reducedMotion: "reduce" });
 
   for (const vp of VIEWPORTS) {
@@ -108,9 +67,7 @@ test.describe("Blog tile (index) — content stays inside card boundaries", () =
         await tile.scrollIntoViewIfNeeded();
         const tileBox = await rectOrFail(tile, `tile #${i}`);
 
-        // Title — load-bearing for hyphen-heavy headlines like
-        // "5-Minute-TTL" that some browsers refuse to break without
-        // `overflow-wrap: anywhere`.
+        // hyphen-heavy headlines need `overflow-wrap: anywhere` to break
         const titleBox = await rectOrFail(
           tile.locator("h2"),
           `tile #${i} title`,
@@ -120,8 +77,6 @@ test.describe("Blog tile (index) — content stays inside card boundaries", () =
           `${vp.name} tile #${i}: title overflowed card. title=${JSON.stringify(titleBox)} card=${JSON.stringify(tileBox)}`,
         ).toBe(true);
 
-        // Each tag must individually fit inside the card. We don't
-        // assert row count because that drifts with font metrics.
         const tagList = tile.locator('[data-testid="blog-tag-list"]');
         if ((await tagList.count()) === 0) continue;
 
@@ -152,13 +107,8 @@ test.describe("Blog post header — tags wrap inside the content area", () => {
       await page.setViewportSize({ width: vp.width, height: vp.height });
       await gotoAncovaPost(page);
 
-      // The post-page main column. The tag list and h1 must both fit
-      // horizontally inside this rect — anything past it is overflow
-      // (which on Vercel showed as tags spilling over the visible
-      // reading-mode card edge).
       const mainBox = await rectOrFail(page.locator("main"), "main column");
 
-      // Title h1 — the prominent headline.
       const titleBox = await rectOrFail(
         page.locator("main h1").first(),
         "post title h1",
@@ -168,7 +118,6 @@ test.describe("Blog post header — tags wrap inside the content area", () => {
         `${vp.name}: post title overflowed main. title=${JSON.stringify(titleBox)} main=${JSON.stringify(mainBox)}`,
       ).toBe(true);
 
-      // Tag list — the original bug surface.
       const tagList = page.locator('[data-testid="blog-post-tag-list"]');
       const tags = tagList.locator("a[href^='/blog?tags=']");
       const tagCount = await tags.count();
@@ -193,12 +142,6 @@ test.describe("Blog post header — tags wrap inside the content area", () => {
   test("ANCOVA post-header tags wrap onto multiple rows on mobile", async ({
     page,
   }) => {
-    // Stronger regression guard for the post-page failure mode. The
-    // original bug was that `flex items-center gap-3 mb-2` had NO
-    // `flex-wrap`, so 7 tags rendered in a single row that bled past
-    // the card. After the fix, the tag-list block container wraps onto
-    // multiple rows. Detect "wraps" via distinct row Y-coordinates so
-    // the assertion stays robust against font-metric drift.
     await page.setViewportSize({ width: 375, height: 812 });
     await gotoAncovaPost(page);
 

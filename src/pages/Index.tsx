@@ -7,15 +7,6 @@ import { useHeroStaggerVariant, useMotionPolicy } from "@/lib/motion";
 
 const HERO_PLAYED_KEY = "hero-cascade-played";
 
-/**
- * True only while the Vite dev server is running (`npm run dev`). Vercel
- * preview AND production both run `vite build`, so `import.meta.env.DEV` is
- * false for them and the cascade-replay flag persists as designed.
- *
- * Earlier hostname-based gate (`*.vercel.app`) accidentally treated the live
- * production subdomain as dev, so the back-button suppression never armed
- * for actual visitors. Build-time DEV is the durable signal.
- */
 function isDevBuild(): boolean {
   return import.meta.env.DEV === true;
 }
@@ -115,8 +106,7 @@ const Index = () => {
     timeoutsRef.current = [];
     setPhase(3);
     writeHeroReplayFlag();
-    // Move focus to the first CTA so keyboard users aren't stranded on an
-    // unmounted SKIP button (a11y — Wave 3 review B5 / F-UX-05).
+    // a11y Wave 3 B5 / F-UX-05 — refocus first CTA after SKIP unmounts
     setTimeout(() => viewProjectsRef.current?.focus(), 0);
   };
 
@@ -138,10 +128,7 @@ const Index = () => {
     }
   };
 
-  // Tri-state badge per F-UX-03 + F-CONS-05 convergence. animationsDisabled can
-  // be caused by (1) OS reduced-motion, (2) session replay-skip, or (3) tier
-  // default. The cause determines the label so the user understands WHY motion
-  // is off. Priority: OS > session > tier (matches §4 evaluation chain order).
+  // Tri-state badge per F-UX-03 + F-CONS-05; priority OS > session > tier
   const showReducedMotionBadge = prefersReducedMotion && !badgeDismissed;
   const showSessionBadge =
     !prefersReducedMotion && animationsDisabled && heroReplaySkip && !badgeDismissed;
@@ -183,10 +170,7 @@ const Index = () => {
         </motion.button>
       )}
 
-      {/* SKIP button MUST be a direct child of the top-level fragment to avoid
-          stacking-context traps. Sibling <section> and <div className="relative
-          z-20"> around AboutSection each create later stacking contexts that
-          would paint over a nested z-40 button. See Wave 3 review B2. */}
+      {/* SKIP must be top-level fragment child — Wave 3 B2 stacking-context */}
       {phase >= 1 && phase < 3 && !animationsDisabled && (
         <button
           type="button"
@@ -212,8 +196,6 @@ const Index = () => {
         />
 
         <div className="text-center px-4 max-w-3xl">
-          {/* LetterReveal skipAnimation receives animationsDisabled (which composes
-              heroReplaySkip via useMotionPolicy) — no double-pass needed per §5.3. */}
           {phase >= 1 ? (
             <LetterReveal
               text="> INITIALIZING SYSTEM..."
@@ -256,15 +238,7 @@ const Index = () => {
             </span>
           </h1>
 
-          {/* The CTA region uses the modern HTML `inert` attribute (React 19
-              boolean prop) to gate it during the cascade. `inert` is one
-              attribute that subsumes three older ones we used to coordinate
-              by hand: it removes the subtree from the accessibility tree
-              (like aria-hidden), prevents focus from reaching descendants
-              (like tabindex=-1 on each child), and disables pointer events
-              (like pointer-events-none). axe-DevTools previously flagged
-              the aria-hidden + focusable-children pair as a Serious WCAG
-              violation; `inert` resolves it cleanly. */}
+          {/* React 19 boolean `inert` prop — replaces aria-hidden+tabindex+pointer-events */}
           <motion.div
             variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.5, delayChildren: 0.05 } } }}
             initial={animationsDisabled ? "visible" : "hidden"}

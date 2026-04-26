@@ -6,9 +6,7 @@ global.ResizeObserver = class ResizeObserver {
   disconnect() {}
 };
 
-// framer-motion's InViewFeature instantiates IntersectionObserver on mount;
-// jsdom does not implement it. Stub it so components using whileInView /
-// viewport triggers render cleanly in unit tests.
+// jsdom has no IntersectionObserver — required by framer-motion InViewFeature
 global.IntersectionObserver = class IntersectionObserver {
   root = null;
   rootMargin = "";
@@ -46,7 +44,7 @@ Object.defineProperty(window, "matchMedia", {
     } else if (maxWidthMatch) {
       matches = __mockViewportWidth__ <= parseInt(maxWidthMatch[1], 10);
     } else if (reducedMotionMatch) {
-      matches = false; // tests opt-in via Framer's useReducedMotion override if needed
+      matches = false;
     }
 
     return {

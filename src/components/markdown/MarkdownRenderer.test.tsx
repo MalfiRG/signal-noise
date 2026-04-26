@@ -8,7 +8,6 @@ describe("MarkdownRenderer inline code", () => {
       <MarkdownRenderer content={"This is `inline code` here"} />
     );
     const inlineCode = container.querySelector("code:not(pre code)");
-    // Fix L2: type-narrow before chaining .className so the test is strict-mode safe.
     expect(inlineCode, "inline code element not found").not.toBeNull();
     if (!inlineCode) throw new Error("unreachable");
     expect(inlineCode.className).toContain("bg-secondary");
@@ -16,18 +15,7 @@ describe("MarkdownRenderer inline code", () => {
 });
 
 describe("customSlugify (anchor-link resolution helper)", () => {
-  // customSlugify is the fallback slug generator used by findElementId for
-  // in-page anchor links. Heading IDs themselves come from rehype-slug
-  // (github-slugger), which preserves Unicode letters — so the heading
-  // for "Książka i ćwiczenia" renders with id "książka-i-ćwiczenia".
-  // customSlugify's \w-based character class DELETES diacritics, producing
-  // a different slug. That asymmetry is a known gap between CLAUDE.md's
-  // transliteration claim and the actual implementation; true transliteration
-  // (ą→a, ć→c) is a deferred follow-up.
-
   it("strips Polish diacritics via the \\w character class", () => {
-    // \w is [A-Za-z0-9_], so ą, ć, ż, ś, ź, ł, ó, ę, ń are DELETED.
-    // książka → ksika; ćwiczenia → wiczenia.
     expect(customSlugify("Książka i ćwiczenia")).toBe("ksika-i-wiczenia");
   });
 

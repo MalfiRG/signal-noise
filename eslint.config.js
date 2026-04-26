@@ -5,9 +5,6 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  // Top-level ignores. visual-mobile.spec.ts is the Wave 1 quarantined spec
-  // that gets REWRITTEN into e2e/visual/kitchen-sink.spec.ts in Wave 4 per
-  // spec §5 — skip it from lint until that rewrite lands.
   { ignores: ["dist", "e2e/visual-mobile.spec.ts"] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
@@ -24,10 +21,7 @@ export default tseslint.config(
       ...reactHooks.configs.recommended.rules,
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
       "@typescript-eslint/no-unused-vars": "off",
-      // Workspace-level tautology warn. Smoke and functional tier blocks
-      // below set no-restricted-syntax to their own (stricter) values which
-      // REPLACE this rule per ESLint flat-config semantics — value=true is
-      // forbidden in those tiers; value=1 is warned workspace-wide.
+      // ESLint flat config — later tier blocks REPLACE this rule, not merge
       "no-restricted-syntax": [
         "warn",
         {
@@ -38,10 +32,7 @@ export default tseslint.config(
       ],
     },
   },
-  // Smoke tier — e2e/smoke/**/*.ts
-  // Fix C2: AST selector for expect(X).toBe(Y) MUST use
-  // callee.object.type='CallExpression' (the inner expect() is a
-  // CallExpression, NOT an Identifier named 'expect').
+  // AST selector: inner expect() is CallExpression, not Identifier
   {
     files: ["e2e/smoke/**/*.ts"],
     rules: {
@@ -85,7 +76,6 @@ export default tseslint.config(
       ],
     },
   },
-  // Functional tier — e2e/functional/**/*.ts
   {
     files: ["e2e/functional/**/*.ts"],
     rules: {
@@ -124,12 +114,8 @@ export default tseslint.config(
       ],
     },
   },
-  // Fixtures override — MUST come after the general `**/*.{ts,tsx}` block so
-  // this rule-off setting wins per ESLint flat-config semantics (later block
-  // overrides earlier for the same rule on the same file). e2e/fixtures/
-  // uses Playwright's `use` callback-parameter name, which
-  // react-hooks/rules-of-hooks misidentifies as a React hook call. Scoped
-  // narrowly so the rule still applies everywhere else.
+  // Fixtures override — ESLint flat-config source order (later wins)
+  // Playwright `use` param trips react-hooks/rules-of-hooks; scope narrowly
   {
     files: ["e2e/fixtures/**/*.ts"],
     rules: {

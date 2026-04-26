@@ -1,33 +1,4 @@
-/**
- * Accessibility regression guards for findings the user observed in
- * Brave's DevTools Accessibility audit on the Vercel preview.
- *
- * Locks three contracts:
- *
- *   1. Every top-level page has exactly one <main> landmark.
- *      WCAG 2.4.1 (Bypass Blocks). Centralized in `App.tsx` (single
- *      <main> wraps every route). `BlogLayout.tsx` was downgraded
- *      from <main> to <div> so blog routes don't end up with two.
- *
- *   2. No focusable element lives inside an `aria-hidden="true"` or
- *      `data-aria-hidden="true"` subtree. `Index.tsx` was the original
- *      offender: the cascade-gated CTA region used aria-hidden +
- *      pointer-events-none on the wrapper while keeping the CTA links
- *      focusable. Fix replaces both with React 19's `inert` boolean.
- *      This spec catches any regression that reintroduces aria-hidden
- *      around focusables — independent of which CSS approach the
- *      component chooses.
- *
- *   3. The Skills page Tabs triggers meet WCAG AA 4.5:1 normal-text
- *      contrast against their effective background. The active tab is
- *      bright by definition; the inactive tab(s) used to fall to ~4.0
- *      against `bg-secondary/50` and now use `text-foreground/70`.
- *
- * Why DOM probes instead of axe-core: axe is a 200kb runtime payload
- * for findings we already know to expect. Three focused DOM queries
- * give us the exact selectors that fail (so a regression is easy to
- * pinpoint) and zero new dependencies.
- */
+// WCAG 2.4.1 single <main>, aria-hidden+focusable hygiene, WCAG AA 4.5:1 contrast
 import { test, expect, type Page } from "@playwright/test";
 
 const PAGES = ["/", "/projects", "/skills"] as const;
@@ -125,16 +96,8 @@ test.describe("A11y — landmarks and aria-hidden hygiene", () => {
   test("/ keeps cascade-gated CTA region inert (no aria-hidden over focusables) during phases 0-2", async ({
     page,
   }) => {
-    // Specifically targets the original Index.tsx bug: a wrapper that was
-    // both aria-hidden=true AND contained focusable Link CTAs during the
-    // 5.8s cascade. After the fix, the wrapper uses `inert` instead, so
-    // querying [aria-hidden] should return zero violations even mid-cascade.
-    //
-    // We DON'T wait for phase 3 — the assertion has to hold during the
-    // cascade window where the original bug lived.
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.goto("/");
-    // Wait only for the cascading marker, not for phase 3.
     await page.waitForSelector(
       '[data-testid="hero-cascading"], [data-testid="hero-phase3"]',
       { timeout: 6000 },
@@ -153,10 +116,6 @@ test.describe("A11y — landmarks and aria-hidden hygiene", () => {
   test("/ cascade CTA wrapper carries the `inert` attribute during phases 0-2", async ({
     page,
   }) => {
-    // Implementation-level assertion: the CTA wrapper must use the modern
-    // `inert` attribute. Catches a regression to the old aria-hidden
-    // pattern that would still pass test 2 above (because aria-hidden
-    // would simply be removed) but lose the focus-trap-out behavior.
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.goto("/");
     await page.waitForSelector(
@@ -165,8 +124,6 @@ test.describe("A11y — landmarks and aria-hidden hygiene", () => {
     );
 
     const result = await page.evaluate(() => {
-      // Find the wrapper that contains both CTA links. We don't anchor
-      // by class because that's brittle to refactors.
       const projectsLink = document.querySelector('a[href="/projects"]');
       const blogLink = document.querySelector('a[href="/blog"]');
       if (!projectsLink || !blogLink) return null;
@@ -175,9 +132,6 @@ test.describe("A11y — landmarks and aria-hidden hygiene", () => {
         wrapper = wrapper.parentElement;
       }
       if (!wrapper) return null;
-      // Check this wrapper OR any ancestor up to <main> — Framer Motion may
-      // wrap the inert region in another div. We look for the closest
-      // ancestor that has either inert OR aria-hidden=true.
       let node: HTMLElement | null = wrapper;
       while (node && node.tagName.toLowerCase() !== "main") {
         if (node.hasAttribute("inert") || node.getAttribute("aria-hidden") === "true") {
@@ -189,14 +143,11 @@ test.describe("A11y — landmarks and aria-hidden hygiene", () => {
         }
         node = node.parentElement;
       }
-      // No gating ancestor found — the cascade may already have settled to
-      // phase 3, in which case neither inert nor aria-hidden should be set.
       return { tag: "(none)", hasInert: false, ariaHidden: null };
     });
 
     expect(result, "could not locate the CTA wrapper").not.toBeNull();
     if (result?.tag === "(none)") {
-      // Cascade settled — that's fine, no gating needed.
       return;
     }
     expect(
