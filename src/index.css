@@ -480,12 +480,16 @@
      title, and tags off-screen. overflow-wrap:anywhere lets the identifier
      break inside the pill; overflow-x:hidden on the article container is
      defensive — any future unbreakable element clips instead of forcing
-     page scroll. Fenced code blocks have their own internal scroll
-     (.code-block-wrapper) and are unaffected. */
+     page scroll.
+     Selector :not([class*="language-"]) — NOT :not(pre code) — because the
+     CodeBlock component replaces <pre> with <div class="code-block-wrapper">,
+     so a :not(pre code) exclusion no longer fires for fenced code. The
+     `language-*` class that rehype-prism-plus stamps on every fenced <code>
+     is the invariant we anchor on instead. */
   .markdown-body {
     overflow-x: hidden;
   }
-  .markdown-body code:not(pre code) {
+  .markdown-body code:not([class*="language-"]) {
     overflow-wrap: anywhere;
   }
 
@@ -523,9 +527,20 @@
     border-color: hsl(30 10% 78%);
   }
 
+  /* Outlined edges on the code-block-wrapper in reading mode. The original
+     rule targeted pre[class*="language-"] but CodeBlock.tsx replaced <pre>
+     with <div class="code-block-wrapper">, so the rule never fired. Border
+     re-anchored to .code-block-wrapper with a warm-tone color tuned to
+     the cream reading-mode page (border picked against the page bg, not
+     the code-block bg, so it reads on mobile WebKit). The faint
+     box-shadow gives the frame a slight lift so it doesn't blend at low DPI. */
+  .theme-reading .markdown-body .code-block-wrapper {
+    border: 1px solid hsl(30 25% 45%);
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px hsl(30 10% 50% / 0.25);
+  }
   .theme-reading .markdown-body pre[class*="language-"] {
     background: hsl(220 13% 15%) !important;
-    border: 1px solid hsl(220 10% 25%);
     border-radius: 0.5rem;
   }
   .theme-reading .markdown-body code[class*="language-"] {
@@ -568,15 +583,19 @@
   .token.important, .token.bold { font-weight: bold; }
   .token.italic { font-style: italic; }
 
-  .theme-reading .markdown-body code:not(pre code) {
+  .theme-reading .markdown-body code:not([class*="language-"]) {
     /* Pill is LIGHTER than the cream page (L=92 vs page L=88) with a faint
        border for edge definition. Earlier value (L=82) sat darker than the
        page and read as a dingy stripe. Saturation bumped 12% → 30% so the
        warm-cream feel is intentional, not muddy. Padding/radius/font-size
        are the GitHub-style inline pill convention — they were missing
        entirely, so each <code> rendered as a flat rectangle the full height
-       of the line. Foreground unchanged (already passes contrast). Fenced
-       code blocks (pre code) keep their dark wrapper via line 509-541. */
+       of the line. Foreground unchanged (already passes contrast).
+       Selector exclusion is :not([class*="language-"]) NOT :not(pre code) —
+       see the same reasoning at the .markdown-body block above. The
+       previous form leaked the pill border onto fenced <code> (which has
+       no <pre> ancestor), and box-decoration-break:slice tiled that 1px
+       border across every visual line of the syntax-highlighted code. */
     background-color: hsl(30 30% 92%);
     color: hsl(30 10% 20%);
     border: 1px solid hsl(30 15% 82%);
