@@ -1,10 +1,6 @@
 import { test, expect } from "../fixtures/blog-page";
 
-// Theme-activation class-presence checks (previously here as 3 tests) moved
-// to src/App.test.tsx for jsdom-based unit coverage. This file retains the
-// CSS-variable computed-style assertions that require real browser CSSOM —
-// jsdom does not resolve CSS-variable cascades, so those must stay in
-// Playwright.
+// jsdom does not resolve CSS-variable cascades — these assertions need real CSSOM
 
 test.describe("CSS variable overrides", () => {
   test("background color is warm, not dark green", async ({ page, blogPage }) => {

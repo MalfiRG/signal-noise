@@ -11,6 +11,21 @@ Personal technical blog by **Piotr Tarach**, QA engineer based in Prague. Single
 
 - **`DESIGN.md`** — visual identity spec (palette HSLs, typography, components, motion grammar, do's/don'ts). Read for ANY UI/styling work before generating code.
 - **`ARCHITECTURE.md`** — engineering architecture (routing, content pipeline, motion system internals, hero cascade state machine, testing layers). Read for structural changes.
+  - **`§12 Implementation Notes` is the WHY layer of this codebase.** Every non-obvious decision lives there: motion override precedence, hero cascade focus management, inert-vs-aria-hidden semantics, the Playwright visual-determinism fixture, blog-tile geometric regression testing, device-tier boundaries, scroll restoration, frontmatter parser scope, etc. Code comments are NOT the WHY layer — narrative rationale was migrated out in commit `14143ea` per the workspace-global rule `~/.claude/rules/docs-over-code-comments.md`.
+
+---
+
+## Resolving ambiguity (READ BEFORE "fixing" anything that looks weird)
+
+When working in this repo and you encounter a pattern that looks wrong, redundant, over-engineered, or unfamiliar:
+
+1. **Search `ARCHITECTURE.md §12 Implementation Notes` first.** Most surprising patterns are documented there as deliberate, load-bearing decisions. Examples: `inert` instead of `aria-hidden+tabindex+pointer-events`; SKIP button as direct child of top-level fragment (not inside `<section>`); double-rAF settle in the visual-determinism fixture; `setTimeout(..., 0)` for focus-after-unmount; `try/catch` on `localStorage.getItem`; `next-themes` provider despite single theme.
+2. **Search by symbol or filename, not by line.** §12 references `useMotionPolicy`, `readAuthorOverride`, `gotoFreshCascade`, `freezeAnimationsViaInitScript`, etc. — these names are stable. Line numbers are not.
+3. **One-liner inline comments are breadcrumbs, not explanations.** A comment like `// Wave 3 B2 stacking-context` or `// spec §5.3` points to a §12 subsection or a `docs/superpowers/specs/*.md` file. Don't strip them; follow them.
+4. **If a pattern looks load-bearing but isn't in `§12`, check `git log -p <file>` for the introducing commit.** Most have descriptive conventional-commit messages.
+5. **If still unclear, ASK before changing.** Reverting a deliberate fix in good faith has asymmetric cost — the original bug returns silently. Cost of asking: one round-trip. Cost of regressing a load-bearing decision: a Vercel deploy + bug report + re-investigation.
+
+This rule is the consumer side of the workspace-global policy `~/.claude/rules/docs-over-code-comments.md` (single-source-of-truth: docs are the WHY, code identifiers + types are the WHAT). The producer side — what NEW code should look like — lives in that rule.
 
 ---
 
