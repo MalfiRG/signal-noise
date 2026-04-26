@@ -32,20 +32,27 @@ export const AppContent = () => {
       <Navbar />
       {!isTextSection && <div className="scanline-overlay scan-sweep" />}
       <div className={isReadingMode ? "theme-reading min-h-screen bg-background" : ""}>
-        <PageTransition>
-          <Routes location={location}>
-            <Route path="/" element={<Index />} />
-            <Route path="/projects" element={<ProjectsPage />} />
-            <Route path="/skills" element={<SkillsPage />} />
-            <Route path="/how-i-do-it" element={<HowIDoItIndexPage />} />
-            <Route path="/how-i-do-it/:slug" element={<HowIDoItSlugPage />} />
-            <Route path="/blog" element={<BlogLayoutPage />}>
-              <Route index element={<BlogIndexPage />} />
-              <Route path=":slug" element={<BlogSlugPage />} />
-            </Route>
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </PageTransition>
+        {/* Single <main> landmark per WCAG 2.4.1 — Bypass Blocks. Was
+            previously absent on /, /projects, /skills, /how-i-do-it,
+            and only present on blog pages via BlogLayout's nested <main>.
+            Centralizing here means every route gets exactly one main, and
+            BlogLayout's main was downgraded to <div> to avoid duplicates. */}
+        <main id="main-content">
+          <PageTransition>
+            <Routes location={location}>
+              <Route path="/" element={<Index />} />
+              <Route path="/projects" element={<ProjectsPage />} />
+              <Route path="/skills" element={<SkillsPage />} />
+              <Route path="/how-i-do-it" element={<HowIDoItIndexPage />} />
+              <Route path="/how-i-do-it/:slug" element={<HowIDoItSlugPage />} />
+              <Route path="/blog" element={<BlogLayoutPage />}>
+                <Route index element={<BlogIndexPage />} />
+                <Route path=":slug" element={<BlogSlugPage />} />
+              </Route>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </PageTransition>
+        </main>
       </div>
     </>
   );

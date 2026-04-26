@@ -249,12 +249,20 @@ const Index = () => {
             </span>
           </h1>
 
+          {/* The CTA region uses the modern HTML `inert` attribute (React 19
+              boolean prop) to gate it during the cascade. `inert` is one
+              attribute that subsumes three older ones we used to coordinate
+              by hand: it removes the subtree from the accessibility tree
+              (like aria-hidden), prevents focus from reaching descendants
+              (like tabindex=-1 on each child), and disables pointer events
+              (like pointer-events-none). axe-DevTools previously flagged
+              the aria-hidden + focusable-children pair as a Serious WCAG
+              violation; `inert` resolves it cleanly. */}
           <motion.div
-            className={phase < 3 ? "pointer-events-none" : ""}
             variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.5, delayChildren: 0.05 } } }}
             initial={animationsDisabled ? "visible" : "hidden"}
             animate={phase >= 3 ? "visible" : "hidden"}
-            aria-hidden={phase < 3 ? true : undefined}
+            inert={phase < 3}
           >
             <motion.div variants={heroItem}>
               <p className="text-foreground/80 text-lg mb-8 leading-relaxed">
