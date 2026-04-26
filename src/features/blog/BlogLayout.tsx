@@ -78,7 +78,10 @@ const BlogLayout = () => {
             />
           </div>
         )}
-        <main className="flex-1 min-w-0 px-4">
+        {/* Was <main> — downgraded to <div> when App.tsx took over the
+            single landmark. Only one <main> is allowed per WCAG 2.4.1, and
+            App.tsx now wraps every route. */}
+        <div className="flex-1 min-w-0 px-4">
           <div className="mx-auto max-w-6xl">
             <AnimatePresence mode="wait">
               <motion.div key={location.pathname} {...outletVariant}>
@@ -86,7 +89,7 @@ const BlogLayout = () => {
               </motion.div>
             </AnimatePresence>
           </div>
-        </main>
+        </div>
       </div>
     </div>
   );
