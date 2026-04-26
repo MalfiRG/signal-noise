@@ -18,15 +18,22 @@ const Skills = () => {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           <Tabs defaultValue="skills" className="w-full">
             <TabsList className="w-full justify-center bg-secondary/50 border border-border">
+              {/* Inactive tabs explicitly use `text-foreground/70` so they
+                  meet WCAG AA 4.5:1 contrast against the translucent
+                  `bg-secondary/50` of TabsList. axe-DevTools previously
+                  flagged these triggers (ratio 4.00). The active state
+                  still wins via `data-[state=active]:text-primary` /
+                  `text-learning`, so visual hierarchy is preserved:
+                  active = themed accent color, inactive = bright neutral. */}
               <TabsTrigger
                 value="skills"
-                className="flex-1 tracking-wider text-xs data-[state=active]:text-primary data-[state=active]:text-glow"
+                className="flex-1 tracking-wider text-xs text-foreground/70 data-[state=active]:text-primary data-[state=active]:text-glow"
               >
                 SKILLS
               </TabsTrigger>
               <TabsTrigger
                 value="learning"
-                className="flex-1 tracking-wider text-xs data-[state=active]:text-learning"
+                className="flex-1 tracking-wider text-xs text-foreground/70 data-[state=active]:text-learning"
               >
                 LEARNING
               </TabsTrigger>
