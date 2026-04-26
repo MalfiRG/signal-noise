@@ -539,12 +539,20 @@
     border-radius: 0.5rem;
     box-shadow: 0 1px 3px hsl(30 10% 50% / 0.25);
   }
+  /* Code-block bg: must match the .code-block-wrapper inline style (#2d2d2d).
+     Earlier value hsl(220 13% 15%) (=#21252b) created a tonal seam — the
+     <code> element bg sat ~5L darker than the wrapper bg, and because
+     <code> renders display:inline with white-space:pre, each visual line
+     showed its darker patch behind the text while the wrapper's lighter
+     bg framed it on the sides. Visually identical to the per-line pill
+     regression; structurally a different cause (bg mismatch, not border
+     leak). Unifying the values eliminates the seam. */
   .theme-reading .markdown-body pre[class*="language-"] {
-    background: hsl(220 13% 15%) !important;
+    background: #2d2d2d !important;
     border-radius: 0.5rem;
   }
   .theme-reading .markdown-body code[class*="language-"] {
-    background: hsl(220 13% 15%) !important;
+    background: #2d2d2d !important;
     color: hsl(220 15% 85%) !important;
   }
 
