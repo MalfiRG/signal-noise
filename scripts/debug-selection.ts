@@ -1,7 +1,3 @@
-/**
- * Playwright debug script — captures selected text in a code block.
- */
-
 import { chromium } from "playwright";
 
 async function main() {
@@ -12,13 +8,11 @@ async function main() {
   await page.goto("http://localhost:8080/blog/autonomous-qa-loop", { waitUntil: "domcontentloaded" });
   await page.waitForTimeout(2000);
 
-  // Scroll to first language code block and screenshot before selection
   await page.locator("code[class*='language']").first().scrollIntoViewIfNeeded();
   await page.waitForTimeout(300);
   await page.screenshot({ path: "/tmp/sel-before.png" });
   console.log("Before screenshot: /tmp/sel-before.png");
 
-  // Select all text in the first code[class*=language] element
   await page.evaluate(() => {
     const el = document.querySelector("code[class*='language']");
     if (!el) { console.error("no code element found"); return; }
@@ -33,7 +27,6 @@ async function main() {
   await page.screenshot({ path: "/tmp/sel-active.png" });
   console.log("Active selection screenshot: /tmp/sel-active.png");
 
-  // Inspect the token spans
   const info = await page.evaluate(() => {
     const el = document.querySelector("code[class*='language']") as HTMLElement;
     if (!el) return null;

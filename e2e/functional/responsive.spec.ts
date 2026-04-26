@@ -116,7 +116,7 @@ test.describe("Mobile no-overflow contract", () => {
         return Array.from(document.body.querySelectorAll("*"))
           .filter((el) => {
             const rect = el.getBoundingClientRect();
-            return rect.right > vw + 1; // +1 for sub-pixel rounding tolerance
+            return rect.right > vw + 1;
           })
           .map((el) => ({
             tag: el.tagName.toLowerCase(),
@@ -137,16 +137,9 @@ test.describe("Mobile no-overflow contract", () => {
       await page.goto("/blog");
       await stabilizeForLayout(page);
 
-      // Per spec §1.1 mitigation: guard against pathological tag-list wrapping.
-      // Calibrated empirically on 2026-04-23 CI runs — at 375px with 6 tags the
-      // current design wraps to 4 rows (text-xs / 16px line-height / ~327px
-      // card-content width). Bound of 4.5 × line-height = 72px still fires on
-      // 5+ rows (80px), catching future regressions that push wrapping further.
-      // Tightening toward the 2-line ideal is tracked as a separate UX ticket.
+      // spec §1.1 — bound 4.5 × line-height fires on 5+ rows of wrapped tags
       const tagList = page.locator("[data-testid='blog-tag-list']").first();
-      // Tag list may not exist on every blog index variant — skip if not present.
-      // Fix M10: explicit return after test.skip — test.skip registers skip but
-      // does NOT halt JS execution; subsequent code runs and would throw.
+      // test.skip registers skip but does NOT halt — explicit return required
       const exists = await tagList.count();
       if (exists === 0) {
         test.skip(true, "blog-tag-list testid not present yet");

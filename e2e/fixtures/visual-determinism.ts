@@ -6,14 +6,11 @@ import { expect } from "@playwright/test";
 // ---------------------------------------------------------------------------
 
 /**
- * Inject a stylesheet that zeros animations and transitions and forces
- * scroll-behavior: auto. Uses addInitScript so the style is in the DOM
- * BEFORE any author stylesheet loads — and prepended as the FIRST child
- * of <head> so author rules cannot win on source-order tie-break.
+ * Inject a stylesheet that zeros animations/transitions; prepended as first
+ * <head> child so author rules cannot win the source-order tie-break.
  *
- * Note: framer-motion's `layout` animations are rAF-driven via
- * useLayoutEffect and are NOT covered by this CSS injection. Tests that
- * exercise `layout` props must additionally wrap with
+ * NOTE: framer-motion `layout` animations are rAF-driven via useLayoutEffect
+ * and are NOT covered — tests using `layout` must wrap with
  * <MotionConfig reducedMotion="always"> in a test-only render.
  */
 export async function freezeAnimationsViaInitScript(page: Page) {
@@ -32,10 +29,8 @@ export async function freezeAnimationsViaInitScript(page: Page) {
 }
 
 /**
- * Pre-seed sessionStorage so Index.tsx's useState initializer
- * (Index.tsx:14-19) captures `true` instead of `false`, skipping the
- * 6-second hero cascade entirely. Must run via addInitScript so it
- * fires BEFORE the React tree's useState executes on every navigation.
+ * Pre-seed sessionStorage to skip the hero cascade. Must use addInitScript
+ * so it fires BEFORE useState in Index.tsx on every navigation.
  */
 export async function skipHeroCascadeViaInitScript(page: Page) {
   await page.addInitScript(() => {
@@ -48,11 +43,8 @@ export async function skipHeroCascadeViaInitScript(page: Page) {
 // ---------------------------------------------------------------------------
 
 /**
- * Resolve when all currently pending @font-face downloads complete and
- * their faces become "loaded". Replaces every waitForTimeout(1500) in the
- * suite. The async wrapper discards FontFaceSet — the helper is void.
- *
- * Fix L1: watchdog so a stalled FontFaceSet cannot hang the run indefinitely.
+ * Wait for pending @font-face downloads. Watchdog timeout prevents stalled
+ * FontFaceSet from hanging the run.
  */
 export async function waitForFonts(page: Page, timeoutMs = 10_000) {
   await page.evaluate(async (timeout: number) => {
@@ -66,18 +58,9 @@ export async function waitForFonts(page: Page, timeoutMs = 10_000) {
 }
 
 /**
- * Mermaid diagrams render via an async observer. Wait for every rendered
- * <svg> (one per MermaidRenderer in MarkdownRenderer.tsx:145-171) to
- * have a measurable bbox.
- *
- * DOM shape post-render: <div class="my-6 …"><svg id="mermaid-<9chars>">…</svg></div>
- * — the `mermaid-*` id lives on the svg ITSELF, not on a parent element.
- * So the selector is `svg[id^='mermaid-']` (svg with that id), NOT
- * `[id^='mermaid-'] svg` (svg nested inside such an element).
- *
- * Fix M6: getBBox() throws on hidden/detached SVGs — wrap in try/catch
- * and treat as not-yet-measurable so the polling loop continues instead
- * of failing.
+ * Wait for every rendered Mermaid SVG to have a measurable bbox.
+ * Selector targets `svg[id^='mermaid-']` (id lives on the svg itself).
+ * getBBox() throws on hidden/detached SVGs — try/catch keeps polling.
  */
 export async function waitForMermaid(page: Page) {
   await page.waitForFunction(
@@ -88,7 +71,7 @@ export async function waitForMermaid(page: Page) {
         try {
           return (s as SVGGraphicsElement).getBBox().width > 0;
         } catch {
-          return false; // not yet measurable — keep polling
+          return false;
         }
       });
     },
@@ -97,11 +80,8 @@ export async function waitForMermaid(page: Page) {
 }
 
 /**
- * Double-rAF: the FIRST rAF schedules a callback in the same frame; the
- * SECOND rAF guarantees the paint after the first has committed. A single
- * rAF resolves before paint — Chromium's pipeline is rAF callbacks → style
- * → layout → paint → composite, so a single-rAF screenshot can capture
- * mid-paint state.
+ * Double-rAF — single rAF resolves before paint in Chromium's pipeline,
+ * so two are required to guarantee the screenshot captures post-paint state.
  */
 export async function settleStyles(page: Page) {
   await page.evaluate(
@@ -122,9 +102,6 @@ export async function prepareContext(
   page: Page,
   opts?: { skipHeroCascade?: boolean; freezeKeyframes?: boolean }
 ) {
-  // Fix H3: freezeKeyframes is opt-out so Wave 2 verification can decide
-  // whether the freezeAnimationsViaInitScript step is load-bearing for
-  // CSS keyframe coverage on Playwright 1.58.2. Default stays true for safety.
   if (opts?.freezeKeyframes !== false) {
     await freezeAnimationsViaInitScript(page);
   }

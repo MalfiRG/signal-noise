@@ -96,12 +96,9 @@ export interface MotionPolicy {
   animationsDisabled: boolean;
 }
 
-// Module-level latch so the console.info fires once per page load, not on
-// every hook call. Prevents log spam when several components use useMotionPolicy.
 let authorOverrideWarned = false;
 
 function readAuthorOverride(): boolean {
-  // Layer 1 — per-browser localStorage. Wins over build-time default when set.
   if (typeof window !== "undefined") {
     try {
       const stored = localStorage.getItem(motionConfig.storageKey);
@@ -116,20 +113,17 @@ function readAuthorOverride(): boolean {
       }
       if (stored === "off") return false;
     } catch {
-      // localStorage may throw in private mode; fall through to env var.
+      // localStorage throws in private mode — fall through to env var
     }
   }
-  // Layer 2 — build-time env var (VITE_MOTION_OVERRIDE).
   return motionConfig.buildTimeOverride === "on";
 }
 
 /**
- * The single public motion-policy hook. See
- * docs/superpowers/specs/2026-04-24-device-tier-motion-policy-design.md §5.2.
+ * The single public motion-policy hook.
+ * Spec: docs/superpowers/specs/2026-04-24-device-tier-motion-policy-design.md §5.2.
  *
- * @param opts.heroReplaySkip — MUST only be passed by src/pages/Index.tsx.
- *   Other components must not read sessionStorage keys through this parameter.
- *   This is a documented contract, not a runtime-enforced one.
+ * @param opts.heroReplaySkip — contract: only Index.tsx passes this.
  */
 export function useMotionPolicy(
   opts?: { heroReplaySkip?: boolean }
@@ -139,12 +133,7 @@ export function useMotionPolicy(
   const heroReplaySkip = !!opts?.heroReplaySkip;
   const authorOverride = readAuthorOverride();
 
-  // Evaluation order per spec §4 pseudocode + §10 H7 resolution.
-  // Numbers match spec §4 override numbering (NOT execution order):
-  //   prefersReducedMotion → disabled (§4 item 1; highest priority)
-  //   heroReplaySkip       → disabled (§4 item 2)
-  //   authorOverride       → enabled  (§4 item 4; checked 3rd per H7)
-  //   tier default         → desktop=false else=true (§4 item 3; checked 4th per H7)
+  // Evaluation order per spec §4 + §10 H7
   let animationsDisabled: boolean;
   if (prefersReducedMotion) animationsDisabled = true;
   else if (heroReplaySkip) animationsDisabled = true;

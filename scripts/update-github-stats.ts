@@ -1,17 +1,8 @@
-/**
- * Fetches current GitHub repo stats and updates data.ts.
- * Runs inline before vite build (see package.json "build" script).
- *
- * Usage: npx tsx scripts/update-github-stats.ts
- */
-
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-// Honors spec §2.2: visual webServer's `npm run build` step must not hit
-// the GitHub API. The visual config sets env { SKIP_GITHUB_FETCH: "1" };
-// this guard short-circuits the script when that env var is set.
+// spec §2.2 — visual webServer must not hit GitHub API; gated by SKIP_GITHUB_FETCH=1
 if (process.env.SKIP_GITHUB_FETCH === "1") {
   console.log("[update-github-stats] SKIP_GITHUB_FETCH=1 set, exiting without fetching");
   process.exit(0);

@@ -10,9 +10,6 @@ describe("App reading-mode wrapper", () => {
         <AppContent />
       </MemoryRouter>
     );
-    // The reading-mode wrapper is a div with class theme-reading wrapping
-    // the blog post body. Class presence is jsdom-safe (the underlying CSS
-    // variable cascade stays in Playwright — see reading-mode.spec.ts:21-107).
     const wrapper = container.querySelector(".theme-reading");
     expect(wrapper).toBeTruthy();
   });

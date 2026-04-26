@@ -126,19 +126,6 @@ export const blogPosts: BlogPost[] = [
   },
 ];
 
-/**
- * The post list as exposed to consumers. The visibility tier is derived
- * from Vite's build-time env (PROD + VITE_VERCEL_ENV), so the dead branches
- * are tree-shaken from each bundle.
- *
- * Mode resolution at build time:
- *   - npm run dev                              → "development"
- *   - npm run build (no Vercel env)            → "preview"
- *   - Vercel deploy with VERCEL_ENV=preview    → "preview"
- *   - Vercel deploy with VERCEL_ENV=production → "production" (drafts hidden)
- *
- * VERCEL_ENV is bridged to VITE_VERCEL_ENV by the package.json build script.
- */
 export const visibilityMode: VisibilityMode = detectVisibilityMode({
   PROD: import.meta.env.PROD,
   VITE_VERCEL_ENV: import.meta.env.VITE_VERCEL_ENV as string | undefined,
