@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { type RefObject } from "react";
+import { type RefObject, useEffect, useState } from "react";
 import IdStrip from "./IdStrip";
 import LetterReveal from "@/components/LetterReveal";
 import { useHeroStaggerVariant } from "@/lib/motion";
@@ -23,6 +23,13 @@ const HeroSignalNoise = ({
   viewProjectsRef,
 }: HeroSignalNoiseProps) => {
   const heroItem = useHeroStaggerVariant();
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
   return (
     <div className="text-center px-4 w-full max-w-[960px]">
       <IdStrip />
@@ -110,11 +117,19 @@ const HeroSignalNoise = ({
             </Link>
           </motion.div>
 
-          <motion.div variants={heroItem} className="mt-8">
-            <p className="text-muted-foreground text-xs tracking-[0.2em] animate-glow-pulse">
-              ▼ SCROLL TO EXPLORE ▼
-            </p>
-          </motion.div>
+          {/* Outer plain div owns the scroll-fade so framer-motion's inline
+              opacity (from variants={heroItem}) on the inner div doesn't fight
+              with Tailwind's opacity-0/100. */}
+          <div
+            className={`transition-opacity duration-300 ${scrolled ? "opacity-0 pointer-events-none" : "opacity-100"}`}
+            aria-hidden={scrolled ? "true" : undefined}
+          >
+            <motion.div variants={heroItem} className="mt-8">
+              <p className="text-muted-foreground text-xs tracking-[0.2em] animate-glow-pulse">
+                ▼ SCROLL TO EXPLORE ▼
+              </p>
+            </motion.div>
+          </div>
         </motion.div>
       </div>
     </div>

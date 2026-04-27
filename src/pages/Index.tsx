@@ -7,10 +7,6 @@ import { useMotionPolicy } from "@/lib/motion";
 
 const HERO_PLAYED_KEY = "hero-cascade-played";
 
-function isDevBuild(): boolean {
-  return import.meta.env.DEV === true;
-}
-
 function readHeroReplaySkip(): boolean {
   if (typeof window === "undefined") return false;
   try {
@@ -21,16 +17,7 @@ function readHeroReplaySkip(): boolean {
   }
 }
 
-let devHostWriteSkipWarned = false;
-
 function writeHeroReplayFlag(): void {
-  if (isDevBuild()) {
-    if (!devHostWriteSkipWarned) {
-      console.info("[digital-matrix] dev build: cascade replay flag NOT persisted (import.meta.env.DEV is true)");
-      devHostWriteSkipWarned = true;
-    }
-    return;
-  }
   try {
     sessionStorage.setItem(HERO_PLAYED_KEY, "1");
   } catch (err) {
