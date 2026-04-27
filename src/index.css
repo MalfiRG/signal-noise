@@ -1214,18 +1214,28 @@ code[class*="language-"] span::selection {
   font-weight: 900;
   color: hsl(var(--foreground));
   text-shadow: var(--matrix-text-glow);
-  font-size: clamp(80px, 15vw, 184px);
+  font-size: clamp(56px, 9vw, 112px);
   line-height: 1;
   letter-spacing: 0.02em;
   padding-top: 8px;
 }
 
-.hero-h .h-row { display: flex; }
+@media (min-width: 768px) { .hero-h { gap: 22px; } }
+
+.hero-h .h-row { display: flex; white-space: nowrap; }
 .hero-h .h-row.center { justify-content: center; }
 .hero-h .h-row.left,
 .hero-h .h-row.right { justify-content: center; }
 
 @media (min-width: 768px) {
-  .hero-h .h-row.left  { justify-content: flex-start; padding-left: clamp(0px, 6vw, 48px); }
-  .hero-h .h-row.right { justify-content: flex-end;   padding-right: clamp(0px, 6vw, 48px); }
+  .hero-h .h-row.left  {
+    justify-content: flex-start;
+    padding-left: clamp(0px, 4vw, 48px);
+    margin-left: clamp(-160px, -8vw, 0px);
+  }
+  .hero-h .h-row.right {
+    justify-content: flex-end;
+    padding-right: 0;
+    margin-right: clamp(-160px, -8vw, 0px);
+  }
 }
