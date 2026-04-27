@@ -177,7 +177,7 @@ const Index = () => {
       )}
 
       <section
-        className="relative z-20 min-h-screen flex items-center justify-center overflow-hidden"
+        className="relative z-20 min-h-screen flex items-center justify-center overflow-hidden pt-24 pb-12"
         data-testid={phase >= 3 ? "hero-phase3" : "hero-cascading"}
       >
         <div

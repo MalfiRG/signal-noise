@@ -24,7 +24,7 @@ const HeroSignalNoise = ({
 }: HeroSignalNoiseProps) => {
   const heroItem = useHeroStaggerVariant();
   return (
-    <div className="text-center px-4 max-w-3xl">
+    <div className="text-center px-4 w-full max-w-[960px]">
       <IdStrip />
 
       {phase >= 1 ? (
