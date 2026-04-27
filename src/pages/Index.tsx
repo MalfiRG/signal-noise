@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
 import AboutSection from "@/features/about/AboutSection";
-import LetterReveal from "@/components/LetterReveal";
-import { useHeroStaggerVariant, useMotionPolicy } from "@/lib/motion";
+import HeroSignalNoise from "@/features/hero-signal-noise/HeroSignalNoise";
+import HeroChrome from "@/features/hero-signal-noise/HeroChrome";
+import { useMotionPolicy } from "@/lib/motion";
 
 const HERO_PLAYED_KEY = "hero-cascade-played";
 
@@ -39,8 +39,6 @@ function writeHeroReplayFlag(): void {
 }
 
 const Index = () => {
-  const heroItem = useHeroStaggerVariant();
-
   const [heroReplaySkip] = useState(() => readHeroReplaySkip());
   const policy = useMotionPolicy({ heroReplaySkip });
   const { animationsDisabled, prefersReducedMotion, tier } = policy;
@@ -93,11 +91,6 @@ const Index = () => {
     };
   }, [animationsDisabled, prefersReducedMotion, tier]);
 
-  const animClass = (gateMet: boolean, cls: string): string => {
-    if (!gateMet) return "opacity-0";
-    return animationsDisabled ? "" : cls;
-  };
-
   const skipToPhase3 = () => {
     if (phase >= 3) return;
     if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
@@ -138,6 +131,7 @@ const Index = () => {
   return (
     <>
       <div className="scanline fixed inset-0 z-10" />
+      <HeroChrome />
 
       {(showReducedMotionBadge || showSessionBadge || showTierBadge) && (
         <motion.button
@@ -195,88 +189,12 @@ const Index = () => {
           style={{ backgroundColor: 'hsl(var(--hero-orb-accent))', mixBlendMode: 'screen' }}
         />
 
-        <div className="text-center px-4 max-w-3xl">
-          {phase >= 1 ? (
-            <LetterReveal
-              text="> INITIALIZING SYSTEM..."
-              tag="p"
-              className="text-muted-foreground text-sm tracking-[0.3em] mb-4 letter-reveal-linear"
-              delayPerLetter={40}
-              startDelay={0}
-              skipAnimation={animationsDisabled}
-            />
-          ) : (
-            <p aria-hidden="true" className="text-muted-foreground text-sm tracking-[0.3em] mb-4 opacity-0">
-              {">"} INITIALIZING SYSTEM...
-            </p>
-          )}
-
-          <h1 className="font-display text-5xl md:text-7xl font-black text-foreground text-glow mb-6 flex flex-col items-center gap-1 md:gap-2">
-            <span
-              className={animClass(phase >= 2, "hero-glitch-entrance")}
-              data-text="BREAK IT"
-            >
-              BREAK IT
-            </span>
-            {phase >= 2 ? (
-              <LetterReveal
-                text="BUILD IT"
-                tag="span"
-                className="block"
-                delayPerLetter={70}
-                startDelay={1000}
-                skipAnimation={animationsDisabled}
-              />
-            ) : (
-              <span className="block opacity-0" aria-hidden="true" aria-label="BUILD IT">BUILD IT</span>
-            )}
-            <span
-              className={animClass(phase >= 2, "hero-stamp-entrance")}
-              style={phase >= 2 && !animationsDisabled ? { animationDelay: "2.2s" } : undefined}
-            >
-              PROVE IT
-            </span>
-          </h1>
-
-          {/* React 19 boolean `inert` prop — replaces aria-hidden+tabindex+pointer-events */}
-          <motion.div
-            variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.5, delayChildren: 0.05 } } }}
-            initial={animationsDisabled ? "visible" : "hidden"}
-            animate={phase >= 3 ? "visible" : "hidden"}
-            inert={phase < 3}
-          >
-            <motion.div variants={heroItem}>
-              <p className="text-foreground/80 text-lg mb-8 leading-relaxed">
-                Every bug is a hypothesis waiting to be tested.<br />
-                Research. Execute. Certify.
-              </p>
-            </motion.div>
-
-            <motion.div variants={heroItem} className="flex gap-4 justify-center">
-              <Link
-                ref={viewProjectsRef}
-                to="/projects"
-                className={`border border-primary/50 bg-primary/10 px-8 py-3 text-sm tracking-widest text-primary hover:bg-primary/20 hover:border-primary transition-all box-glow btn-interactive glitch-hover`}
-                data-text="VIEW PROJECTS"
-              >
-                VIEW PROJECTS
-              </Link>
-              <Link
-                to="/blog"
-                className={`border border-border px-8 py-3 text-sm tracking-widest text-muted-foreground hover:border-primary/50 hover:text-foreground transition-all btn-interactive glitch-hover`}
-                data-text="READ BLOG"
-              >
-                READ BLOG
-              </Link>
-            </motion.div>
-
-            <motion.div variants={heroItem} className="mt-8">
-              <p className="text-muted-foreground text-xs tracking-[0.2em] animate-glow-pulse">
-                ▼ SCROLL TO EXPLORE ▼
-              </p>
-            </motion.div>
-          </motion.div>
-        </div>
+        <HeroSignalNoise
+          phase={phase}
+          animationsDisabled={animationsDisabled}
+          prefersReducedMotion={prefersReducedMotion}
+          viewProjectsRef={viewProjectsRef}
+        />
       </section>
 
       <div className="relative z-20">
