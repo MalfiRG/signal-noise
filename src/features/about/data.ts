@@ -1,6 +1,11 @@
+export interface ToolEntry {
+  name: string;
+  version: string | null;
+}
+
 export interface ToolCategory {
   name: string;
-  tools: string[];
+  tools: ToolEntry[];
 }
 
 export interface SocialLink {
@@ -19,26 +24,54 @@ export const introText = {
   ],
 };
 
+// TODO(piotr): refresh tool versions quarterly — see spec §11.2 for rationale.
+// Tools without an explicit minor version (e.g. Pytest "v8.x") are intentional;
+// bump quarterly during feature retrospectives.
 export const toolCategories: ToolCategory[] = [
   {
     name: "Test Automation",
-    tools: ["Pytest", "Pester", "Playwright", "Selenium"],
+    tools: [
+      { name: "Pytest", version: "v8.x" },
+      { name: "Pester", version: "v5.x" },
+      { name: "Playwright", version: "v1.58" },
+      { name: "Selenium", version: "v4.x" },
+    ],
   },
   {
     name: "Languages",
-    tools: ["Python", "PowerShell", "TypeScript", "C#"],
+    tools: [
+      { name: "Python", version: "3.13" },
+      { name: "PowerShell", version: "7.x" },
+      { name: "TypeScript", version: "5.x" },
+      { name: "C#", version: "12" },
+    ],
   },
   {
     name: "CI/CD & DevOps",
-    tools: ["GitLab CI", "Jenkins", "GitHub Actions", "Docker"],
+    tools: [
+      { name: "GitLab CI", version: null },
+      { name: "Jenkins", version: "LTS" },
+      { name: "GitHub Actions", version: null },
+      { name: "Docker", version: "27.x" },
+    ],
   },
   {
     name: "Test Management",
-    tools: ["JIRA", "TestRail", "Confluence", "ClickUp"],
+    tools: [
+      { name: "JIRA", version: null },
+      { name: "TestRail", version: null },
+      { name: "Confluence", version: null },
+      { name: "ClickUp", version: null },
+    ],
   },
   {
     name: "AI & Tooling",
-    tools: ["Claude", "GitHub Copilot", "n8n", "Qdrant"],
+    tools: [
+      { name: "Claude", version: "sonnet-4.6" },
+      { name: "GitHub Copilot", version: null },
+      { name: "n8n", version: null },
+      { name: "Qdrant", version: null },
+    ],
   },
 ];
 
