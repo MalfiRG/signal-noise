@@ -20,7 +20,7 @@ const AboutSection = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           <div
-            className={`cat-block space-y-3${animationsDisabled ? "" : " animate-fade-in opacity-0"}`}
+            className={`cat-block space-y-3${animationsDisabled ? " motion-disabled" : " animate-fade-in opacity-0"}`}
             style={animationsDisabled ? undefined : { animationDelay: "0.2s" }}
           >
             <p className="cat-head">
