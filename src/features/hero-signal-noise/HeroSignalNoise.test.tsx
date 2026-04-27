@@ -42,11 +42,11 @@ describe("HeroSignalNoise", () => {
 
   it("renders the terminal line at phase >= 1 (placeholder at phase 0)", () => {
     const { container, rerender } = render(<Wrapper phase={0} />);
-    expect(container.textContent).toContain("INITIALIZING SYSTEM");
-    expect(container.querySelector("[aria-hidden='true']")?.classList.contains("opacity-0")).toBe(true);
+    expect(container.textContent?.replace(/ /g, " ")).toContain("INITIALIZING SYSTEM");
+    expect(container.querySelector("p.opacity-0")).not.toBeNull();
 
     rerender(<Wrapper phase={1} />);
-    expect(container.textContent).toContain("INITIALIZING SYSTEM");
+    expect(container.textContent?.replace(/ /g, " ")).toContain("INITIALIZING SYSTEM");
   });
 
   it("renders BUILD IT via LetterReveal at phase 2 (per-letter animation preserved)", () => {
@@ -55,7 +55,7 @@ describe("HeroSignalNoise", () => {
     // LetterReveal with `tag="span"` renders a `<span class="block">` wrapper.
     // The text is split into per-letter spans inside that wrapper.
     expect(buildRow?.querySelector(".block")).not.toBeNull();
-    expect(buildRow?.textContent).toContain("BUILD IT");
+    expect(buildRow?.textContent?.replace(/ /g, " ")).toContain("BUILD IT");
   });
 
   it("CTA wrap is inert before phase 3 and active at phase 3", () => {

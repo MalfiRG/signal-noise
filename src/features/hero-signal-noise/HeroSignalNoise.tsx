@@ -25,6 +25,8 @@ const HeroSignalNoise = ({
   const heroItem = useHeroStaggerVariant();
   return (
     <div className="text-center px-4 max-w-3xl">
+      <IdStrip />
+
       {phase >= 1 ? (
         <LetterReveal
           text="> INITIALIZING SYSTEM..."
@@ -35,13 +37,10 @@ const HeroSignalNoise = ({
           skipAnimation={animationsDisabled}
         />
       ) : (
-        <p aria-hidden="true" className="text-muted-foreground text-sm tracking-[0.3em] mb-4 opacity-0">
+        <p className="text-muted-foreground text-sm tracking-[0.3em] mb-4 opacity-0">
           {">"} INITIALIZING SYSTEM...
         </p>
       )}
-      <span className="sr-only" aria-hidden="true">INITIALIZING SYSTEM</span>
-
-      <IdStrip />
 
       <h1 className="hero-h">
         <span
@@ -53,17 +52,14 @@ const HeroSignalNoise = ({
         </span>
         <span className="h-row center" data-row="build" aria-label="BUILD IT">
           {phase >= 2 ? (
-            <>
-              <span className="sr-only" aria-hidden="true">BUILD IT</span>
-              <LetterReveal
-                text="BUILD IT"
-                tag="span"
-                className="block"
-                delayPerLetter={70}
-                startDelay={1000}
-                skipAnimation={animationsDisabled}
-              />
-            </>
+            <LetterReveal
+              text="BUILD IT"
+              tag="span"
+              className="block"
+              delayPerLetter={70}
+              startDelay={1000}
+              skipAnimation={animationsDisabled}
+            />
           ) : (
             <span className="block opacity-0" aria-hidden="true">BUILD IT</span>
           )}
