@@ -1,8 +1,9 @@
 # SIGNAL_NOISE Hero Port — Design Spec
 
-**Date:** 2026-04-27
-**Status:** HARD SPEC — pre-implementation. Authoritative source of truth for the SIGNAL_NOISE port until landed and graduated to ARCHITECTURE.md §12.
+**Date:** 2026-04-27 (Rev 1) — Rev 2 same day
+**Status:** Rev 2 — post-adversarial-review (35 findings applied: 3 critical, 13 high, 12 medium, 7 low). HARD SPEC — pre-implementation. Authoritative source of truth for the SIGNAL_NOISE port until landed and graduated to ARCHITECTURE.md §12.
 **Author:** Piotr Tarach (verbal brainstorm), transcribed by Claude 2026-04-27
+**Review:** 3-agent adversarial team (`adversarial-tl-reviewer`, `reviewer-consistency`, `reviewer-coverage`). Findings consolidated and applied by `curator` agent.
 **Source artifact:** `improvements/SIGNAL_NOISE.html` (single-file design prototype, 1,588 lines, generated 2026-04-26)
 **Companion docs:** `DESIGN.md` (visual identity), `ARCHITECTURE.md` §6 (motion system), §7 (hero cascade), §12 (implementation notes), `docs/superpowers/specs/2026-04-24-device-tier-motion-policy-design.md`.
 
@@ -14,7 +15,7 @@
 - Drop the scan-sweep traveling line entirely
 - D1: Live tweaks panel stays design-time-only (prototype HTML); not ported to React
 - D2: Keep existing `hero-cascade-played` sessionStorage key
-- D3: Data column desktop-only (`≥769px`)
+- D3: Data column desktop-only (`≥768px`)
 - D4: Ambient chrome homepage-only; not site-wide
 - D5: All new motion gated through existing `useMotionPolicy()`
 
@@ -36,9 +37,9 @@ The spec pins design decisions resolved during the 2026-04-27 brainstorm so futu
 - New components: `HeroSignalNoise`, `HeroChrome`, `HudBrackets`, `DataColumn`, `IdStrip`
 - Rewrite of `src/features/about/AboutSection.tsx` to cat-block bio + versioned tools grid
 - Wire the new hero into `src/pages/Index.tsx` (replace the hero `<section>`)
-- New global CSS classes in `src/index.css` (`.grid-tex`, `.data-column`, `.dc-track`, `.hud-bracket`, `.id-strip`, `.cat-block`, `.cat-head`, `.cursor-blink`, `.tools-grid`, `.badge`, `.ver`)
+- New global CSS classes in `src/index.css` — see §4.2 for the authoritative list.
 - Mobile-reflow CSS (clamp-based asymmetric padding) replacing the prototype's hardcoded `-213px / -224px` inline negative margins
-- Playwright e2e specs for cascade, mobile reflow, about-section
+- Playwright e2e specs for cascade (`e2e/functional/hero-signal-noise-cascade.spec.ts`), mobile reflow (`e2e/functional/hero-signal-noise-mobile.spec.ts`), about-section (`e2e/functional/about-section-rewrite.spec.ts`)
 - Vitest unit tests for `HeroSignalNoise`, `IdStrip`
 - Visual-regression baseline updates at 375 / 768 / 1280 / 1920 px
 - Extension of the visual-determinism Playwright fixture to freeze the ID-strip live clock
@@ -49,7 +50,7 @@ The spec pins design decisions resolved during the 2026-04-27 brainstorm so futu
 - The rotated CERTIFIED seal (rejected during brainstorm)
 - The scan-sweep traveling line (rejected during brainstorm — distracting)
 - Site-wide ambient chrome on routes other than `/`. Future work; not in v1.
-- New CSS tokens or keyframes. The port reuses everything already defined in `src/index.css` (`--primary`, `--accent`, `--matrix-glow`, `--matrix-text-glow`, `--hero-orb-primary`, `--hero-orb-accent`; keyframes `hero-glitch-flash/cyan/magenta`, `hero-stamp`, `letter-reveal`, `glitch-slice`).
+- No new CSS TOKENS. New keyframes `dc-scroll` and `cursor-blink` are added, listed in §4.2. The port reuses every existing token in `src/index.css` (`--primary`, `--accent`, `--matrix-glow`, `--matrix-text-glow`, `--hero-orb-primary`, `--hero-orb-accent`) and the existing keyframes `hero-glitch-flash/cyan/magenta`, `hero-stamp`, `letter-reveal`, `glitch-slice`.
 - The `MatrixRain` component (already removed in PR #27; not coming back).
 - A feature flag or VITE env var to A/B the new hero. Q1=A explicitly rejected the flagged-rollout option.
 
@@ -69,7 +70,9 @@ The spec pins design decisions resolved during the 2026-04-27 brainstorm so futu
 
 **Rationale:** asymmetric look survives at all viewports, never clips. At `375px` the offsets are ~22 px (subtle), at `1920px` they cap at 48 px (matches design intent). The lower bound `0px` ensures the layout never overflows the container.
 
-**Layout flip:** below `641px`, the asymmetric placement is removed entirely — all three rows centered. Asymmetric look is intentional for `≥641px`.
+Acknowledged design tradeoff: the prototype's `-213/-224 px` offsets are NOT preserved. The chosen `clamp(0px, 6vw, 48px)` caps at 48 px — ~22% of the prototype's offset magnitude at 1920px. This is intentional: Q2=B was selected explicitly to prevent any clipping at narrow viewports. The asymmetric "off-balance" feel is therefore toned down from the prototype's "strongly asymmetric" to "subtly skewed". A future iteration could raise the ceiling if the toned-down feel proves insufficient — but raising it without re-checking the 320–375 px viewport guarantee would re-introduce the original overflow bug.
+
+**Layout flip:** below `768px`, the asymmetric placement is removed entirely — all three rows centered. Asymmetric look is intentional for `≥768px`.
 
 ### 2.3 About section (Q3)
 
@@ -103,9 +106,9 @@ The spec pins design decisions resolved during the 2026-04-27 brainstorm so futu
 
 ### 2.8 Data column visibility (D3)
 
-**Decision: desktop-only (`≥769px`).** Hidden via media query on tablet and mobile.
+**Decision: desktop-only (`≥768px`).** Hidden via media query on tablet and mobile.
 
-**Rationale:** matches the prototype's default. The vertical data column reads as decorative noise on narrow viewports; on desktop it adds peripheral motion that reinforces the cyberpunk frame. The 769 px cutoff aligns with the device-tier motion policy spec's mobile/tablet boundary.
+**Rationale:** matches the prototype's default. The vertical data column reads as decorative noise on narrow viewports; on desktop it adds peripheral motion that reinforces the cyberpunk frame. The 768 px cutoff aligns with the device-tier motion policy spec's mobile/tablet boundary AND with `use-mobile.tsx`'s `MOBILE_BREAKPOINT = 768`.
 
 ### 2.9 Ambient chrome scope (D4)
 
@@ -133,12 +136,20 @@ New feature folder: `src/features/hero-signal-noise/`.
 **Does NOT own:** cascade state machine, SKIP button, badge, scanline. Those stay in `Index.tsx` because the SKIP button's stacking-context constraint (`// SKIP must be top-level fragment child — Wave 3 B2 stacking-context`) prevents moving it into a child component, and SKIP/badge render conditions depend on `phase` — therefore the state machine stays at the same level as SKIP/badge, i.e. `Index.tsx`.
 **Renders inside it:** `<IdStrip />` plus the three asymmetric headline rows plus the existing `<motion.div>` CTA wrap.
 
+`viewProjectsRef` is a regular prop typed `RefObject<HTMLAnchorElement>` — NOT React's special `ref` prop. Do NOT wrap `HeroSignalNoise` in `forwardRef`. The child attaches the ref via `<Link ref={props.viewProjectsRef}>` directly. `Link` (react-router-dom 6) is already forward-ref'd internally.
+
+Conditional flags inside `HeroSignalNoise` are computed from the `phase` and `animationsDisabled` props passed in. The CTA-wrap `inert={phase < 3}` and the headline-row `phase >= 2` checks are both child-side computations. Parent does not pre-compute these.
+
 ### 3.2 `HeroChrome`
 
 **Path:** `src/features/hero-signal-noise/HeroChrome.tsx`
-**Role:** ambient-chrome bundle. Renders the four background layers as siblings of `HeroSignalNoise`.
-**Mounts:** `<GridTexture />` (a thin div with `.grid-tex`), `<HudBrackets />`, `<DataColumn />`. Does NOT mount `<ScanSweep />` (dropped).
+**Role:** ambient-chrome bundle. Renders the three background layers as siblings of `HeroSignalNoise`.
+**Mounts:** Renders three children: `<div className="grid-tex" aria-hidden="true" />` (inline — no separate component), `<HudBrackets />`, `<DataColumn />`. Does NOT mount `<ScanSweep />` (dropped).
 **Where used:** rendered as a sibling of `<HeroSignalNoise />` inside `Index.tsx`, before the about section.
+
+`HeroChrome` does NOT accept children — its layers are owned internally. Render as `<HeroChrome />` self-closing. The §3.6 DOM tree's nested-children illustration is for documentation clarity only, not a reflection of the API.
+
+Hero orbs (the two `.absolute ... animate-hero-glow-slow/-slower` divs at `Index.tsx:189-196`) are NOT part of `HeroChrome`. They remain inside the hero `<section>` as siblings of `<HeroSignalNoise />` because they are hero-section-scoped (positioned relative to the `<section>`), not viewport-scoped like `HeroChrome`'s layers. Migration step 5 (§9) preserves them in place.
 
 ### 3.3 `HudBrackets`
 
@@ -151,14 +162,16 @@ New feature folder: `src/features/hero-signal-noise/`.
 
 **Path:** `src/features/hero-signal-noise/DataColumn.tsx`
 **Role:** right-edge vertical data feed in Share Tech Mono characters, 18 px wide, autoscrolling via `dc-scroll` keyframe (26 s linear infinite).
-**Content:** generated client-side — random characters from `0-9 A-F . - / # *`, ~120 lines, repeated for seamless loop.
-**Render gate:** `≥769px` viewport (CSS `display: none` below). When `animationsDisabled === true`, `animation: none` is applied via `useMotionPolicy()` consumer pattern (the column still renders statically, just doesn't scroll).
+**Content:** generated client-side from a deterministic PRNG seeded by the literal string `dc-seed-v1`. Output is ~120 lines of characters from the alphabet `0-9 A-F . - / # *`, repeated for seamless loop. Seed is module-scope-constant — not random per mount — so React StrictMode's dev double-mount produces identical content. The seed string is intentionally versioned (`-v1`) so a future content refresh can flip the seed without breaking visual baselines accidentally.
+**Render gate:** `≥768px` viewport (CSS `display: none` below). When `animationsDisabled === true`, `animation: none` is applied via `useMotionPolicy()` consumer pattern (the column still renders statically, just doesn't scroll).
+
+Visibility gating is CSS-only (`@media (min-width: 768px) { .data-column { display: block; } }` over a `display: none` base). The component always renders in the DOM; CSS controls paint. No JS-side viewport detection is used for the gate (avoids hydration mismatch). Pre-generated content (per the deterministic seed above) ensures first paint includes column contents — no layout shift from late content insertion.
 
 ### 3.5 `IdStrip`
 
 **Path:** `src/features/hero-signal-noise/IdStrip.tsx`
 **Role:** telemetry-bar above the headline. Renders five segments separated by `//`: `NODE_07`, `OP: PT`, `TS: HH:MM:SS` (live), `UTC: YYYY/MM/DD`, `SEC: OK`.
-**Live clock:** `setInterval(updateClock, 1000)` inside a `useEffect` with cleanup. Format: 24-hour HH:MM:SS for `TS`, `YYYY/MM/DD` for the UTC date.
+**Live clock:** `setInterval(updateClock, 1000)` inside a `useEffect` with cleanup. The interval is gated through `useMotionPolicy()` consumer pattern — when `animationsDisabled === true` (reduced-motion, low-tier device, session-replay-skip), the interval is NOT created and TS displays a static page-load timestamp from the initial mount. Additionally, `document.hidden` gating pauses the interval when the tab is backgrounded. Format: 24-hour HH:MM:SS for `TS`, `YYYY/MM/DD` for the UTC date.
 **Reduced-motion:** clock continues ticking (it's information, not animation). The blink-pulse on `SEC: OK` is suppressed when `animationsDisabled === true`.
 **Visual-determinism note:** the Playwright fixture must override `Date.now()` and `new Date()` to a fixed instant before render so visual baselines are stable. See §8.1.
 
@@ -170,16 +183,16 @@ New feature folder: `src/features/hero-signal-noise/`.
 Index.tsx fragment:
 <>
   <div className="scanline ..." />          // existing — unchanged, stays here
-  <HeroChrome>                              // NEW — sibling, mounts ambient layers
-    <GridTexture />
-    <HudBrackets />
-    <DataColumn />
-  </HeroChrome>
+  <HeroChrome />                            // NEW — self-closing; layers owned internally
+                                            //   (illustrative children below — not the API):
+                                            //     <div className="grid-tex" aria-hidden /> // inline
+                                            //     <HudBrackets />
+                                            //     <DataColumn />
   {showBadge && <BadgeButton />}            // existing tri-state badge — unchanged, stays here
   {phase>=1 && phase<3 && !disabled &&
      <SkipButton />}                        // existing — must remain top-level fragment child
                                             // (Wave 3 B2 stacking-context); stays here
-  <section className="..." data-testid={...}>
+  <section className="..." data-testid={phase >= 3 ? "hero-phase3" : "hero-cascading"}>
     <div className="absolute ... orb-primary" />  // existing hero orbs — stay
     <div className="absolute ... orb-accent"  />
     <HeroSignalNoise                        // NEW — receives phase + motion props
@@ -200,22 +213,30 @@ Index.tsx fragment:
 ### 4.1 What gets reused (already in `src/index.css`)
 
 - Tokens: `--primary`, `--accent`, `--matrix-glow`, `--matrix-text-glow`, `--hero-orb-primary`, `--hero-orb-accent`, `--background`, `--foreground`, `--muted-foreground`, `--border`, `--card`.
-- Keyframes: `hero-glow`, `hero-glow-mobile`, `hero-glitch-flash`, `hero-glitch-cyan`, `hero-glitch-magenta`, `hero-stamp`, `letter-reveal`, `glitch-slice`, `glitch-slice-alt`, `cursor-blink`.
+- Keyframes: `hero-glow`, `hero-glow-mobile`, `hero-glitch-flash`, `hero-glitch-cyan`, `hero-glitch-magenta`, `hero-stamp`, `letter-reveal`, `glitch-slice`, `glitch-slice-alt`.
 - Utility classes: `.text-glow`, `.box-glow`, `.scanline`, `.glitch-hover`, `.hero-glitch-entrance`, `.hero-stamp-entrance`.
 
 ### 4.2 New classes to add to `src/index.css`
 
 | Class | Role |
 |---|---|
-| `.grid-tex` | Fixed 64 px grid overlay with radial mask, `z-index: 5` |
+| `.grid-tex` | Fixed 64 px grid overlay with radial mask, `z-index: 11` |
 | `.hud-bracket`, `.hud-bracket.tl/.tr/.bl/.br` | Corner L brackets |
 | `.data-column`, `.dc-track` | Right-edge data feed and autoscroll track |
 | `@keyframes dc-scroll` | Linear top-to-bottom column scroll, 26 s infinite |
+| `@keyframes cursor-blink` | Terminal-cursor 1Hz blink (50% on / 50% off, infinite). Powers `.cursor-blink::after` in the cat-block. |
 | `.id-strip` | Telemetry bar layout + `seg / div` children styling |
 | `.cat-block`, `.cat-head` | About-section bio frame |
-| `.cursor-blink::after` | Terminal-cursor blink (already has `cursor-blink` keyframe in production CSS) |
+| `.cursor-blink::after` | Terminal-cursor blink — new keyframe `cursor-blink` introduced in this spec — see row above. |
 | `.tools-grid`, `.tools-grid h4` | Tools grid layout (5 categories) |
 | `.badge`, `.badge .ver` | Versioned tool badge |
+| `.hero-h`, `.h-row`, `.h-row.left/.center/.right` | Hero headline row layout — flex container + per-row alignment |
+| `.id-strip .pulse` | 1Hz blink indicator on `SEC: OK` segment (motion-gated; static dot when reduced) |
+| `.cat-block .cat-head` (and child spans `.pmt`, `.file`, `.meta`) | Cat-block header row — `$` prompt, filename, metadata segment |
+| `.cat-block .row` | Tools-grid badge row (flex-wrap container) |
+| `.ascii-div`, `.ascii-div .tag` | ASCII separator below about grid (`aria-hidden`, `font-family: 'Share Tech Mono', monospace` for glyph coverage) |
+
+`grid-tex` sits at z=11 above the scanline (z=10) so the texture is perceptible. Hero `<section>` (z=20) covers both — that's intentional; the chrome is for negative space.
 
 All new classes use `hsl(var(--token) / alpha)` form — no hex literals. Per `DESIGN.md`'s convention.
 
@@ -223,8 +244,8 @@ All new classes use `hsl(var(--token) / alpha)` form — no hex literals. Per `D
 
 The prototype's hardcoded inline negative margins are replaced. The new hero rows use this rule structure:
 
-- `.hero-h .h-row.left` — `padding-left: clamp(0px, 6vw, 48px)` at `≥641px`, `0` and `justify-content: center` below
-- `.hero-h .h-row.right` — `padding-right: clamp(0px, 6vw, 48px)` at `≥641px`, `0` and `justify-content: center` below
+- `.hero-h .h-row.left` — `padding-left: clamp(0px, 6vw, 48px)` at `≥768px`, `0` and `justify-content: center` below
+- `.hero-h .h-row.right` — `padding-right: clamp(0px, 6vw, 48px)` at `≥768px`, `0` and `justify-content: center` below
 - `.hero-h .h-row.center` — always `justify-content: center`
 
 No JS is involved in the layout decision. CSS-only.
@@ -252,10 +273,10 @@ The current state machine has phases 0/1/2/3 driven by a `useEffect` that schedu
 | 1 (terminal line letter-reveal) | 1 | No change. Already works. |
 | 2a (BREAK glitch entrance) | 2 | No change. Already works (`.hero-glitch-entrance` class). |
 | 2b (BUILD letter-reveal) | 2 | No change. Already works. |
-| 2c (PROVE stamp entrance) | 2 | **ADD** `.hero-stamp-entrance` class to PROVE row at phase ≥ 2. The keyframe `hero-stamp` already exists in `index.css`. The prototype's `animation-delay: 4800ms` does NOT carry forward; we use the production pattern of `animationDelay: "2.2s"` already present in the live `Index.tsx` for PROVE so the relative timing inside the existing phase-2 `setTimeout` window is preserved. |
+| 2c (PROVE stamp entrance) | 2 | No change. Already attached in production at the PROVE row via `animClass(phase >= 2, 'hero-stamp-entrance')`. Keyframe `hero-stamp` already in `index.css`. The prototype's `animation-delay: 4800ms` does NOT carry forward; we use the production pattern of `animationDelay: "2.2s"` already present in the live `Index.tsx` for PROVE so the relative timing inside the existing phase-2 `setTimeout` window is preserved. The inline-style condition is preserved verbatim from production: `style={phase >= 2 && !animationsDisabled ? { animationDelay: '2.2s' } : undefined}`. Both `phase` and `animationsDisabled` come from `HeroSignalNoise` props; the `!animationsDisabled` clause is load-bearing for the reduced-motion contract — do NOT drop it. |
 | 3 (CTAs visible) | 3 | No change. Already works. |
 
-**Net change:** the state machine itself is not modified — it stays in `Index.tsx` verbatim. What changes is (a) the JSX inside the hero `<section>` now delegates to `<HeroSignalNoise />` (which receives `phase`/motion-policy/refs as props), (b) a new `<IdStrip />` renders inside `HeroSignalNoise` before the headline, and (c) the PROVE row gains the `.hero-stamp-entrance` class.
+**Net change:** the state machine itself is not modified — it stays in `Index.tsx` verbatim. What changes is (a) the JSX inside the hero `<section>` now delegates to `<HeroSignalNoise />` (which receives `phase`/motion-policy/refs as props), and (b) a new `<IdStrip />` renders inside `HeroSignalNoise` before the headline.
 
 ### 5.3 The IdStrip clock
 
@@ -263,13 +284,19 @@ The clock is independent of the cascade. It renders at phase 0+ with a placehold
 
 ```
 useEffect(() => {
+  if (animationsDisabled) {
+    // Static page-load timestamp; no live tick.
+    setNow(new Date());
+    return;
+  }
   const tick = () => {
+    if (document.hidden) return;
     setNow(new Date());
   };
   tick();
   const id = setInterval(tick, 1000);
   return () => clearInterval(id);
-}, []);
+}, [animationsDisabled]);
 ```
 
 Reduced-motion: the `tick` interval still runs (the clock displays current time — it's informational). The `.pulse` blink animation on the `SEC: OK` indicator is gated through `useMotionPolicy()` and replaced with a static dot when `animationsDisabled`.
@@ -292,16 +319,17 @@ Net behavior change: zero. Only relocation — and only the inert+ref-attachment
 
 ## 6. Mobile-fit strategy — full breakpoint table
 
-| Viewport width | Hero rows | Padding offsets | Data column | HUD brackets | ID-strip layout |
+| Viewport width | Hero rows | Padding offsets | Data column | HUD brackets | ID-strip |
 |---|---|---|---|---|---|
-| `≤640px` | Centered stack | All rows centered, no padding | Hidden | 18×18 px | Wraps to 2 lines |
-| `641–768px` | Centered stack | All centered | Hidden | 28×28 px | Single row |
-| `769–1023px` | Asymmetric | `clamp(0, 6vw, 48px)` | Visible | 28×28 px | Single row |
-| `≥1024px` | Asymmetric | `clamp(0, 6vw, 48px)` (caps at 48 px ≥800 px viewport) | Visible | 28×28 px | Single row |
+| `≤640px` | Centered stack | All centered | Hidden | 18×18 px | Wraps to 2 lines |
+| `641–767px` | Centered stack | All centered | Hidden | 28×28 px | Single row |
+| `≥768px` | Asymmetric | `clamp(0, 6vw, 48px)` (caps at 48 px when `vw ≥ 800`) | Visible | 28×28 px | Single row |
 
 **Implementation:** purely CSS media queries on `.hero-h .h-row.left/.right`, `.data-column`, `.hud-bracket`, `.id-strip`. No JS-side viewport detection.
 
-**Why `≤640px` removes asymmetry entirely instead of relying on clamp's lower bound:** at `375px` the asymmetric padding evaluates to `clamp(0, 22.5px, 48px) = 22.5px`. That's enough offset to make the layout look intentionally asymmetric on a phone where it reads as a layout glitch. Below `641px` we want centered-stack to communicate "this is the small-screen layout", not "the asymmetric layout is sort-of-working".
+The three-row table is cleaner and matches the device-tier policy. Reasoning: 640 px is purely a HUD-bracket-size + ID-strip-wrap threshold (not a layout/motion threshold), inherited from the prototype's mobile token override — preserved here for visual fidelity. The 768 px boundary is the canonical Tailwind `md` / `use-mobile.tsx` `MOBILE_BREAKPOINT` / device-tier-motion-policy mobile-vs-tablet+desktop split.
+
+**Why `<768px` removes asymmetry entirely instead of relying on clamp's lower bound:** at `375px` the asymmetric padding evaluates to `clamp(0, 22.5px, 48px) = 22.5px`. That's enough offset to make the layout look intentionally asymmetric on a phone where it reads as a layout glitch. Below `768px` we want centered-stack to communicate "this is the small-screen layout", not "the asymmetric layout is sort-of-working".
 
 ---
 
@@ -309,7 +337,7 @@ Net behavior change: zero. Only relocation — and only the inert+ref-attachment
 
 ### 7.1 Current `AboutSection`
 
-Plain prose paragraphs + pill-style tools list (rendered from a static array). Already exists at `src/features/about/AboutSection.tsx`.
+Current `AboutSection` is a `lg:grid-cols-2` two-column layout: left column = three prose paragraphs from `introText` (in `data.ts`) under a `> whoami` terminal-styled header; right column = `<ToolBadges />` rendering five categorized rows from `toolCategories` in `data.ts`. The category structure (Test Automation, Languages, CI/CD & DevOps, Test Management, AI & Tooling) already matches the SIGNAL_NOISE prototype's grouping. What's missing for the port: (a) version annotations on each badge, (b) the cat-block frame styling around the bio, (c) the trailing terminal-cursor blink, (d) the ASCII separator line.
 
 ### 7.2 New structure
 
@@ -326,11 +354,11 @@ Two-column grid (single column below `1024px`):
 - Five category sections, each with `<h4>` category name + `<div class="row">` of badges
 - Categories (per the prototype): Test Automation, Languages, CI/CD & DevOps, Test Management, AI & Tooling
 - Badge format: `<span class="badge">Name <span class="ver">version</span></span>`
-- Data source: a static `toolsByCategory` array in `src/features/about/tools-data.ts` — versioned. See §11.2 for the version-staleness concern.
+- Data source: extend the existing `toolCategories` array in `src/features/about/data.ts`. Change the `ToolCategory.tools` type from `string[]` to `Array<{ name: string; version: string }>` (or `{ name: string; version: string | null }` if some tools have no version like `JIRA` / `Confluence`). Update `<ToolBadges />` to render the new `{name, version}` shape. Do NOT create a new `tools-data.ts` — that would conflict with the existing `data.ts`. Preserve the `introText` and `socialLinks` exports unchanged. See §11.2 for the version-staleness concern.
 
 ### 7.3 ASCII separator line
 
-Below the about-grid, the prototype renders an ASCII separator (`━━━━━━━━━━━━━━ // END_OF_FILE ━━━━━━━━━━━━━━`). Port keeps this as `<div class="ascii-div">` — pure decorative, `aria-hidden="true"`.
+Below the about-grid, the prototype renders a separator (`──────────── // END_OF_FILE ────────────` using U+2500 LIGHT HORIZONTAL — wider font coverage than U+2501 HEAVY HORIZONTAL). Class `.ascii-div` specifies `font-family: 'Share Tech Mono', monospace` to guarantee glyph coverage. Port keeps this as `<div class="ascii-div">` — pure decorative, `aria-hidden="true"`.
 
 ---
 
@@ -342,13 +370,19 @@ The existing Playwright visual-determinism fixture freezes animations via init s
 
 Add the helper to the visual-determinism fixture file (path lives in `e2e/fixtures/`). Existing tests must pass after the addition (the override is a no-op for components that don't read clock).
 
+The fixture must override BOTH `Date.now` / `new Date(...)` AND `performance.now` to a fixed instant. The existing `freezeAnimationsViaInitScript` does not freeze `performance.now()` directly; the new `freezeClockViaInitScript` does. This is required for stable visual baselines on `cursor-blink` and any other CSS animation whose phase depends on the monotonic clock.
+
+Playwright runner config must set `TZ=UTC` (in `playwright.config.ts` use block) so the IdStrip's TS field renders deterministically across local-dev (e.g., Prague) and CI (UTC) environments. Visual baselines are committed against `TZ=UTC` rendering.
+
+Integrate via the existing `prepareContext(page, opts)` helper in `e2e/fixtures/visual-determinism.ts` — add a new opt `freezeClock?: boolean` so consumers can compose with `freezeKeyframes` and `skipHeroCascade` without piecemeal init-script calls. Init-script registration order matters: freeze the clock BEFORE freezing animations to avoid `setTimeout(0)` re-entrancy issues during page boot.
+
 ### 8.2 New e2e specs
 
 | File | What it verifies |
 |---|---|
-| `e2e/hero-signal-noise-cascade.spec.ts` | Phase 0 → 3 progression at desktop viewport. SKIP button refocus. Replay-skip on second visit (sessionStorage). Reduced-motion short-circuit (immediate phase 3). |
-| `e2e/hero-signal-noise-mobile.spec.ts` | 375 / 414 / 768 px viewports. Assert no horizontal overflow (`page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)`). Assert centered-stack layout below 641 / asymmetric at 769+. |
-| `e2e/about-section-rewrite.spec.ts` | Cat-block bio renders with `$ cat ~/profile.txt` header. Versioned badges render. Categories render in expected order. |
+| `e2e/functional/hero-signal-noise-cascade.spec.ts` | Phase 0 → 3 progression at desktop viewport. SKIP button refocus. Replay-skip on second visit (sessionStorage). Reduced-motion short-circuit (immediate phase 3). Includes assertion: after SKIP click, `document.activeElement` equals the VIEW PROJECTS link. This regression-tests F-UX-05 — the focus-after-unmount contract. |
+| `e2e/functional/hero-signal-noise-mobile.spec.ts` | 375 / 414 / 768 px viewports. Assert no horizontal overflow (`page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)`). Assert centered-stack layout below 768 / asymmetric at 768+. |
+| `e2e/functional/about-section-rewrite.spec.ts` | Cat-block bio renders with `$ cat ~/profile.txt` header. Versioned badges render. Categories render in expected order. |
 
 ### 8.3 Visual regression baselines
 
@@ -364,7 +398,7 @@ New baselines at viewports 375, 768, 1280, 1920 for the homepage. Run with `--up
 
 ### 8.5 Existing tests that must stay green
 
-- `e2e/blog-rendering.spec.ts`, `e2e/reading-mode.spec.ts`, `e2e/responsive.spec.ts` — must pass unchanged.
+- `e2e/functional/blog-rendering.spec.ts`, `e2e/functional/reading-mode.spec.ts`, `e2e/functional/responsive.spec.ts` — must pass unchanged.
 - `src/lib/motion.test.ts` — motion policy unchanged; tests should not need edits.
 - `src/hooks/use-device-tier.test.tsx` — unchanged.
 
@@ -375,7 +409,7 @@ New baselines at viewports 375, 768, 1280, 1920 for the homepage. Run with `--up
 1. Create branch `feat/signal-noise-hero-port` from `main`.
 2. Add new feature folder `src/features/hero-signal-noise/` with the five components.
 3. Append new CSS classes + keyframe to `src/index.css`. No edits to existing rules — purely additive.
-4. Rewrite `src/features/about/AboutSection.tsx`. Add `src/features/about/tools-data.ts`.
+4. Edit `src/features/about/AboutSection.tsx` to replace the prose-paragraphs section with the cat-block frame (`<div class="cat-block">` + `<div class="cat-head">` header + bio paragraphs + trailing `.cursor-blink` paragraph). Edit `src/features/about/data.ts` to extend `ToolCategory.tools` from `string[]` to versioned objects. Edit `src/features/about/ToolBadges.tsx` to render the `<span class="badge">Name <span class="ver">version</span></span>` shape from §4.2.
 5. Edit `src/pages/Index.tsx`:
    - Keep the existing top-level fragment structure (scanline div, badge button, SKIP button — all stay where they are; the SKIP-button stacking-context constraint requires it)
    - Keep the cascade state machine in `Index.tsx` (phase, useEffect, useMotionPolicy, badge tri-state, replay-flag helpers, sessionStorage keys)
@@ -423,6 +457,10 @@ If the fixture is implemented as a Playwright init script, the clock-freeze help
 
 The vertical scroll runs continuously when on. At desktop tier it's fine (we already burn animation budget on hero orbs). On low-end laptops the linear-gradient mask plus animation may cost ~1ms/frame. If profiling reveals this is hot on a tier-2 device, gate via `useMotionPolicy()` (currently CSS-only via media query, but could be elevated to JS-side opt-out).
 
+### 11.5 Resize-during-cascade transition
+
+A user opening DevTools mid-cascade and resizing through the 768 px boundary triggers an instant CSS layout flip from asymmetric to centered while phase 2 stamp/glitch animations are mid-flight. Accepted edge case for v1; not testable via static Playwright. If reports surface, add `transition: padding 0.2s ease` to `.h-row.left/.right` for a softer flip.
+
 ---
 
 ## 12. Decision provenance
@@ -432,6 +470,18 @@ All decisions in §2 trace to the 2026-04-27 brainstorm session (Claude + Piotr)
 - `about-scope.html` — three about-section scope cards A/B/C; user clicked A
 
 The brainstorm server protocol is documented in `~/.claude/rules/brainstorm-server-network.md` (rule) and `~/.claude/scripts/brainstorm-restart.sh` (helper).
+
+---
+
+## 13. Resolutions Applied in Rev 2
+
+Three changes are load-bearing enough to call out:
+
+1. **`cursor-blink` keyframe is NEW, not reused.** Rev 1 falsely claimed it existed in production. Adversarial review (F-ADV-01, F-COV-01) verified by grep that the keyframe is only in the prototype HTML. §4.2 now lists it as a new addition; §1 out-of-scope clause adjusted accordingly.
+
+2. **All breakpoints aligned to 768 px.** Rev 1 mixed three values (640, 641, 768, 769) across §2, §4, §6 with no consistent rule. Rev 2 collapses to the device-tier motion policy boundary: `<768` = mobile, `≥768` = tablet+desktop. The 640 cutoff survives only as an HUD-bracket-size + ID-strip-wrap threshold (visual fidelity, not layout).
+
+3. **`AboutSection` already partially matches target.** Rev 1 described the current state as "plain prose + pill list" but it's actually a categorized two-column grid via `data.ts` + `ToolBadges.tsx` whose 5 categories already mirror the SIGNAL_NOISE prototype. Rev 2 extends `data.ts` (changing `ToolCategory.tools` from `string[]` to `{name, version}[]`) instead of creating a conflicting `tools-data.ts`. Preserves `introText` and `socialLinks` consumers.
 
 ---
 
