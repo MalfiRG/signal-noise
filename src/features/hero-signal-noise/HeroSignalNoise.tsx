@@ -86,7 +86,7 @@ const HeroSignalNoise = ({
           animate={phase >= 3 ? "visible" : "hidden"}
         >
           <motion.div variants={heroItem}>
-            <p className="text-foreground/80 text-lg mb-8 leading-relaxed">
+            <p className="text-foreground/80 text-lg mt-10 mb-8 leading-relaxed">
               Every bug is a hypothesis waiting to be tested.<br />
               Research. Execute. Certify.
             </p>
