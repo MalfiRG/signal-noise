@@ -1,8 +1,11 @@
 import { Github, Linkedin } from "lucide-react";
 import ToolBadges from "./ToolBadges";
 import { introText, socialLinks } from "./data";
+import { useMotionPolicy } from "@/lib/motion";
 
 const AboutSection = () => {
+  const { animationsDisabled } = useMotionPolicy();
+  const lastBioIndex = introText.bio.length - 1;
   return (
     <section className="flex items-center pt-8 pb-16 px-4">
       <div className="container mx-auto max-w-4xl">
@@ -16,20 +19,29 @@ const AboutSection = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          <div className="space-y-4">
+          <div
+            className={`cat-block space-y-3${animationsDisabled ? "" : " animate-fade-in opacity-0"}`}
+            style={animationsDisabled ? undefined : { animationDelay: "0.2s" }}
+          >
+            <p className="cat-head">
+              <span className="pmt">$</span>
+              <span>cat</span>
+              <span className="file">~/profile.txt</span>
+              <span className="meta">— 1.2k // utf-8</span>
+            </p>
+
             {introText.bio.map((paragraph, i) => (
               <p
                 key={i}
-                className="text-foreground/80 text-sm leading-relaxed animate-fade-in opacity-0"
-                style={{ animationDelay: `${0.2 + i * 0.2}s` }}
+                className={`text-foreground/80 text-sm leading-relaxed${i === lastBioIndex ? " cursor-blink" : ""}`}
               >
                 {paragraph}
               </p>
             ))}
 
             <div
-              className="flex gap-4 pt-4 animate-fade-in opacity-0"
-              style={{ animationDelay: "0.8s" }}
+              className={`flex gap-4 pt-4${animationsDisabled ? "" : " animate-fade-in opacity-0"}`}
+              style={animationsDisabled ? undefined : { animationDelay: "0.8s" }}
             >
               {socialLinks.map((link) => (
                 <a
@@ -50,9 +62,18 @@ const AboutSection = () => {
             </div>
           </div>
 
-          <div className="animate-fade-in opacity-0" style={{ animationDelay: "0.4s" }}>
+          <div
+            className={animationsDisabled ? undefined : "animate-fade-in opacity-0"}
+            style={animationsDisabled ? undefined : { animationDelay: "0.4s" }}
+          >
             <ToolBadges />
           </div>
+        </div>
+
+        <div className="ascii-div" aria-hidden="true">
+          <span>──────────────────────────────────</span>
+          <span className="tag">// END_OF_FILE</span>
+          <span>──────────────────────────────────</span>
         </div>
       </div>
     </section>
