@@ -86,7 +86,7 @@ test.describe("Hero skip-intro paths (spec §5.6)", () => {
 });
 
 test.describe("Hero sessionStorage round-trip (spec §5.6 + §5.9)", () => {
-  test("after completing cascade, reload-in-session uses replay-skip path", async ({ page }) => {
+  test("after completing cascade, sessionStorage flag is persisted", async ({ page }) => {
     await gotoFreshCascade(page);
 
     const skipButton = page.getByRole("button", { name: /skip intro/i });
@@ -94,14 +94,13 @@ test.describe("Hero sessionStorage round-trip (spec §5.6 + §5.9)", () => {
     await skipButton.click();
     await expect(page.locator('[data-testid="hero-phase3"]')).toBeVisible({ timeout: 2000 });
 
-    // import.meta.env.DEV gates the sessionStorage write — DEV server suppresses it
     const flagValue = await page.evaluate(() =>
       sessionStorage.getItem("hero-cascade-played"),
     );
-    expect(flagValue).toBeNull();
+    expect(flagValue).toBe("1");
   });
 
-  test("dev-build detection: sessionStorage flag is NOT written on the Vite dev server", async ({ page }) => {
+  test("reload within same tab uses replay-skip path (cascade does not replay)", async ({ page }) => {
     await gotoFreshCascade(page);
 
     const skipButton = page.getByRole("button", { name: /skip intro/i });
@@ -109,10 +108,10 @@ test.describe("Hero sessionStorage round-trip (spec §5.6 + §5.9)", () => {
     await skipButton.click();
     await expect(page.locator('[data-testid="hero-phase3"]')).toBeVisible({ timeout: 2000 });
 
-    const flagValue = await page.evaluate(() =>
-      sessionStorage.getItem("hero-cascade-played"),
-    );
-    expect(flagValue).toBeNull();
+    await page.reload();
+    // After reload with persisted flag, hero should land directly in phase3 — no SKIP visible
+    await expect(page.locator('[data-testid="hero-phase3"]')).toBeVisible({ timeout: 2000 });
+    await expect(page.getByRole("button", { name: /skip intro/i })).toHaveCount(0);
   });
 });
 

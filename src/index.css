@@ -1099,6 +1099,7 @@ code[class*="language-"] span::selection {
 .id-strip {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 18px;
   font-family: 'Share Tech Mono', monospace;
   font-size: 10px;
@@ -1110,6 +1111,16 @@ code[class*="language-"] span::selection {
   border-radius: 2px;
   background: hsl(var(--card) / 0.4);
   flex-wrap: wrap;
+}
+
+@media (max-width: 480px) {
+  .id-strip {
+    font-size: 8px;
+    gap: 6px;
+    letter-spacing: 0.12em;
+    padding: 5px 8px;
+  }
+  .id-strip .seg { margin: 0 1px; }
 }
 
 .id-strip .seg { color: hsl(var(--foreground) / 0.75); margin: 0 4px; }
