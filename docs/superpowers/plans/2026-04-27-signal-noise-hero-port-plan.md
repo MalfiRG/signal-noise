@@ -10,6 +10,16 @@
 
 **Source spec:** `docs/superpowers/specs/2026-04-27-signal-noise-hero-port-design.md` (Rev 2, 488 lines, post-adversarial-review, 35 findings applied — commit `b1cfd55`).
 
+**Status:** Rev 2 — post-adversarial-review (32 findings applied: 4 critical, 9 high, 8 medium, 4 low + 7 traceability set findings). 2-agent adversarial team: `traceability-auditor`, `adversarial-tl-reviewer`. Findings consolidated and applied by `curator` agent.
+
+**Plan-level extensions beyond the spec (TDD-driven):**
+
+1. **`clock.ts`** (T-6) — extracts `formatTimeOfDay` / `formatUtcDate` formatters from `IdStrip` for unit-test isolation. Spec §3.5 implies inline logic; the plan extracts because pure formatters are test-trivial without React rendering.
+2. **`dataColumnContent.ts`** (T-7) — extracts the deterministic PRNG content generator from `DataColumn`. Spec §3.4 specifies the seed string and behavior but doesn't mandate a separate module; the plan extracts to unit-test the determinism contract directly.
+3. **`DataColumn.test.tsx`** (T-9) — Vitest unit test for the component's `.motion-disabled` class application. Spec §8.4 lists Vitest specs for `HeroSignalNoise`, `IdStrip`, `AboutSection`; the plan adds `DataColumn` because the motion-policy class application is non-obvious and warrants explicit coverage.
+
+These are not spec violations — the spec describes WHAT must ship, not the file decomposition for HOW. The extractions remain valid as long as the spec's behavior contracts are preserved.
+
 **Locked decisions honored (from spec §1, §2, §11):**
 1. Full hero replacement, no feature flag (Q1=A).
 2. `clamp(0px, 6vw, 48px)` proportional reflow (Q2=B).
@@ -174,7 +184,7 @@ Append:
   -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 30%, transparent 90%);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .grid-tex { background-size: 40px 40px; }
 }
 
@@ -288,7 +298,7 @@ Append:
   background: hsl(var(--primary));
   box-shadow: 0 0 6px hsl(var(--primary) / 0.6);
   margin-right: 4px;
-  animation: cursor-blink 1.4s steps(2, end) infinite;
+  animation: cursor-blink 1s steps(2, end) infinite;
 }
 .id-strip.motion-disabled .pulse { animation: none; opacity: 1; }
 ```
@@ -359,6 +369,7 @@ Append:
 
 .cursor-blink::after {
   content: '▊';
+  font-family: 'Share Tech Mono', monospace;
   color: hsl(var(--primary));
   margin-left: 4px;
   animation: cursor-blink 1s steps(2, end) infinite;
@@ -752,6 +763,8 @@ describe("DataColumn", () => {
   });
 
   it("applies .motion-disabled when animationsDisabled", () => {
+    // Note: mockReturnValueOnce assumes single-render. If StrictMode is enabled
+    // for tests in the future, switch to mockReturnValue + beforeEach reset.
     (useMotionPolicy as unknown as ReturnType<typeof vi.fn>).mockReturnValueOnce({
       tier: "mobile",
       prefersReducedMotion: true,
@@ -881,17 +894,23 @@ describe("IdStrip", () => {
   });
 
   it("does NOT create an interval when animationsDisabled", () => {
+    // Note: mockReturnValueOnce assumes single-render. If StrictMode is enabled
+    // for tests in the future, switch to mockReturnValue + beforeEach reset.
     (useMotionPolicy as unknown as ReturnType<typeof vi.fn>).mockReturnValueOnce({
       tier: "mobile",
       prefersReducedMotion: true,
       animationsDisabled: true,
     });
     const before = vi.getTimerCount();
-    render(<IdStrip />);
+    act(() => {
+      render(<IdStrip />);
+    });
     expect(vi.getTimerCount()).toBe(before); // no new interval
   });
 
   it("adds .motion-disabled class when animationsDisabled", () => {
+    // Note: mockReturnValueOnce assumes single-render. If StrictMode is enabled
+    // for tests in the future, switch to mockReturnValue + beforeEach reset.
     (useMotionPolicy as unknown as ReturnType<typeof vi.fn>).mockReturnValueOnce({
       tier: "mobile",
       prefersReducedMotion: true,
@@ -1036,7 +1055,7 @@ Hero orbs stay in Index.tsx (section-scoped, not viewport-scoped)."
 
 ## Task 12: Implement `HeroSignalNoise` headline + sub + CTAs (§3.1, §3.6)
 
-Stateless w.r.t. cascade. Receives `phase`, `animationsDisabled`, `prefersReducedMotion`, `viewProjectsRef` as props. Renders `<IdStrip />` + asymmetric BREAK/BUILD/PROVE rows + sub + CTAs. The existing terminal-line `> INITIALIZING SYSTEM…` (LetterReveal) stays in `Index.tsx` for now — it's currently rendered there and the migration keeps that exact JSX in place; we add `<IdStrip />` ABOVE the terminal line via insertion in `HeroSignalNoise`.
+Stateless w.r.t. cascade. Receives `phase`, `animationsDisabled`, `prefersReducedMotion`, `viewProjectsRef` as props. Renders `<IdStrip />` + the existing terminal-line `> INITIALIZING SYSTEM…` (LetterReveal at phase ≥ 1, placeholder otherwise) + asymmetric BREAK/BUILD/PROVE rows + sub + CTAs. T-12 produces a complete, self-contained component — T-13 only edits `Index.tsx`.
 
 **Files:**
 - Create: `src/features/hero-signal-noise/HeroSignalNoise.tsx`
@@ -1054,7 +1073,13 @@ import { useRef } from "react";
 
 vi.mock("@/lib/motion", () => ({
   useMotionPolicy: vi.fn().mockReturnValue({ tier: "desktop", prefersReducedMotion: false, animationsDisabled: false }),
-  useHeroStaggerVariant: () => ({ hidden: { opacity: 0 }, visible: { opacity: 1 } }),
+  // useHeroStaggerVariant returns a Variants object — match production shape.
+  // This is an isolation seam — the production hook chain is exercised by
+  // src/lib/motion.test.ts.
+  useHeroStaggerVariant: vi.fn().mockReturnValue({
+    hidden: { opacity: 0, y: 20, filter: "blur(4px)" },
+    visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.7 } },
+  }),
 }));
 
 import HeroSignalNoise from "./HeroSignalNoise";
@@ -1083,16 +1108,34 @@ describe("HeroSignalNoise", () => {
     expect(getByText("READ BLOG")).toBeTruthy();
   });
 
-  it("CTA wrap is inert before phase 3", () => {
-    const { container } = render(<Wrapper phase={1} />);
-    const wrap = container.querySelector("[data-cta-wrap]");
-    expect(wrap?.hasAttribute("inert")).toBe(true);
+  it("renders the terminal line at phase >= 1 (placeholder at phase 0)", () => {
+    const { container, rerender } = render(<Wrapper phase={0} />);
+    expect(container.textContent).toContain("INITIALIZING SYSTEM");
+    expect(container.querySelector("[aria-hidden='true']")?.classList.contains("opacity-0")).toBe(true);
+
+    rerender(<Wrapper phase={1} />);
+    expect(container.textContent).toContain("INITIALIZING SYSTEM");
   });
 
-  it("CTA wrap is NOT inert at phase 3", () => {
-    const { container } = render(<Wrapper phase={3} />);
-    const wrap = container.querySelector("[data-cta-wrap]");
-    expect(wrap?.hasAttribute("inert")).toBe(false);
+  it("renders BUILD IT via LetterReveal at phase 2 (per-letter animation preserved)", () => {
+    const { container } = render(<Wrapper phase={2} animationsDisabled={false} />);
+    const buildRow = container.querySelector("[data-row='build']");
+    // LetterReveal with `tag="span"` renders a `<span class="block">` wrapper.
+    // The text is split into per-letter spans inside that wrapper.
+    expect(buildRow?.querySelector(".block")).not.toBeNull();
+    expect(buildRow?.textContent).toContain("BUILD IT");
+  });
+
+  it("CTA wrap is inert before phase 3 and active at phase 3", () => {
+    const { container, rerender } = render(<Wrapper phase={1} />);
+    const wrap = container.querySelector("[data-cta-wrap]") as HTMLElement | null;
+    expect(wrap).not.toBeNull();
+    // React 19 boolean inert: present (or "") when true, omitted when false.
+    // We test both presence and the truthy/falsy semantics.
+    expect(wrap?.hasAttribute("inert") && wrap?.getAttribute("inert") !== "false").toBe(true);
+
+    rerender(<Wrapper phase={3} />);
+    expect(wrap?.hasAttribute("inert") && wrap?.getAttribute("inert") !== "false").toBe(false);
   });
 
   it("PROVE row gets hero-stamp-entrance only when phase>=2 AND motion is on", () => {
@@ -1131,13 +1174,14 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { type RefObject } from "react";
 import IdStrip from "./IdStrip";
+import LetterReveal from "@/components/LetterReveal";
 import { useHeroStaggerVariant } from "@/lib/motion";
 
 interface HeroSignalNoiseProps {
   phase: number;
   animationsDisabled: boolean;
   prefersReducedMotion: boolean;
-  viewProjectsRef: RefObject<HTMLAnchorElement>;
+  viewProjectsRef: RefObject<HTMLAnchorElement | null>;
 }
 
 const animClass = (gateMet: boolean, cls: string, animationsDisabled: boolean): string => {
@@ -1155,6 +1199,21 @@ const HeroSignalNoise = ({
     <div className="text-center px-4 max-w-3xl">
       <IdStrip />
 
+      {phase >= 1 ? (
+        <LetterReveal
+          text="> INITIALIZING SYSTEM..."
+          tag="p"
+          className="text-muted-foreground text-sm tracking-[0.3em] mb-4 letter-reveal-linear"
+          delayPerLetter={40}
+          startDelay={0}
+          skipAnimation={animationsDisabled}
+        />
+      ) : (
+        <p aria-hidden="true" className="text-muted-foreground text-sm tracking-[0.3em] mb-4 opacity-0">
+          {">"} INITIALIZING SYSTEM...
+        </p>
+      )}
+
       <h1 className="hero-h">
         <span
           className={`h-row left ${animClass(phase >= 2, "hero-glitch-entrance", animationsDisabled)}`}
@@ -1163,12 +1222,19 @@ const HeroSignalNoise = ({
         >
           BREAK IT
         </span>
-        <span
-          className={`h-row center ${phase >= 2 ? "" : "opacity-0"}`}
-          data-row="build"
-          aria-label="BUILD IT"
-        >
-          BUILD IT
+        <span className="h-row center" data-row="build" aria-label="BUILD IT">
+          {phase >= 2 ? (
+            <LetterReveal
+              text="BUILD IT"
+              tag="span"
+              className="block"
+              delayPerLetter={70}
+              startDelay={1000}
+              skipAnimation={animationsDisabled}
+            />
+          ) : (
+            <span className="block opacity-0" aria-hidden="true">BUILD IT</span>
+          )}
         </span>
         <span
           className={`h-row right ${animClass(phase >= 2, "hero-stamp-entrance", animationsDisabled)}`}
@@ -1185,7 +1251,7 @@ const HeroSignalNoise = ({
         variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.5, delayChildren: 0.05 } } }}
         initial={animationsDisabled ? "visible" : "hidden"}
         animate={phase >= 3 ? "visible" : "hidden"}
-        inert={phase < 3}
+        inert={phase < 3 ? "" : undefined}
       >
         <motion.div variants={heroItem}>
           <p className="text-foreground/80 text-lg mb-8 leading-relaxed">
@@ -1231,7 +1297,7 @@ export default HeroSignalNoise;
 npm run test -- src/features/hero-signal-noise/HeroSignalNoise.test.tsx --run
 ```
 
-Expected: PASS — 5 tests.
+Expected: PASS — 7 tests.
 
 - [ ] **Step 5: Commit**
 
@@ -1239,12 +1305,15 @@ Expected: PASS — 5 tests.
 git add src/features/hero-signal-noise/HeroSignalNoise.tsx src/features/hero-signal-noise/HeroSignalNoise.test.tsx
 git commit -m "feat(hero): add HeroSignalNoise stateless headline + sub + CTAs
 
-Receives phase + motion-policy + viewProjectsRef as props. Asymmetric
-BREAK/BUILD/PROVE rows use .hero-h .h-row.left/.center/.right (CSS
-gates asymmetric placement to >=768px). PROVE keeps the production
-animationDelay 2.2s + !animationsDisabled condition verbatim (Fix M10).
-viewProjectsRef is a regular RefObject prop — NOT React's ref, no
-forwardRef wrap (Fix H7)."
+Receives phase + motion-policy + viewProjectsRef as props. Self-contained:
+includes IdStrip, terminal-line LetterReveal (phase >= 1), asymmetric
+BREAK/BUILD/PROVE rows, and CTA wrap with React 19 boolean inert. The
+BUILD IT row keeps its existing per-letter LetterReveal animation per
+spec §5.2 row 2b (Fix C1). PROVE keeps the production animationDelay
+2.2s + !animationsDisabled condition verbatim (Fix M10). viewProjectsRef
+is typed RefObject<HTMLAnchorElement | null> to match useRef(null) (Fix
+C4). Inert pattern: empty-string when true, undefined when false — robust
+across framer-motion forwarding (Fix M7)."
 ```
 
 ---
@@ -1254,71 +1323,14 @@ forwardRef wrap (Fix H7)."
 Edit `src/pages/Index.tsx` to:
 - Add `<HeroChrome />` as a sibling between scanline and the hero `<section>`.
 - Replace the inner `<div className="text-center px-4 max-w-3xl">…</div>` content with `<HeroSignalNoise … />`, passing `phase`, `animationsDisabled`, `prefersReducedMotion`, `viewProjectsRef` as props.
-- Keep state machine, scanline, badge, SKIP button, hero `<section>` wrapper, hero orbs, `LetterReveal` for the terminal line, and existing data-testid handling unchanged.
+- Keep state machine, scanline, badge, SKIP button, hero `<section>` wrapper, hero orbs, and existing data-testid handling unchanged.
 
-Wait — note: the Hero already renders the terminal `> INITIALIZING SYSTEM…` LetterReveal at phase 1 directly inside the inner div. Per §3.6 DOM tree, IdStrip renders inside `HeroSignalNoise` BEFORE the headline. But the existing terminal line ALSO renders inside that inner div. Migration: the inner div contents now belong to `HeroSignalNoise` — we must move the LetterReveal/terminal line INSIDE `HeroSignalNoise` too OR keep it in `Index.tsx` and pass JSX through. To keep the state machine boundary clean, we move the LetterReveal into `HeroSignalNoise` with a small extension to its props.
-
-**Sub-task: extend HeroSignalNoise to also render the existing terminal line.** Add this to `HeroSignalNoise.tsx` AFTER `<IdStrip />` and BEFORE `<h1>`:
-
-```tsx
-{phase >= 1 ? (
-  <LetterReveal
-    text="> INITIALIZING SYSTEM..."
-    tag="p"
-    className="text-muted-foreground text-sm tracking-[0.3em] mb-4 letter-reveal-linear"
-    delayPerLetter={40}
-    startDelay={0}
-    skipAnimation={animationsDisabled}
-  />
-) : (
-  <p aria-hidden="true" className="text-muted-foreground text-sm tracking-[0.3em] mb-4 opacity-0">
-    {">"} INITIALIZING SYSTEM...
-  </p>
-)}
-```
-
-Add to imports: `import LetterReveal from "@/components/LetterReveal";`. (This line was elided from Task 12's component for clarity; add it now in T-13 to avoid two patches to the same file across the same session.)
+T-12 produced a complete, self-contained `HeroSignalNoise.tsx` (IdStrip + terminal-line LetterReveal + asymmetric BREAK/BUILD/PROVE rows + CTA wrap). T-13 mutates ONLY `Index.tsx`.
 
 **Files:**
-- Modify: `src/features/hero-signal-noise/HeroSignalNoise.tsx` (add LetterReveal import + JSX)
-- Modify: `src/pages/Index.tsx` (replace inner content + add HeroChrome sibling)
+- Modify: `src/pages/Index.tsx` (replace inner content + add HeroChrome sibling + remove dead imports/locals)
 
-- [ ] **Step 1: Patch `HeroSignalNoise.tsx` to include the terminal line**
-
-Add to the imports of `src/features/hero-signal-noise/HeroSignalNoise.tsx`:
-
-```tsx
-import LetterReveal from "@/components/LetterReveal";
-```
-
-Then immediately after `<IdStrip />` and before `<h1 className="hero-h">`, insert:
-
-```tsx
-{phase >= 1 ? (
-  <LetterReveal
-    text="> INITIALIZING SYSTEM..."
-    tag="p"
-    className="text-muted-foreground text-sm tracking-[0.3em] mb-4 letter-reveal-linear"
-    delayPerLetter={40}
-    startDelay={0}
-    skipAnimation={animationsDisabled}
-  />
-) : (
-  <p aria-hidden="true" className="text-muted-foreground text-sm tracking-[0.3em] mb-4 opacity-0">
-    {">"} INITIALIZING SYSTEM...
-  </p>
-)}
-```
-
-Re-run the test:
-
-```bash
-npm run test -- src/features/hero-signal-noise/HeroSignalNoise.test.tsx --run
-```
-
-Expected: still PASS — the terminal line addition does not break existing assertions.
-
-- [ ] **Step 2: Edit `src/pages/Index.tsx`**
+- [ ] **Step 1: Edit `src/pages/Index.tsx`**
 
 Open `src/pages/Index.tsx`. Find the imports block at the top and add:
 
@@ -1327,11 +1339,27 @@ import HeroSignalNoise from "@/features/hero-signal-noise/HeroSignalNoise";
 import HeroChrome from "@/features/hero-signal-noise/HeroChrome";
 ```
 
-REMOVE the now-unused import:
+REMOVE imports that are no longer used:
 
 ```tsx
-// REMOVE THIS LINE — LetterReveal moves into HeroSignalNoise:
+// REMOVE — LetterReveal lives in HeroSignalNoise now:
 import LetterReveal from "@/components/LetterReveal";
+```
+
+Update the motion import — drop `useHeroStaggerVariant` (now consumed inside `HeroSignalNoise`), keep `useMotionPolicy`:
+
+```tsx
+// BEFORE:
+import { useHeroStaggerVariant, useMotionPolicy } from "@/lib/motion";
+// AFTER:
+import { useMotionPolicy } from "@/lib/motion";
+```
+
+REMOVE the now-dead local from inside the `Index` component body:
+
+```tsx
+// REMOVE — heroItem is consumed inside HeroSignalNoise now:
+const heroItem = useHeroStaggerVariant();
 ```
 
 Find the `return (<>` block. After the `<div className="scanline fixed inset-0 z-10" />` line, add:
@@ -1353,6 +1381,14 @@ Find the `<section ...>` opening tag (currently `<section className="relative z-
 
 The `phase`, `animationsDisabled`, `prefersReducedMotion`, `viewProjectsRef` constants already exist in `Index.tsx` (the cascade state machine). Verify each is in scope at the call site.
 
+- [ ] **Step 2: Run lint to catch unused-vars regressions**
+
+```bash
+npm run lint 2>&1 | tail -20
+```
+
+Expected: clean (no `no-unused-vars` errors). If any imports are flagged, remove them.
+
 - [ ] **Step 3: Run all unit tests**
 
 ```bash
@@ -1369,7 +1405,17 @@ npx tsc --noEmit -p tsconfig.app.json
 
 Expected: no errors.
 
-- [ ] **Step 5: Visual smoke (manual)**
+- [ ] **Step 5: Add badge tri-state smoke assertion**
+
+Open `src/pages/Index.tsx` and verify the existing `showReducedMotionBadge` / `showSessionBadge` / `showTierBadge` logic compiles unchanged. Run the existing `src/lib/motion.test.ts` and `src/hooks/use-device-tier.test.tsx` to confirm:
+
+```bash
+npm run test -- src/lib/motion.test.ts src/hooks/use-device-tier.test.tsx --run
+```
+
+Expected: green. The tri-state logic is exercised indirectly through these tests; a dedicated `Index.test.tsx` is out of scope for v1 (the badge JSX is in Index.tsx; rendering Index.tsx in Vitest would require routing-context shims that the project doesn't have for other page-level tests). Documented in spec §11 as monitoring-only for v1.
+
+- [ ] **Step 6: Visual smoke (manual)**
 
 Start the dev server per `~/.claude/rules/hard-reload-dev-servers.md`:
 
@@ -1380,22 +1426,81 @@ node node_modules/vite/bin/vite.js --port 8080 --host
 
 (Run that command via the Bash tool with `run_in_background: true`.) Open `http://localhost:8080`. Verify: ID-strip visible above headline, asymmetric BREAK/BUILD/PROVE at desktop width, HUD brackets at corners, vertical data column on the right, no console errors. Cascade plays once (or skips if `hero-cascade-played` is in sessionStorage). SKIP button works.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
-git add src/pages/Index.tsx src/features/hero-signal-noise/HeroSignalNoise.tsx
+git add src/pages/Index.tsx
 git commit -m "feat(hero): wire HeroSignalNoise + HeroChrome into Index.tsx
 
 Replaces the inner content of the hero <section> with the new
 HeroSignalNoise component (props-driven). Adds HeroChrome as a sibling
-of the scanline. State machine, badge, SKIP button, hero orbs, and
-section wrapper all stay in place — only the inner JSX moves
-(spec §9 step 5)."
+of the scanline. Removes now-dead LetterReveal import and
+useHeroStaggerVariant local — both moved inside HeroSignalNoise (Fix
+H6). State machine, badge, SKIP button, hero orbs, and section wrapper
+all stay in place — only the inner JSX moves (spec §9 step 5)."
 ```
 
 ---
 
-## Task 14: Extend `data.ts` to versioned tools (§7.2)
+## Task 14: Update existing functional specs to new HeroSignalNoise selectors (F-PLAN-01 + spec §8.5)
+
+The Rev 2 plan introduces a new hero JSX shape (`h1.hero-h`, `[data-row='break|build|prove']`) that replaces the production selectors `h1.font-display`, `aria-label="BUILD IT"`, `span.block`, `span.hero-stamp-entrance`. The existing functional specs in `e2e/functional/` use the OLD selectors and would fail at T-25 (full test suite run). This task migrates them.
+
+**Files:**
+- Modify: `e2e/functional/hero-cascade.spec.ts`
+- Modify: `e2e/functional/hero-skip-and-badge.spec.ts`
+- Modify: `e2e/functional/hero-focus-management.spec.ts`
+
+- [ ] **Step 1: Audit existing selectors**
+
+```bash
+grep -nE "font-display|aria-label=\"BUILD IT\"|hero-stamp-entrance|span\.block|span\.hero-glitch" e2e/functional/hero-*.spec.ts
+```
+
+Expected: list of selector references that need migration. Examples:
+- `h1.font-display` → `h1.hero-h`
+- `[data-text="BREAK IT"]` → `[data-row='break']`
+- `h1 span[aria-label="BUILD IT"]` → `[data-row='build']`
+- `span.hero-stamp-entrance` → `[data-row='prove']`
+
+- [ ] **Step 2: Patch each file in turn**
+
+For every selector match, update to the new shape. Preserve the test logic — only the selector strings change. Examples (illustrative — patch as needed based on Step 1 audit):
+
+```ts
+// OLD:
+await expect(page.locator("h1.font-display")).toBeVisible();
+// NEW:
+await expect(page.locator("h1.hero-h")).toBeVisible();
+
+// OLD:
+const buildIt = page.locator('h1 span[aria-label="BUILD IT"]');
+// NEW:
+const buildIt = page.locator("[data-row='build']");
+```
+
+- [ ] **Step 3: Run the migrated specs**
+
+```bash
+npx playwright test e2e/functional/hero-cascade.spec.ts e2e/functional/hero-skip-and-badge.spec.ts e2e/functional/hero-focus-management.spec.ts --project=functional --reporter=list 2>&1 | tail -10
+```
+
+Expected: all specs pass against the new HeroSignalNoise structure. If any selector still fails, do another audit pass.
+
+- [ ] **Step 4: Commit**
+
+```bash
+git add e2e/functional/hero-cascade.spec.ts e2e/functional/hero-skip-and-badge.spec.ts e2e/functional/hero-focus-management.spec.ts
+git commit -m "test(e2e): migrate hero specs to new HeroSignalNoise selectors
+
+Updates h1.font-display → h1.hero-h and aria-label/span-class
+selectors to the new [data-row='break|build|prove'] shape introduced
+by the SIGNAL_NOISE port (F-PLAN-01 / spec §8.5)."
+```
+
+---
+
+## Task 15: Extend `data.ts` to versioned tools (§7.2)
 
 Change `ToolCategory.tools` from `string[]` to `Array<{ name: string; version: string | null }>`. Update each existing tool entry. `introText` and `socialLinks` exports unchanged.
 
@@ -1433,6 +1538,9 @@ export const introText = {
   ],
 };
 
+// TODO(piotr): refresh tool versions quarterly — see spec §11.2 for rationale.
+// Tools without an explicit minor version (e.g. Pytest "v8.x") are intentional;
+// bump quarterly during feature retrospectives.
 export const toolCategories: ToolCategory[] = [
   {
     name: "Test Automation",
@@ -1501,7 +1609,7 @@ export const socialLinks: SocialLink[] = [
 npx tsc --noEmit -p tsconfig.app.json 2>&1 | grep -E "ToolBadges|tools-data|toolCategories" | head -5
 ```
 
-Expected: errors complaining about `ToolBadges.tsx` reading `tool` as `string`. That's the seam we fix in Task 15.
+Expected: errors complaining about `ToolBadges.tsx` reading `tool` as `string`. That's the seam we fix in Task 16.
 
 - [ ] **Step 3: Commit**
 
@@ -1517,7 +1625,7 @@ GitHub Actions, Confluence, etc.). Spec §7.2 + Fix H11."
 
 ---
 
-## Task 15: Update `ToolBadges` to render `{name, version}` shape (§7.2)
+## Task 16: Update `ToolBadges` to render `{name, version}` shape (§7.2)
 
 **Files:**
 - Modify: `src/features/about/ToolBadges.tsx`
@@ -1531,7 +1639,7 @@ import { toolCategories } from "./data";
 
 const ToolBadges = () => {
   return (
-    <div className="tools-grid space-y-4">
+    <div className="tools-grid space-y-6">
       {toolCategories.map((category) => (
         <div key={category.name}>
           <h4>{category.name}</h4>
@@ -1566,7 +1674,7 @@ Expected: no errors.
 npm run test -- src/features/about --run
 ```
 
-Expected: any existing AboutSection-related tests pass. (We add a new test in Task 17.)
+Expected: any existing AboutSection-related tests pass. (We add a new test in Task 18.)
 
 - [ ] **Step 4: Commit**
 
@@ -1582,9 +1690,9 @@ render only the name (no .ver span)."
 
 ---
 
-## Task 16: Rewrite `AboutSection` with cat-block frame + ascii-div (§7.2, §7.3)
+## Task 17: Rewrite `AboutSection` with cat-block frame + ascii-div (§7.2, §7.3)
 
-Replace the prose-paragraphs section with the cat-block frame. Keep the existing two-column grid, social links, headline. Add the ASCII separator below the grid.
+Replace the prose-paragraphs section with the cat-block frame. Keep the existing two-column grid, social links, headline. Add the ASCII separator below the grid. Restore production's `animate-fade-in opacity-0` entrance animations on cat-block, social-icons row, and ToolBadges container — but gate them through `useMotionPolicy()` (Fix H8).
 
 **Files:**
 - Modify: `src/features/about/AboutSection.tsx`
@@ -1597,8 +1705,10 @@ Replace the prose-paragraphs section with the cat-block frame. Keep the existing
 import { Github, Linkedin } from "lucide-react";
 import ToolBadges from "./ToolBadges";
 import { introText, socialLinks } from "./data";
+import { useMotionPolicy } from "@/lib/motion";
 
 const AboutSection = () => {
+  const { animationsDisabled } = useMotionPolicy();
   const lastBioIndex = introText.bio.length - 1;
   return (
     <section className="flex items-center pt-8 pb-16 px-4">
@@ -1613,7 +1723,10 @@ const AboutSection = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          <div className="cat-block space-y-3">
+          <div
+            className={`cat-block space-y-3${animationsDisabled ? "" : " animate-fade-in opacity-0"}`}
+            style={animationsDisabled ? undefined : { animationDelay: "0.2s" }}
+          >
             <p className="cat-head">
               <span className="pmt">$</span>
               <span>cat</span>
@@ -1630,7 +1743,10 @@ const AboutSection = () => {
               </p>
             ))}
 
-            <div className="flex gap-4 pt-4">
+            <div
+              className={`flex gap-4 pt-4${animationsDisabled ? "" : " animate-fade-in opacity-0"}`}
+              style={animationsDisabled ? undefined : { animationDelay: "0.8s" }}
+            >
               {socialLinks.map((link) => (
                 <a
                   key={link.label}
@@ -1650,7 +1766,10 @@ const AboutSection = () => {
             </div>
           </div>
 
-          <div>
+          <div
+            className={animationsDisabled ? undefined : "animate-fade-in opacity-0"}
+            style={animationsDisabled ? undefined : { animationDelay: "0.4s" }}
+          >
             <ToolBadges />
           </div>
         </div>
@@ -1686,13 +1805,16 @@ git commit -m "feat(about): rewrite with cat-block frame + ASCII separator
 Bio is now framed in .cat-block with a $ cat ~/profile.txt header.
 Trailing bio paragraph carries .cursor-blink class for terminal cursor.
 ASCII separator (U+2500 LIGHT HORIZONTAL — wider font coverage than
-U+2501) renders below the grid as decorative aria-hidden divider
-(spec §7.2 + §7.3 + Fix L6)."
+U+2501) renders below the grid as decorative aria-hidden divider.
+Fade-in entrance animations on cat-block, social-icons row, and
+ToolBadges wrapper preserved from production but gated through
+useMotionPolicy() — when animationsDisabled, no entrance animation
+and no opacity-0 starting state (spec §7.2 + §7.3 + Fix L6 + Fix H8)."
 ```
 
 ---
 
-## Task 17: Add `AboutSection.test.tsx` (§8.4)
+## Task 18: Add `AboutSection.test.tsx` (§8.4)
 
 Smoke-level Vitest assertions for the rewritten AboutSection.
 
@@ -1776,7 +1898,7 @@ git commit -m "test(about): cover cat-block + 5-category badges + ascii-div"
 
 ---
 
-## Task 18: Extend visual-determinism fixture with `freezeClockViaInitScript` (§8.1)
+## Task 19: Extend visual-determinism fixture with `freezeClockViaInitScript` (§8.1)
 
 Add the new helper to `e2e/fixtures/visual-determinism.ts` and extend `prepareContext` with a `freezeClock?: boolean` option. Init-script registration order matters per spec Fix L8: register clock-freeze BEFORE animation-freeze.
 
@@ -1805,29 +1927,37 @@ export async function freezeClockViaInitScript(page: Page) {
   await page.addInitScript(() => {
     const FIXED_INSTANT_MS = Date.UTC(2026, 3, 27, 12, 0, 0); // April = month 3 (0-indexed)
     const RealDate = Date;
-    const realNow = RealDate.now.bind(RealDate);
-    // Replace Date.now and new Date() — fall through to RealDate when args provided.
-    const FrozenDate: typeof Date = function (this: Date, ...args: ConstructorParameters<typeof Date>) {
-      if (!(this instanceof FrozenDate)) return new RealDate(FIXED_INSTANT_MS).toString();
-      if (args.length === 0) return new RealDate(FIXED_INSTANT_MS) as unknown as Date;
-      return new (RealDate as new (...a: ConstructorParameters<typeof Date>) => Date)(...args);
-    } as unknown as typeof Date;
-    Object.setPrototypeOf(FrozenDate, RealDate);
-    Object.setPrototypeOf(FrozenDate.prototype, RealDate.prototype);
-    FrozenDate.now = () => FIXED_INSTANT_MS;
-    FrozenDate.parse = RealDate.parse;
-    FrozenDate.UTC = RealDate.UTC;
-    (window as unknown as { Date: typeof Date }).Date = FrozenDate;
-    void realNow;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    function FrozenDate(this: unknown, ...args: any[]): unknown {
+      if (!(this instanceof FrozenDate)) {
+        // Date() called without `new` — return a string of the FIXED instant.
+        return new RealDate(FIXED_INSTANT_MS).toString();
+      }
+      if (args.length === 0) {
+        return new RealDate(FIXED_INSTANT_MS);
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return new (RealDate as any)(...args);
+    }
+    FrozenDate.prototype = RealDate.prototype;
+    (FrozenDate as unknown as { now: () => number }).now = () => FIXED_INSTANT_MS;
+    (FrozenDate as unknown as { parse: typeof Date.parse }).parse = RealDate.parse;
+    (FrozenDate as unknown as { UTC: typeof Date.UTC }).UTC = RealDate.UTC;
+    (window as unknown as { Date: unknown }).Date = FrozenDate;
 
     // performance.now → fixed value relative to navigation start.
     const realPerfNow = performance.now.bind(performance);
     const frozenPerfStart = realPerfNow();
-    Object.defineProperty(performance, "now", {
-      configurable: true,
-      writable: true,
-      value: () => frozenPerfStart,
-    });
+    try {
+      Object.defineProperty(performance, "now", {
+        configurable: true,
+        writable: true,
+        value: () => frozenPerfStart,
+      });
+    } catch {
+      // Some browsers make performance.now non-configurable; fallback no-op.
+    }
   });
 }
 ```
@@ -1857,7 +1987,13 @@ export async function prepareContext(
 npx tsc --noEmit -p tsconfig.app.json
 ```
 
-Expected: no errors.
+Expected: no errors. Also explicitly probe for fixture-typed regressions:
+
+```bash
+npx tsc --noEmit -p tsconfig.app.json 2>&1 | grep -E "freezeClock|FrozenDate" || echo "OK"
+```
+
+Expected: `OK` (no errors).
 
 - [ ] **Step 3: Run existing visual specs to confirm no regressions**
 
@@ -1867,40 +2003,76 @@ npx playwright test --project=visual --grep="@visual" 2>&1 | tail -10
 
 Expected: existing visual specs still pass (the new opt defaults to `false` so prior callers unchanged).
 
-- [ ] **Step 4: Commit**
+- [ ] **Step 4: Verify the freeze worked end-to-end**
+
+Add a smoke assertion to confirm `Date.now()` returns the frozen instant on first paint. Create a tiny one-test file (or add to an existing visual spec):
+
+`e2e/functional/freeze-clock-smoke.spec.ts`:
+
+```ts
+import { test, expect } from "@playwright/test";
+import { prepareContext } from "../fixtures/visual-determinism";
+
+test("freezeClockViaInitScript fixes Date.now() to 2026-04-27T12:00:00Z", async ({ page }) => {
+  await prepareContext(page, { freezeClock: true });
+  await page.goto("/");
+  const frozen = await page.evaluate(() => Date.now());
+  expect(frozen).toBe(Date.UTC(2026, 3, 27, 12, 0, 0));
+  const perfFrozen = await page.evaluate(() => performance.now());
+  // perf.now is frozen to a single value — calling twice returns the same.
+  const perfFrozen2 = await page.evaluate(() => performance.now());
+  expect(perfFrozen2).toBe(perfFrozen);
+});
+```
+
+Run:
 
 ```bash
-git add e2e/fixtures/visual-determinism.ts
+npx playwright test e2e/functional/freeze-clock-smoke.spec.ts --project=functional --reporter=list 2>&1 | tail -5
+```
+
+Expected: PASS.
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add e2e/fixtures/visual-determinism.ts e2e/functional/freeze-clock-smoke.spec.ts
 git commit -m "test(fixtures): add freezeClockViaInitScript and prepareContext opt
 
 Overrides Date / Date.now / new Date() to 2026-04-27T12:00:00Z and
 freezes performance.now() so the IdStrip live clock and cursor-blink
 keyframe produce stable visual baselines. Init-script ordering: clock
 freeze runs BEFORE animation freeze to avoid setTimeout(0) re-entrancy
-during page boot (spec §8.1 + Fix L8)."
+during page boot. Constructor uses widened any-typing to side-step
+ConstructorParameters<typeof Date> overload-tuple union (Fix H2).
+Includes a smoke spec asserting Date.now() == frozen instant after
+prepareContext (spec §8.1 + Fix L8 + Fix M4)."
 ```
 
 ---
 
-## Task 19: Set `TZ=UTC` in `playwright.config.ts` (§8.1)
+## Task 20: Set browser `timezoneId='UTC'` in `playwright.config.ts` (§8.1)
 
-So local clock formatting in `IdStrip` renders the same on local-dev (Prague) and CI (UTC) machines.
+So local clock formatting in `IdStrip` renders the same on local-dev (Prague) and CI (UTC) machines. The browser reads OS timezone — `process.env.TZ` (Node-side) is irrelevant for browser-rendered Date methods.
 
 **Files:**
 - Modify: `playwright.config.ts`
 
-- [ ] **Step 1: Edit `playwright.config.ts`**
+- [ ] **Step 1: Add `timezoneId: "UTC"` to playwright.config.ts**
 
-Find the `defineConfig({` block. Add a top-level config entry to spawn the test runner with `TZ=UTC`:
+Open `playwright.config.ts`. Find the `use:` block (or add one if missing). Add `timezoneId: "UTC"`:
 
 ```ts
-// At the top of the file, ABOVE defineConfig, set process env BEFORE Playwright spawns workers.
-process.env.TZ = "UTC";
+// Inside defineConfig({...}):
+use: {
+  // ... existing entries
+  timezoneId: "UTC",
+},
 ```
 
-Place that line right after the `import` statements, before any other code. This is the simplest cross-platform way to set the TZ for all worker processes — avoids the cross-platform nightmare of using `cross-env` in package.json.
+This sets the BROWSER's timezone for every Playwright context. `process.env.TZ` (Node-side) is irrelevant for browser-rendered Date methods — do NOT add it.
 
-- [ ] **Step 2: Verify the env propagates**
+- [ ] **Step 2: Verify the config still parses**
 
 ```bash
 npx playwright test --list --project=functional 2>&1 | head -3
@@ -1912,15 +2084,17 @@ Expected: command exits cleanly. (We're not running tests yet — just confirmin
 
 ```bash
 git add playwright.config.ts
-git commit -m "test(config): set process.env.TZ='UTC' for stable IdStrip baselines
+git commit -m "test(config): set browser timezoneId='UTC' in playwright.config.ts
 
-Ensures formatTimeOfDay() in IdStrip renders identical local hours on
-Prague-dev and UTC-CI machines (spec §8.1 + Fix M9)."
+Sets every Playwright context's browser timezone to UTC so the IdStrip
+live clock renders identical local hours on Prague-dev and UTC-CI
+machines. process.env.TZ is irrelevant — that's Node-side, the browser
+reads OS timezone. (Spec §8.1 + Fix M9 corrected via F-PLAN-11.)"
 ```
 
 ---
 
-## Task 20: Add `e2e/functional/hero-signal-noise-cascade.spec.ts` (§8.2)
+## Task 21: Add `e2e/functional/hero-signal-noise-cascade.spec.ts` (§8.2)
 
 Phase 0 → 3 progression, SKIP-then-refocus, replay-skip on second visit, reduced-motion short-circuit.
 
@@ -1931,9 +2105,15 @@ Phase 0 → 3 progression, SKIP-then-refocus, replay-skip on second visit, reduc
 
 ```ts
 import { test, expect } from "@playwright/test";
-import { freezeAnimationsViaInitScript } from "../fixtures/visual-determinism";
 
 test.describe("HeroSignalNoise cascade", () => {
+  test.beforeEach(async ({ page }) => {
+    // Force OS preference to no-preference for tests 1-3 (test 4 overrides).
+    // If CI/local OS reports prefers-reduced-motion: reduce, the cascade
+    // short-circuits to phase 3 and SKIP never renders.
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+  });
+
   test("phase 0→3 progresses on first visit (no replay-skip)", async ({ page }) => {
     // Do NOT seed sessionStorage — let the cascade play.
     // Do NOT freeze animations — we want phase progression to occur.
@@ -1961,27 +2141,9 @@ test.describe("HeroSignalNoise cascade", () => {
     await expect(page.locator("[data-testid='hero-phase3']")).toBeVisible({ timeout: 2_000 });
   });
 
-  test("reduced-motion short-circuits to phase 3 without intermediate phases", async ({ page, context }) => {
-    await context.addInitScript(() => {
-      // Stub matchMedia to report prefers-reduced-motion: reduce.
-      const real = window.matchMedia.bind(window);
-      window.matchMedia = (q: string) => {
-        if (q.includes("prefers-reduced-motion") && q.includes("reduce")) {
-          return {
-            matches: true,
-            media: q,
-            onchange: null,
-            addListener: () => {},
-            removeListener: () => {},
-            addEventListener: () => {},
-            removeEventListener: () => {},
-            dispatchEvent: () => false,
-          } as MediaQueryList;
-        }
-        return real(q);
-      };
-    });
-    await freezeAnimationsViaInitScript(page);
+  test("reduced-motion short-circuits to phase 3 without intermediate phases", async ({ page }) => {
+    // Override the beforeEach for this test only:
+    await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
     // Should land on phase 3 immediately — no SKIP button visible.
     await expect(page.locator("[data-testid='hero-phase3']")).toBeVisible({ timeout: 2_000 });
@@ -2006,14 +2168,17 @@ git commit -m "test(e2e): hero-signal-noise cascade — phases, SKIP-refocus, re
 
 Covers phase 0→3 progression, SKIP-then-refocus (F-UX-05 a11y contract),
 sessionStorage replay-skip on second visit, reduced-motion short-circuit
-to phase 3 (spec §8.2 + Fix H8)."
+to phase 3. beforeEach forces page.emulateMedia({ reducedMotion:
+'no-preference' }) for tests 1-3 so OS preference does not collapse the
+cascade; test 4 overrides to 'reduce' for its specific assertion (Fix
+H7). Spec §8.2 + Fix H8."
 ```
 
 ---
 
-## Task 21: Add `e2e/functional/hero-signal-noise-mobile.spec.ts` (§8.2)
+## Task 22: Add `e2e/functional/hero-signal-noise-mobile.spec.ts` (§8.2)
 
-Verify no horizontal overflow at 375 / 414 / 768 px and that asymmetric layout activates only at ≥768.
+Verify no horizontal overflow at 375 / 414 / 768 px and that asymmetric padding activates only at ≥768.
 
 **Files:**
 - Create: `e2e/functional/hero-signal-noise-mobile.spec.ts`
@@ -2044,32 +2209,28 @@ test.describe("HeroSignalNoise mobile reflow", () => {
       expect(overflow, `viewport ${vp.width}px must not horizontally overflow`).toBeLessThanOrEqual(0);
     });
 
-    test(`hero rows ${vp.asymmetric ? "are asymmetric" : "are centered stack"} at ${vp.name}`, async ({ page }) => {
+    test(`hero rows ${vp.asymmetric ? "have asymmetric padding" : "have no asymmetric padding"} at ${vp.name}`, async ({ page }) => {
       await page.setViewportSize({ width: vp.width, height: vp.height });
       await skipHeroCascadeViaInitScript(page);
       await page.goto("/");
-      const leftRow = page.locator("[data-row='break']");
-      const rightRow = page.locator("[data-row='prove']");
-      await expect(leftRow).toBeVisible();
-      await expect(rightRow).toBeVisible();
+      await page.waitForSelector("[data-testid='hero-phase3']");
 
-      const leftBox = await leftRow.boundingBox();
-      const rightBox = await rightRow.boundingBox();
-      if (!leftBox || !rightBox) throw new Error("could not measure row bounding boxes");
-
-      // Centered stack: left and right rows have ~the same x. Asymmetric: they don't.
-      const centerLine = vp.width / 2;
-      const leftCenter = leftBox.x + leftBox.width / 2;
-      const rightCenter = rightBox.x + rightBox.width / 2;
+      const leftPadding = await page.locator("[data-row='break']").evaluate(
+        (el) => parseFloat(getComputedStyle(el as HTMLElement).paddingLeft)
+      );
+      const rightPadding = await page.locator("[data-row='prove']").evaluate(
+        (el) => parseFloat(getComputedStyle(el as HTMLElement).paddingRight)
+      );
 
       if (vp.asymmetric) {
-        // At ≥768, the BREAK row anchors left of center, PROVE row right of center.
-        expect(leftCenter).toBeLessThan(centerLine);
-        expect(rightCenter).toBeGreaterThan(centerLine);
+        // At ≥768px, .h-row.left/.right pick up clamp(0, 6vw, 48px) padding.
+        // At 768 viewport, 6vw = 46.08px. At 1280, capped at 48px.
+        expect(leftPadding).toBeGreaterThan(0);
+        expect(rightPadding).toBeGreaterThan(0);
       } else {
-        // Below 768, both rows are centered (within 4px tolerance for rounding).
-        expect(Math.abs(leftCenter - centerLine)).toBeLessThan(4);
-        expect(Math.abs(rightCenter - centerLine)).toBeLessThan(4);
+        // Below 768px, no asymmetric padding — rows are flex-centered.
+        expect(leftPadding).toBe(0);
+        expect(rightPadding).toBe(0);
       }
     });
   }
@@ -2091,13 +2252,15 @@ git add e2e/functional/hero-signal-noise-mobile.spec.ts
 git commit -m "test(e2e): hero-signal-noise mobile reflow at 375/414/768/1280
 
 Asserts (a) no horizontal overflow at any viewport, (b) BREAK/PROVE
-rows centered below 768px, asymmetric at ≥768px (spec §6 breakpoint
-table)."
+rows have asymmetric padding at ≥768px and zero padding below. Padding
+checked via getComputedStyle, not boundingBox geometry — flex items
+stretch to full parent width so bounding-box centers ≈ viewport center
+regardless of justify-content (Fix H1)."
 ```
 
 ---
 
-## Task 22: Add `e2e/functional/about-section-rewrite.spec.ts` (§8.2)
+## Task 23: Add `e2e/functional/about-section-rewrite.spec.ts` (§8.2)
 
 **Files:**
 - Create: `e2e/functional/about-section-rewrite.spec.ts`
@@ -2168,7 +2331,7 @@ git commit -m "test(e2e): about-section rewrite — cat-block + versioned badges
 
 ---
 
-## Task 23: Update visual-regression baselines at 375 / 768 / 1280 / 1920 (§8.3)
+## Task 24: Update visual-regression baselines at 375 / 768 / 1280 / 1920 (§8.3)
 
 Generate new baselines for the homepage at the four viewports. Manual review required before commit.
 
@@ -2209,13 +2372,23 @@ for (const vp of VIEWPORTS) {
 }
 ```
 
-- [ ] **Step 3: Generate baselines**
+- [ ] **Step 3: Generate baselines via the Docker-pinned script**
+
+Visual baselines must be generated in the project's pinned Docker image (matches CI's font fallback chain) so they're reproducible. Use the existing script:
 
 ```bash
-npx playwright test e2e/visual/homepage.visual.spec.ts --update-snapshots=missing 2>&1 | tail -10
+npm run test:e2e:update-baselines
 ```
 
-Expected: new `.png` files written under the snapshots directory. They'll be missing the first time — running the command creates them.
+This script invokes `playwright.visual.config.ts` and runs visual tests inside the pinned Docker image. The first run with a missing baseline writes it; subsequent runs diff against it.
+
+If the script does not exist in `package.json`, add it:
+
+```json
+"test:e2e:update-baselines": "docker run --rm -v $(pwd):/work -w /work mcr.microsoft.com/playwright:v1.58.0-jammy npx playwright test --config playwright.visual.config.ts --update-snapshots=missing"
+```
+
+Note: the exact Docker image and version must match the project's existing visual-test convention. Inspect `playwright.visual.config.ts` for the canonical image tag and use that.
 
 - [ ] **Step 4: Manual review (required)**
 
@@ -2227,13 +2400,15 @@ Open each generated `.png`. Verify each viewport renders the expected layout (as
 git add e2e/visual/homepage.visual.spec.ts e2e/visual/homepage.visual.spec.ts-snapshots/
 git commit -m "test(visual): add homepage baselines at 375/768/1280/1920
 
-Uses prepareContext({freezeClock: true}) for deterministic IdStrip clock
-+ stable cursor-blink phase. Reviewed manually before commit."
+Generated via npm run test:e2e:update-baselines (Docker-pinned image
+matching playwright.visual.config.ts). Uses prepareContext({freezeClock:
+true}) for deterministic IdStrip clock + stable cursor-blink phase.
+Reviewed manually before commit (Fix H4)."
 ```
 
 ---
 
-## Task 24: Run full test suite, smoke the dev server, prepare PR (§9 step 8-10)
+## Task 25: Run full test suite, smoke the dev server, prepare PR (§9 step 8-10)
 
 - [ ] **Step 1: Run all unit tests**
 
@@ -2257,7 +2432,7 @@ Expected: all green. Pay special attention to existing `hero-cascade.spec.ts`, `
 npx playwright test --project=visual 2>&1 | tail -10
 ```
 
-Expected: all green (after Task 23 baselines committed).
+Expected: all green (after Task 24 baselines committed).
 
 - [ ] **Step 4: Smoke the dev server manually**
 
@@ -2327,28 +2502,50 @@ git push
 
 ## Self-Review
 
-After completing all 24 tasks, run the following self-review against the spec:
+After completing all 25 tasks, run the following self-review against the spec:
 
 **1. Spec coverage:**
-- §1 in-scope items: feature folder ✓ (T-1), 5 components ✓ (T-8/9/10/11/12), AboutSection rewrite ✓ (T-14/15/16), Index.tsx wiring ✓ (T-13), CSS additions ✓ (T-2/3/4/5), mobile reflow ✓ (T-5+T-21), Playwright e2e ✓ (T-20/21/22), Vitest ✓ (T-9/10/12/17), visual baselines ✓ (T-23), fixture extension ✓ (T-18).
+- §1 in-scope items: feature folder ✓ (T-1), 5 components ✓ (T-8/9/10/11/12), AboutSection rewrite ✓ (T-15/16/17), Index.tsx wiring ✓ (T-13), spec-selector migration ✓ (T-14), CSS additions ✓ (T-2/3/4/5), mobile reflow ✓ (T-5+T-22), Playwright e2e ✓ (T-21/22/23), Vitest ✓ (T-9/10/12/18), visual baselines ✓ (T-24), fixture extension ✓ (T-19).
 - §3 component list: HeroSignalNoise (T-12), HeroChrome (T-11), HudBrackets (T-8), DataColumn (T-9), IdStrip (T-10) — all 5 covered.
 - §4.2 new classes/keyframes: every row in the table is created across T-2 (keyframes), T-3 (chrome), T-4 (data column + id-strip), T-5 (cat-block + tools-grid + hero-h).
 - §5.4 preserved behaviors table: every row maps to a "stays in Index.tsx" or "moves with JSX" decision honored in T-13.
-- §6 breakpoint table: T-5 sets the CSS, T-21 verifies via e2e.
-- §7.2 / §7.3 about rewrite: covered by T-14/15/16 + T-17 + T-22.
-- §8 testing plan: T-18 (fixture), T-19 (TZ), T-20/21/22 (e2e), T-23 (visual), unit tests embedded in T-6/7/9/10/12/17.
-- §11 open questions: 11.1 inert prop covered by T-12 test + T-20 e2e; 11.2 version rot is documented as out-of-scope; 11.3 fixture compat handled in T-18; 11.4 perf is monitoring-only; 11.5 resize-during-cascade is documented as accepted edge case.
+- §6 breakpoint table: T-5 sets the CSS, T-22 verifies via e2e.
+- §7.2 / §7.3 about rewrite: covered by T-15/16/17 + T-18 + T-23.
+- §8 testing plan: T-19 (fixture), T-20 (browser timezoneId), T-21/22/23 (e2e), T-24 (visual), unit tests embedded in T-6/7/9/10/12/18.
+- §8.5 must-stay-green specs: T-14 migrates `hero-cascade.spec.ts`, `hero-skip-and-badge.spec.ts`, `hero-focus-management.spec.ts` to the new selectors before T-25's full-suite run.
+- §11 open questions: 11.1 inert prop covered by T-12 test + T-21 e2e; 11.2 version rot is documented inline via TODO comment in T-15; 11.3 fixture compat handled in T-19; 11.4 perf is monitoring-only; 11.5 resize-during-cascade is documented as accepted edge case.
 
 **2. Placeholder scan:**
-- Searched the plan for "TBD", "TODO", "fill in", "similar to", "appropriate". Result: only legitimate ones (the `// TODO(piotr, #N)` example in §11.2 of the spec, which is itself the resolution of a finding, not a placeholder).
+- Searched the plan for "TBD", "TODO", "fill in", "similar to", "appropriate". Result: only legitimate ones (the `// TODO(piotr): refresh tool versions quarterly` line added per Fix L2, which is itself a resolution of a finding, not a placeholder).
 
 **3. Type consistency:**
-- `viewProjectsRef: RefObject<HTMLAnchorElement>` consistent across T-12 (component def) and T-13 (parent passes the same ref).
-- `ToolEntry { name: string; version: string | null }` consistent across T-14 (data.ts) and T-15 (ToolBadges).
+- `viewProjectsRef: RefObject<HTMLAnchorElement | null>` consistent across T-12 (component def) and T-13 (parent passes the same ref). `RefObject<T | null>` matches what `useRef<T>(null)` produces (Fix C4).
+- `ToolEntry { name: string; version: string | null }` consistent across T-15 (data.ts) and T-16 (ToolBadges).
 - `useMotionPolicy()` return shape `{ tier, prefersReducedMotion, animationsDisabled }` matches the production source.
 - `phase: number`, `animationsDisabled: boolean`, `prefersReducedMotion: boolean` consistent across T-12 and T-13.
 
+**4. Out of scope:**
+- §9 step 10 (merge to main / Vercel auto-deploy) is intentionally outside plan scope — handled by PR review and Vercel CI after the plan completes.
+
 No issues found.
+
+---
+
+## Resolutions Applied in Rev 2
+
+Five changes are load-bearing enough to call out:
+
+1. **BUILD IT row LetterReveal restored.** Rev 1's T-12 silently dropped `<LetterReveal text="BUILD IT">` and replaced it with a static `<span>`, violating spec §5.2. Rev 2 restores the per-letter reveal and adds a Vitest assertion that catches future regressions (Fix C1).
+
+2. **T-12 made self-contained; T-13 no longer mutates HeroSignalNoise.tsx.** Rev 1's T-13 included a "Sub-task: extend HeroSignalNoise to render terminal line" that mutated T-12's output file with no test coverage. Rev 2 folds the terminal-line LetterReveal into T-12 with its own test; T-13 is now Index.tsx-only (Fix C2).
+
+3. **New task added: migrate existing functional specs to new selectors.** Rev 1 didn't account for `e2e/functional/hero-cascade.spec.ts`, `hero-skip-and-badge.spec.ts`, `hero-focus-management.spec.ts` using selectors (`h1.font-display`, `aria-label="BUILD IT"`) that the new HeroSignalNoise breaks. Rev 2 adds a new task (renumbered T-14, prior T-14..T-24 shifted by +1) to migrate them before the full-suite run (Fix C3).
+
+4. **`viewProjectsRef` typed correctly.** `RefObject<HTMLAnchorElement>` is incompatible with React 18's `useRef<HTMLAnchorElement>(null)` which returns `RefObject<HTMLAnchorElement | null>`. Rev 2 corrects the prop type (Fix C4).
+
+5. **Browser timezone + visual-config fixes.** Rev 1's T-19 set `process.env.TZ='UTC'` (Node-only — doesn't reach Chromium); T-23 invoked the wrong Playwright config. Rev 2 uses Playwright's `contextOptions.timezoneId` for the BROWSER timezone and routes visual baselines through the existing Docker-pinned `test:e2e:update-baselines` script (Fixes H3, H4).
+
+Two pattern-graduation candidates surfaced during adversarial review (env-leak fixes and forward-reference rot in TDD task pairs). Both are graduation-eligible at n=3 and tracked for absorption into workspace rules after the implementation lands.
 
 ---
 
