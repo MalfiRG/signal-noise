@@ -1027,3 +1027,38 @@ code[class*="language-"] span::selection {
   0%, 50%   { opacity: 1; }
   51%, 100% { opacity: 0; }
 }
+
+/* SIGNAL_NOISE port — HUD chrome (spec §4.2) */
+.grid-tex {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 11;
+  background-image:
+    linear-gradient(hsl(var(--primary) / 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--primary) / 0.025) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 30%, transparent 90%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 30%, transparent 90%);
+}
+
+@media (max-width: 767px) {
+  .grid-tex { background-size: 40px 40px; }
+}
+
+.hud-bracket {
+  position: fixed;
+  width: 28px;
+  height: 28px;
+  border-color: hsl(var(--primary) / 0.5);
+  z-index: 12;
+  pointer-events: none;
+}
+.hud-bracket.tl { top: 76px;    left: 16px;   border-top: 1px solid;    border-left: 1px solid; }
+.hud-bracket.tr { top: 76px;    right: 16px;  border-top: 1px solid;    border-right: 1px solid; }
+.hud-bracket.bl { bottom: 16px; left: 16px;   border-bottom: 1px solid; border-left: 1px solid; }
+.hud-bracket.br { bottom: 16px; right: 16px;  border-bottom: 1px solid; border-right: 1px solid; }
+
+@media (max-width: 640px) {
+  .hud-bracket { width: 18px; height: 18px; }
+}
