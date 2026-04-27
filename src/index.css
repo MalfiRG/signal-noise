@@ -1016,3 +1016,14 @@ code[class*="language-"] span::selection {
     transition: none !important;
   }
 }
+
+/* SIGNAL_NOISE port — keyframes added 2026-04-27 (spec §4.2) */
+@keyframes dc-scroll {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-50%); }
+}
+
+@keyframes cursor-blink {
+  0%, 50%   { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
