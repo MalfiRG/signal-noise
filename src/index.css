@@ -1231,11 +1231,17 @@ code[class*="language-"] span::selection {
   .hero-h .h-row.left  {
     justify-content: flex-start;
     padding-left: clamp(0px, 4vw, 48px);
-    margin-left: clamp(-160px, -8vw, 0px);
   }
   .hero-h .h-row.right {
     justify-content: flex-end;
     padding-right: 0;
-    margin-right: clamp(-160px, -8vw, 0px);
   }
+}
+
+/* Asymmetric negative-margin stagger only kicks in when the viewport is
+   comfortably wider than the 960px hero container — otherwise rows clip
+   off the viewport edge on phone-landscape and small tablets. */
+@media (min-width: 1280px) {
+  .hero-h .h-row.left  { margin-left:  clamp(-120px, -6vw, 0px); }
+  .hero-h .h-row.right { margin-right: clamp(-120px, -6vw, 0px); }
 }
