@@ -490,6 +490,7 @@ Reduced-motion (`prefers-reduced-motion: reduce`) compresses to 100/600/1200ms w
 - **DESIGN.md convention:** Google Stitch / VoltAgent collection (https://github.com/VoltAgent/awesome-design-md)
 - **WCAG 2.5.8 touch targets:** 44×44px minimum, met across all interactive elements
 - **Cyberpunk 2077 palette grammar:** yellow + orange + cyan canonical, on near-black backgrounds
+- **Stitch lint validation:** `npx --yes @google/design.md lint DESIGN.md` — runs against the alpha spec. Acceptable warnings: section-order on extensions (Motion, References), orphaned-tokens on body-level color tokens. See spec at https://github.com/google-labs-code/design.md.
 
 ---
 
