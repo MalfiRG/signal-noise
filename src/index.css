@@ -506,13 +506,21 @@
     border-color: hsl(30 10% 78%);
   }
 
+  /* Code-block bg in reading mode must match the .code-block-wrapper inline
+     style (#2d2d2d in CodeBlock.tsx). Earlier hsl(220 13% 15%) (=#21252b)
+     created a tonal seam — <code> bg sat ~5L darker than wrapper bg, and
+     because <code> renders display:inline with white-space:pre, each
+     visual line showed its darker patch behind the text while the
+     wrapper's lighter bg framed it on the sides. Same visual fingerprint
+     as a per-line pill regression; structurally a different cause (bg
+     mismatch, not border leak). Unify the value to eliminate the seam. */
   .theme-reading .markdown-body pre[class*="language-"] {
-    background: hsl(220 13% 15%) !important;
+    background: #2d2d2d !important;
     border: 1px solid hsl(220 10% 25%);
     border-radius: 0.5rem;
   }
   .theme-reading .markdown-body code[class*="language-"] {
-    background: hsl(220 13% 15%) !important;
+    background: #2d2d2d !important;
     color: hsl(220 15% 85%) !important;
   }
 
@@ -1015,4 +1023,244 @@ code[class*="language-"] span::selection {
   .nav-link-motion::after {
     transition: none !important;
   }
+}
+
+/* SIGNAL_NOISE port — keyframes added 2026-04-27 (spec §4.2) */
+@keyframes dc-scroll {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-50%); }
+}
+
+@keyframes cursor-blink {
+  0%, 50%   { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* SIGNAL_NOISE port — HUD chrome (spec §4.2) */
+.grid-tex {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 11;
+  background-image:
+    linear-gradient(hsl(var(--primary) / 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--primary) / 0.025) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 30%, transparent 90%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 30%, transparent 90%);
+}
+
+@media (max-width: 767px) {
+  .grid-tex { background-size: 40px 40px; }
+}
+
+.hud-bracket {
+  position: fixed;
+  width: 28px;
+  height: 28px;
+  border-color: hsl(var(--primary) / 0.5);
+  z-index: 12;
+  pointer-events: none;
+}
+.hud-bracket.tl { top: 76px;    left: 16px;   border-top: 1px solid;    border-left: 1px solid; }
+.hud-bracket.tr { top: 76px;    right: 16px;  border-top: 1px solid;    border-right: 1px solid; }
+.hud-bracket.bl { bottom: 16px; left: 16px;   border-bottom: 1px solid; border-left: 1px solid; }
+.hud-bracket.br { bottom: 16px; right: 16px;  border-bottom: 1px solid; border-right: 1px solid; }
+
+@media (max-width: 640px) {
+  .hud-bracket { width: 18px; height: 18px; }
+}
+
+/* SIGNAL_NOISE port — data column + id-strip (spec §3.4, §3.5, §4.2) */
+.data-column {
+  position: fixed;
+  top: 64px;
+  bottom: 0;
+  right: 12px;
+  width: 18px;
+  z-index: 13;
+  pointer-events: none;
+  overflow: hidden;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  color: hsl(var(--accent) / 0.35);
+  text-shadow: 0 0 6px hsl(var(--accent) / 0.4);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 15%, #000 85%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 15%, #000 85%, transparent 100%);
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .data-column { display: block; }
+}
+
+.data-column .dc-track {
+  display: block;
+  animation: dc-scroll 26s linear infinite;
+  white-space: pre;
+  text-align: center;
+}
+
+.data-column.motion-disabled .dc-track { animation: none; }
+
+.id-strip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: hsl(var(--muted-foreground));
+  margin: 0 0 28px 0;
+  padding: 6px 14px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 2px;
+  background: hsl(var(--card) / 0.4);
+  flex-wrap: wrap;
+}
+
+@media (max-width: 480px) {
+  .id-strip {
+    font-size: 8px;
+    gap: 6px;
+    letter-spacing: 0.12em;
+    padding: 5px 8px;
+  }
+  .id-strip .seg { margin: 0 1px; }
+}
+
+.id-strip .seg { color: hsl(var(--foreground) / 0.75); margin: 0 4px; }
+.id-strip .seg b { color: hsl(var(--primary)); font-weight: normal; text-shadow: 0 0 6px hsl(var(--primary) / 0.4); }
+.id-strip .div { color: hsl(var(--border)); }
+
+.id-strip .pulse {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: hsl(var(--primary));
+  box-shadow: 0 0 6px hsl(var(--primary) / 0.6);
+  margin-right: 4px;
+  animation: cursor-blink 1s steps(2, end) infinite;
+}
+.id-strip.motion-disabled .pulse { animation: none; opacity: 1; }
+
+/* SIGNAL_NOISE port — cat-block bio + tools grid + ascii-div (spec §4.2, §7) */
+.cat-block {
+  border: 1px solid hsl(var(--border));
+  border-left: 2px solid hsl(var(--primary) / 0.5);
+  background: hsl(var(--card) / 0.4);
+  padding: 16px 18px 8px;
+  border-radius: 2px;
+  position: relative;
+}
+
+.cat-block .cat-head {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  color: hsl(var(--muted-foreground));
+  margin: 0 0 14px 0;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.cat-block .cat-head .pmt  { color: hsl(var(--primary)); }
+.cat-block .cat-head .file { color: hsl(var(--accent)); }
+.cat-block .cat-head .meta { margin-left: auto; color: hsl(var(--foreground) / 0.4); font-size: 10px; }
+
+.cat-block .row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.cursor-blink::after {
+  content: '▊';
+  font-family: 'Share Tech Mono', monospace;
+  color: hsl(var(--primary));
+  margin-left: 4px;
+  animation: cursor-blink 1s steps(2, end) infinite;
+  text-shadow: 0 0 6px hsl(var(--primary) / 0.6);
+}
+.cat-block.motion-disabled .cursor-blink::after { animation: none; opacity: 1; }
+
+.tools-grid h4 {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: hsl(var(--accent));
+  margin: 12px 0 4px;
+  text-transform: uppercase;
+}
+
+.badge {
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--card) / 0.4);
+  padding: 2px 7px;
+  border-radius: 2px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  color: hsl(var(--foreground) / 0.85);
+  display: inline-flex;
+  gap: 4px;
+}
+.badge .ver { color: hsl(var(--primary) / 0.6); }
+.badge:hover { border-color: hsl(var(--primary)); color: hsl(var(--primary)); }
+.badge:hover .ver { color: hsl(var(--primary) / 0.9); }
+
+.ascii-div {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  color: hsl(var(--border));
+  letter-spacing: 0;
+  line-height: 1;
+  margin-top: 32px;
+  text-align: center;
+  white-space: pre-wrap;
+}
+.ascii-div .tag { color: hsl(var(--accent) / 0.4); margin: 0 8px; }
+
+/* SIGNAL_NOISE port — hero headline rows (spec §4.3) */
+.hero-h {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 18px;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
+  color: hsl(var(--foreground));
+  text-shadow: var(--matrix-text-glow);
+  font-size: clamp(56px, 9vw, 112px);
+  line-height: 1;
+  letter-spacing: 0.02em;
+  padding-top: 8px;
+}
+
+@media (min-width: 768px) { .hero-h { gap: 22px; } }
+
+.hero-h .h-row { display: flex; white-space: nowrap; }
+.hero-h .h-row.center { justify-content: center; }
+.hero-h .h-row.left,
+.hero-h .h-row.right { justify-content: center; }
+
+@media (min-width: 768px) {
+  .hero-h .h-row.left  {
+    justify-content: flex-start;
+    padding-left: clamp(0px, 4vw, 48px);
+  }
+  .hero-h .h-row.right {
+    justify-content: flex-end;
+    padding-right: 0;
+  }
+}
+
+/* Asymmetric negative-margin stagger only kicks in when the viewport is
+   comfortably wider than the 960px hero container — otherwise rows clip
+   off the viewport edge on phone-landscape and small tablets. */
+@media (min-width: 1280px) {
+  .hero-h .h-row.left  { margin-left:  clamp(-120px, -6vw, 0px); }
+  .hero-h .h-row.right { margin-right: clamp(-120px, -6vw, 0px); }
 }

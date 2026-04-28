@@ -1,11 +1,78 @@
 import { Github, Linkedin } from "lucide-react";
+import { motion } from "framer-motion";
 import ToolBadges from "./ToolBadges";
 import { introText, socialLinks } from "./data";
+import { useItemVariant, useMotionPolicy } from "@/lib/motion";
+
+const desktopStagger = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.5, delayChildren: 0.3 } },
+};
+
+const PANEL_CLASS =
+  "border border-border bg-card/50 p-6 hover:border-primary/50 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/15 transition-all duration-200 group neon-border-trace";
 
 const AboutSection = () => {
+  const { animationsDisabled } = useMotionPolicy();
+  const itemVariant = useItemVariant();
+  const lastBioIndex = introText.bio.length - 1;
+
+  const profilePanel = (
+    <div className={PANEL_CLASS}>
+      <div className={`cat-block space-y-3${animationsDisabled ? " motion-disabled" : ""}`}>
+        <p className="cat-head">
+          <span className="pmt">$</span>
+          <span>cat</span>
+          <span className="file">~/profile.txt</span>
+          <span className="meta">— 1.2k // utf-8</span>
+        </p>
+
+        {introText.bio.map((paragraph, i) => (
+          <p
+            key={i}
+            className={`text-foreground/80 text-sm leading-relaxed${i === lastBioIndex ? " cursor-blink" : ""}`}
+          >
+            {paragraph}
+          </p>
+        ))}
+
+        <div className="flex gap-4 pt-4">
+          {socialLinks.map((link) => (
+            <a
+              key={link.label}
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground hover:text-primary transition-colors"
+              aria-label={link.label}
+            >
+              {link.icon === "github" ? (
+                <Github className="h-5 w-5" />
+              ) : (
+                <Linkedin className="h-5 w-5" />
+              )}
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  const toolkitPanel = (
+    <div className={PANEL_CLASS}>
+      <p className="cat-head mb-4">
+        <span className="pmt">$</span>
+        <span>ls</span>
+        <span className="file">~/toolkit/</span>
+        <span className="meta">— versioned</span>
+      </p>
+      <ToolBadges />
+    </div>
+  );
+
   return (
     <section className="flex items-center pt-8 pb-16 px-4">
-      <div className="container mx-auto max-w-4xl">
+      <div className="container mx-auto max-w-5xl">
         <div className="mb-12">
           <p className="text-muted-foreground text-xs tracking-[0.3em] mb-2">
             {introText.terminal}
@@ -15,44 +82,28 @@ const AboutSection = () => {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          <div className="space-y-4">
-            {introText.bio.map((paragraph, i) => (
-              <p
-                key={i}
-                className="text-foreground/80 text-sm leading-relaxed animate-fade-in opacity-0"
-                style={{ animationDelay: `${0.2 + i * 0.2}s` }}
-              >
-                {paragraph}
-              </p>
-            ))}
-
-            <div
-              className="flex gap-4 pt-4 animate-fade-in opacity-0"
-              style={{ animationDelay: "0.8s" }}
-            >
-              {socialLinks.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                  aria-label={link.label}
-                >
-                  {link.icon === "github" ? (
-                    <Github className="h-5 w-5" />
-                  ) : (
-                    <Linkedin className="h-5 w-5" />
-                  )}
-                </a>
-              ))}
-            </div>
+        {animationsDisabled ? (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>{profilePanel}</div>
+            <div>{toolkitPanel}</div>
           </div>
+        ) : (
+          <motion.div
+            className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+            variants={desktopStagger}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+          >
+            <motion.div variants={itemVariant}>{profilePanel}</motion.div>
+            <motion.div variants={itemVariant}>{toolkitPanel}</motion.div>
+          </motion.div>
+        )}
 
-          <div className="animate-fade-in opacity-0" style={{ animationDelay: "0.4s" }}>
-            <ToolBadges />
-          </div>
+        <div className="ascii-div" aria-hidden="true">
+          <span>──────────────────────────────────</span>
+          <span className="tag">// END_OF_FILE</span>
+          <span>──────────────────────────────────</span>
         </div>
       </div>
     </section>

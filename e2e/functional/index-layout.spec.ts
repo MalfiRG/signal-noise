@@ -18,7 +18,7 @@ test.describe("Index — About below fold", () => {
     await page.setViewportSize({ width: 1280, height: 720 });
     await page.goto("/");
 
-    await page.waitForSelector("h1.font-display");
+    await page.waitForSelector("h1.hero-h");
 
     const whoami = page.locator("text=whoami").first();
     const box = await whoami.boundingBox();
@@ -30,7 +30,7 @@ test.describe("Index — About below fold", () => {
   test("whoami is not visible without scrolling on mobile", async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto("/");
-    await page.waitForSelector("h1.font-display");
+    await page.waitForSelector("h1.hero-h");
 
     const whoami = page.locator("text=whoami").first();
     const box = await whoami.boundingBox();
@@ -41,7 +41,7 @@ test.describe("Index — About below fold", () => {
 
   test("whoami becomes visible after scrolling", async ({ page }) => {
     await page.goto("/");
-    await page.waitForSelector("h1.font-display");
+    await page.waitForSelector("h1.hero-h");
 
     await page.evaluate(() => window.scrollBy(0, window.innerHeight + 200));
     await page.waitForTimeout(500);
