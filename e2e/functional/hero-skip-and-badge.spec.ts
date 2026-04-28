@@ -113,6 +113,72 @@ test.describe("Hero sessionStorage round-trip (spec §5.6 + §5.9)", () => {
     await expect(page.locator('[data-testid="hero-phase3"]')).toBeVisible({ timeout: 2000 });
     await expect(page.getByRole("button", { name: /skip intro/i })).toHaveCount(0);
   });
+
+  // Regression: sessionStorage is per-tab. A fresh browser context (= new tab)
+  // must NOT inherit the flag and must show the cascade again.
+  test("fresh context (simulated new tab) replays the cascade", async ({ browser }) => {
+    // First context: complete cascade, persist flag
+    const ctx1 = await browser.newContext({ viewport: DESKTOP_VIEWPORT });
+    const page1 = await ctx1.newPage();
+    await page1.goto("/");
+    await page1.evaluate(() => { try { sessionStorage.clear(); } catch { /* noop */ } });
+    await page1.reload();
+    const skip1 = page1.getByRole("button", { name: /skip intro/i });
+    await expect(skip1).toBeVisible({ timeout: 4000 });
+    await skip1.click();
+    await expect(page1.locator('[data-testid="hero-phase3"]')).toBeVisible({ timeout: 2000 });
+    await ctx1.close();
+
+    // Second context = new tab: no shared sessionStorage; SKIP must reappear.
+    const ctx2 = await browser.newContext({ viewport: DESKTOP_VIEWPORT });
+    const page2 = await ctx2.newPage();
+    await page2.goto("/");
+    await expect(page2.getByRole("button", { name: /skip intro/i })).toBeVisible({ timeout: 4000 });
+    await ctx2.close();
+  });
+});
+
+test.describe("Hero scroll-to-explore arrow (regression: post-scroll fade)", () => {
+  // Regression guard: the ▼ SCROLL TO EXPLORE ▼ prompt must fade out once the
+  // user starts scrolling, otherwise it lingers on top of content. Bug origin:
+  // framer-motion variants set inline opacity that overrode Tailwind opacity-0
+  // until we split the scroll-fade onto an outer plain div wrapper.
+  for (const viewport of [
+    { width: 1280, height: 720, name: "desktop" },
+    { width: 414, height: 900, name: "mobile-portrait" },
+  ]) {
+    test(`arrow visible at top, hidden after scroll @ ${viewport.name}`, async ({ page }) => {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.goto("/");
+      // Pre-set the replay-skip flag so the page lands directly in phase 3
+      // regardless of viewport/UA-tier classification — the arrow's fade
+      // behavior is what's under test, not the cascade itself.
+      await page.evaluate(() => {
+        try { sessionStorage.setItem("hero-cascade-played", "1"); } catch { /* noop */ }
+      });
+      await page.reload();
+      await expect(page.locator('[data-testid="hero-phase3"]')).toBeVisible({ timeout: 4000 });
+
+      const arrow = page.getByText(/SCROLL TO EXPLORE/i).first();
+      await expect(arrow).toBeVisible({ timeout: 2000 });
+
+      // Read the wrapper that owns the scroll-fade transition (outer plain div).
+      const arrowWrapperOpacityBefore = await arrow.evaluate((el) => {
+        const wrapper = el.closest('[aria-hidden], .transition-opacity') as HTMLElement | null;
+        return wrapper ? Number(getComputedStyle(wrapper).opacity) : Number(getComputedStyle(el).opacity);
+      });
+      expect(arrowWrapperOpacityBefore).toBeGreaterThan(0.5);
+
+      await page.evaluate(() => window.scrollTo(0, 200));
+      await page.waitForTimeout(450); // 300ms transition + headroom
+
+      const arrowWrapperOpacityAfter = await arrow.evaluate((el) => {
+        const wrapper = el.closest('[aria-hidden], .transition-opacity') as HTMLElement | null;
+        return wrapper ? Number(getComputedStyle(wrapper).opacity) : Number(getComputedStyle(el).opacity);
+      });
+      expect(arrowWrapperOpacityAfter).toBeLessThan(0.05);
+    });
+  }
 });
 
 test.describe("Hero feedback badge (spec §5.7)", () => {
