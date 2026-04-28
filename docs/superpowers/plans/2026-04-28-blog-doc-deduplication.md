@@ -2,6 +2,23 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+**Status:** Rev 2 — post-adversarial-review (2026-04-28). Spec at Rev 2 commit `8e7ba04`.
+
+**Rev 2 changes (vs Rev 1 commit `7bfe172`):**
+- BLOCKING (plan-consistency reviewer): Task 6 Step 3 no longer creates a NEW `### Stagger variant selection` subsection in DESIGN.md §Motion (would have duplicated existing `### Subtle vs cyber stagger variants`). Now points to existing subsection.
+- HIGH: Wave 5 deletion scope expanded from 2 → 7 files (`memory/` actually has all 7 .md files, not 2 — adversarial reviewer caught this).
+- HIGH: Task 8 + Task 14 commit messages no longer contain literal `<KEEP|CUT>` / `<link to merged PR>` placeholders. Task 8 composes commit body from scenario-walk summary file; Task 14 captures PR URL into a variable with verification.
+- HIGH: Task 11 (motion-policy spec patches) moved from Wave 3 → Wave 1 sequencing per spec §3.2 "same/adjacent commit" timing rule. Header label preserved for cross-doc continuity; execution order: Tasks 1, 2, **11**, 3, 4, 5.
+- HIGH: Task 3 Step 3 self-check now distinguishes YAML-mirror entries from description-only `theme-dot` (10 YAML + 1 description-only = 11 prose).
+- MEDIUM: Pre-flight Step 7 added (capture pre-Wave-2 SHA for Task 13).
+- MEDIUM: Task 12 Step 5 CRLF loop no longer uses `cd .. ` inside loop (violated `submodule-cd-trap.md`).
+- MEDIUM: Task 12 Step 6 stray-branch audit added remote-branch loop (cited rule mandates both local + remote).
+- MEDIUM: Task 12 added Step 8 mechanical re-verification of AC#3-7 (schema/counts/line-targets) at gate level, not just task-end.
+- MEDIUM: Task 13 subagent type changed from `reviewer-consistency` → `general-purpose` (correct fit for adversarial scenario construction). Brief now includes the `subagent-output-ownership.md` verify-phase WROTE-log protocol.
+- MEDIUM: Recovery procedures section added (per-wave fix-forward vs revert decision tables).
+- LOW: Task 11 Step 3 misleading `replace_all` warning removed (verified the §7 substring is unique).
+- LOW: File Structure ARCHITECTURE.md delta corrected from -800/-1500 → -870/-1370 (matches spec §5.1 math).
+
 **Goal:** Migrate the blog's 6 architecture-tier docs to a single-source-of-truth architecture with role-based ownership, with DESIGN.md conforming to the Google Stitch DESIGN.md spec (alpha).
 
 **Architecture:** 5-wave plan across 2 repos. Waves 1-4 run in the `the-digital-matrix` submodule; Wave 5 in the outer MetaOrchestrator repo (delete + submodule-bump). Wave 1 (DESIGN.md + README.md) parallel-safe. Wave 2 (ARCHITECTURE.md) depends on Wave 1 target sections existing. Wave 3 (CLAUDE.md + spec line-patches) depends on Wave 2 stable. Wave 4 verification gate. Wave 5 separable.
@@ -19,7 +36,7 @@
 | File | Change | Net delta |
 |---|---|---|
 | `DESIGN.md` | Spec migration: YAML front matter + 8 canonical sections + 2 extensions | +200 to +400 words (absorbs migrated §12 entries) |
-| `ARCHITECTURE.md` | In-section trim (numbering frozen): §1, §5, §6, §12, §13 | -800 to -1,500 words |
+| `ARCHITECTURE.md` | In-section trim (numbering frozen): §1, §5, §6, §12, §13 | -870 to -1,370 words (per spec §5.1 sum: -200 + -250 + -150 + -300 to -800 + +30) |
 | `CLAUDE.md` | Slim: strip duplicated content, add routing manifest + Agent Prompt Guide | -1,000 to -1,300 words |
 | `README.md` | Expand: project pitch + Tech Stack table + Quick Start + Doc Map | +250 to +400 words |
 | `docs/superpowers/specs/2026-04-24-device-tier-motion-policy-design.md` | 2-line patch for renamed DESIGN.md sections | ~0 |
@@ -74,7 +91,7 @@ grep -rEn "ARCHITECTURE\.md §[0-9]+" the-digital-matrix/ --include="*.md" \
 wc -l /tmp/blog-doc-dedup/arch-refs-before.txt
 ```
 
-Expected: ~14-20 lines (one per anchor reference instance).
+Expected: **55-56 lines total** (the grep includes references inside the spec + plan we're authoring, which legitimately enumerate the numbering as part of migration framing). Of these, ~20 are inbound dependencies from external specs/plans that constrain the frozen-numbering rule (per spec §3.1). Either count is fine to stash — the post-edit diff (Wave 4 Step 2) checks identical-set, not specific count.
 
 - [ ] **Step 3: Stash DESIGN.md anchor list**
 
@@ -84,12 +101,12 @@ grep -rEn "DESIGN\.md §" the-digital-matrix/ --include="*.md" \
 cat /tmp/blog-doc-dedup/design-refs-before.txt
 ```
 
-Expected: 2 lines, both in `2026-04-24-device-tier-motion-policy-design.md` (lines 92 and 392).
+Expected: 2 lines (excluding self-references in the spec/plan), both in `2026-04-24-device-tier-motion-policy-design.md`. Line numbers will drift; the grep output captures whatever the current state is. Re-locate via grep at execution time, never trust line numbers as load-bearing.
 
-- [ ] **Step 4: Confirm zero memory/* references (final verification)**
+- [ ] **Step 4: Confirm zero memory/* references for ALL 7 files (final verification)**
 
 ```bash
-grep -rn "memory/architecture\|memory/design-system" \
+grep -rn "memory/\(architecture\|content-pipeline\|deployment\|design-system\|portfolio-reference\|project-owner\|tech-stack\)" \
   /mnt/c/Users/malfi/programming_projects/MetaOrchestrator/TechnicalBlog/ \
   --include="*.md" --include="*.json" --include="*.yml" --include="*.yaml" \
   --include="*.ts" --include="*.tsx" --include="*.js"
@@ -113,9 +130,20 @@ npx @google/design.md spec --format markdown 2>&1 | head -5
 
 Expected: prints the spec preamble. If "command not found" or install prompt — accept the install (it'll auto-install). If anything else fails, STOP and ask user.
 
+- [ ] **Step 7: Capture pre-Wave-2 SHA for the adversarial agent audit (Task 13)**
+
+```bash
+git -C the-digital-matrix rev-parse HEAD > /tmp/blog-doc-dedup/pre-wave2-sha.txt
+echo "Pre-Wave-2 SHA captured: $(cat /tmp/blog-doc-dedup/pre-wave2-sha.txt)"
+```
+
+Task 13 reads this file via `git show $(cat /tmp/blog-doc-dedup/pre-wave2-sha.txt):ARCHITECTURE.md` to compare the original §12 against the trimmed version. If this step is skipped, Task 13 has no anchor to compare against.
+
 ---
 
-## Wave 1: DESIGN.md spec migration + README.md expansion (parallel-safe)
+## Wave 1: DESIGN.md spec migration + README.md expansion + motion-policy spec patches (parallel-safe within wave; Task 11 sequenced after Task 2)
+
+**REV 2 NOTE:** Per spec §3.2 timing rule, **Task 11 (motion-policy spec patches) runs in Wave 1, immediately after Task 2 commits**. The header listing it under "Wave 3" is a structural artifact preserved for cross-doc continuity — actual execution order: Tasks 1, 2, **11**, 3, 4, 5.
 
 ### Task 1: Add YAML front matter to DESIGN.md
 
@@ -599,23 +627,32 @@ transition-all btn-interactive glitch-hover
 Border tints to primary/50; text brightens from muted-foreground to foreground.
 ```
 
-Repeat the pattern for: `nav-link`, `nav-link-active`, `card`, `theme-dot` (the corner-button pattern), `tab-active`, `tab-active-learning`, `code-block`.
+Repeat the pattern for: `nav-link`, `nav-link-active`, `card`, `tab-active`, `tab-active-learning`, `code-block`.
 
-The exact restructured text should match the YAML `components` map keys from Task 1's front matter — use the SAME names (e.g., `button-primary` not `Primary CTA Button`). Mismatch between YAML keys and prose `### <name>` headings will surface as Stitch lint warnings.
+**Theme dot / social icon NOT included as a YAML component entry.** The corner-button pattern is a borderless circular icon container with no foreground/background pair worth tokenizing — its primary properties (`rounded.full`, 44×44 touch target) are already covered by `rounded.full` in the YAML root. The current prose subsection `### Theme dot / social icon` from the original §4 stays in DESIGN.md as a `### theme-dot` description-only subsection (no YAML mirror) — the Stitch spec allows prose subsections without YAML entries.
 
-- [ ] **Step 3: Verify component count matches YAML**
+The exact restructured text should match the YAML `components` map keys from Task 1's front matter — use the SAME names (e.g., `button-primary` not `Primary CTA Button`). Mismatch between YAML keys and prose `### <name>` headings (excluding the description-only `### theme-dot`) will surface as Stitch lint warnings.
+
+- [ ] **Step 3: Verify component count matches YAML (excluding the description-only `theme-dot`)**
 
 ```bash
-# Components in markdown
-grep -cE "^### [a-z-]+$" <(sed -n '/^## Components/,/^## /p' the-digital-matrix/DESIGN.md) || true
+# Components in markdown EXCLUDING theme-dot (which is description-only by design)
+prose_count=$(grep -cE "^### [a-z-]+$" <(sed -n '/^## Components/,/^## /p' the-digital-matrix/DESIGN.md) || echo 0)
+theme_dot_count=$(grep -cE "^### theme-dot$" <(sed -n '/^## Components/,/^## /p' the-digital-matrix/DESIGN.md) || echo 0)
+prose_yaml_eligible=$((prose_count - theme_dot_count))
+echo "Prose entries: $prose_count (of which $theme_dot_count is description-only theme-dot, so $prose_yaml_eligible should match YAML)"
 
 # Components in YAML
-grep -cE "^  [a-z-]+:" <(sed -n '/^components:/,/^---/p' the-digital-matrix/DESIGN.md) || true
+yaml_count=$(grep -cE "^  [a-z-]+:" <(sed -n '/^components:/,/^---/p' the-digital-matrix/DESIGN.md) || echo 0)
+echo "YAML entries: $yaml_count"
+
+# Assertion
+[ "$prose_yaml_eligible" = "$yaml_count" ] && echo "MATCH" || echo "MISMATCH — fix Task 3 step 2"
 ```
 
-These two numbers should be equal (one `###` heading per top-level component-entry in the YAML map). Variants like `button-primary-hover` count as separate entries on both sides.
+Expected: `MATCH`. If `MISMATCH`, the prose subsection count (excluding `theme-dot`) doesn't equal the YAML map count — review Task 3 step 2 prose for an extra/missing entry.
 
-Expected count: ~10 (button-primary, button-primary-hover, button-secondary, button-secondary-hover, card, nav-link, nav-link-active, tab-active, tab-active-learning, code-block — and theme-dot if you add it to the YAML).
+Expected absolute count: **10** YAML entries (`button-primary`, `button-primary-hover`, `button-secondary`, `button-secondary-hover`, `card`, `nav-link`, `nav-link-active`, `tab-active`, `tab-active-learning`, `code-block`) + **1** description-only prose entry (`theme-dot`). Total prose `###` count: **11**.
 
 - [ ] **Step 4: Run Stitch lint**
 
@@ -873,30 +910,39 @@ Color tokens live as HSL CSS custom properties on `:root` in `src/index.css`. `t
 
 ```
 
-- [ ] **Step 3: Trim ARCHITECTURE.md §6 — move "Why two stagger hooks?" rationale to DESIGN.md §Motion**
+- [ ] **Step 3: Trim ARCHITECTURE.md §6 "Why two stagger hooks?" — replace with pointer to existing DESIGN.md §Motion subsection**
 
-The current §6 has the paragraph at the end of `### Variant-selection hooks`:
+**REV 2 NOTE:** This step originally created a NEW `### Stagger variant selection` subsection in DESIGN.md §Motion. The plan-consistency adversarial review flagged this as BLOCKING — DESIGN.md §Motion ALREADY has a `### Subtle vs cyber stagger variants` subsection covering the exact same hooks/variants/rationale. Creating a new subsection would have introduced new intra-doc duplication while doing a deduplication migration. Updated step: do NOT create a new subsection; just replace the ARCHITECTURE.md paragraph with a pointer to the existing one.
+
+The current §6 has this paragraph at the end of `### Variant-selection hooks`:
 
 ```
 **Why two stagger hooks?** Hero already runs heavy entrance theater (`hero-glitch-entrance` + `hero-stamp-entrance`). The Phase 3 stagger should be **subtle** to not compete; cyber stagger would fight the headline. Other pages get the cyber variant for first-impression drama.
 ```
 
-This is semantic-tier rationale, not architectural. Move it to DESIGN.md §Motion.
+  a. Verify the existing destination subsection is present in DESIGN.md §Motion:
 
-  a. Read DESIGN.md §Motion to find the insertion point. The paragraph fits well after the easing-grammar table, before `### Hero cascade`.
-  b. Use Edit on DESIGN.md to INSERT the paragraph there, with a small adjustment to make it stand alone:
-
-```markdown
-### Stagger variant selection
-
-Two stagger variants ship — `staggerItem` (subtle vertical slide + blur) and `staggerItemCyber` (horizontal shift + brightness flash). The home-page hero's Phase 3 cascade (subtitle, buttons, scroll hint) uses the subtle variant via `useHeroStaggerVariant()` so it doesn't compete with the heavy headline theater above. Every other page uses the cyber variant via `useItemVariant()` for first-impression drama. Both hooks gracefully degrade to mobile-fallback (`staggerItemMobile`, opacity only) and reduced-motion (`reducedVariant`, instant).
-
+```bash
+grep -nA3 "^### Subtle vs cyber stagger variants" the-digital-matrix/DESIGN.md
 ```
 
-  c. Use Edit on ARCHITECTURE.md to DELETE the original `**Why two stagger hooks?**` paragraph and replace with:
+Expected: prints the heading + first 3 lines of body (the bullet list covering `staggerItem` and `staggerItemCyber`). If empty, STOP — the assumption that this subsection survived Wave 1 Task 2 has failed; re-check Task 2 step 9 ("Rename §7 'Motion Design' → 'Motion'") preserved the subsection.
+
+  b. Use Edit on ARCHITECTURE.md to REPLACE the original `**Why two stagger hooks?**` paragraph with:
+
 ```markdown
-**Stagger semantics:** `→ DESIGN.md §Motion / Stagger variant selection`. The hook indirection (which lives here as architecture) enforces mobile-fallback and reduced-motion handling — always use the hook, never import variants directly.
+**Stagger semantics:** `→ DESIGN.md §Motion / Subtle vs cyber stagger variants` covers the rationale (hero subtitle uses subtle variant so the Phase 3 cascade doesn't fight the headline theater above; other pages get the cyber variant for first-impression drama). The hook indirection (which lives here as architecture) enforces mobile-fallback and reduced-motion handling — always use the hook, never import variants directly.
 ```
+
+  c. **DO NOT EDIT DESIGN.md** in this step. The destination subsection already exists; no migration of new content is needed.
+
+  d. Verify the pointer is the only new line by re-grepping ARCHITECTURE.md for `Why two stagger hooks`:
+
+```bash
+grep -n "Why two stagger hooks" the-digital-matrix/ARCHITECTURE.md
+```
+
+Expected: empty (paragraph deleted).
 
 - [ ] **Step 4: Verify ARCHITECTURE.md numbering preserved**
 
@@ -943,18 +989,22 @@ Expected: empty (no diff). If diff: a numbered reference text changed. STOP and 
 head -1 the-digital-matrix/ARCHITECTURE.md | cat -A | grep -c '\^M\$' || true
 head -1 the-digital-matrix/DESIGN.md | cat -A | grep -c '\^M\$' || true
 
-git -C the-digital-matrix add ARCHITECTURE.md DESIGN.md
+git -C the-digital-matrix add ARCHITECTURE.md
 git -C the-digital-matrix commit -m "$(cat <<'EOF'
 docs(arch): trim §1, §5, §6 — point to canonical homes (README, DESIGN.md)
 
 §1 Tech stack table: 11 rows → 3 architectural-essentials rows + → README.md
-§5 Theme tokens: enumeration removed → § DESIGN.md §Colors pointer
-§6 "Why two stagger hooks?": rationale moved to DESIGN.md §Motion
+§5 Theme tokens: enumeration removed → → DESIGN.md §Colors pointer
+§6 "Why two stagger hooks?": replaced with → DESIGN.md §Motion /
+    Subtle vs cyber stagger variants pointer (existing subsection
+    already covers this rationale; no DESIGN.md edit required)
 
 Section numbering preserved (13 sections); anchor diff empty.
 EOF
 )"
 ```
+
+(REV 2 NOTE: previous version of this commit also added DESIGN.md to the staged set; updated to ARCHITECTURE.md only since Step 3 no longer edits DESIGN.md.)
 
 ---
 
@@ -1151,30 +1201,60 @@ diff /tmp/blog-doc-dedup/arch-refs-before.txt /tmp/blog-doc-dedup/arch-refs-mid-
 
 Expected: empty.
 
-- [ ] **Step 6: CRLF guard + commit**
+- [ ] **Step 6: CRLF guard**
 
 ```bash
 head -1 the-digital-matrix/ARCHITECTURE.md | cat -A | grep -c '\^M\$' || true
+```
 
+Expected: 0.
+
+- [ ] **Step 7: Compose commit message from scenario-walk results (NO PLACEHOLDERS)**
+
+Read the scenario-walk doc and extract each candidate's resolution:
+
+```bash
+grep -E "^## 12\.|^\*\*Resolution:" /tmp/blog-doc-dedup/scenario-walks.md
+```
+
+This prints the per-candidate `## 12.X ...` heading + its `**Resolution:** <decision>` line. Construct the commit message body from these lines — DO NOT paste literal `<KEEP|CUT>` placeholders into the commit body. If any candidate's `**Resolution:**` line is missing, STOP — Step 2 didn't complete; finish the scenario-walks first.
+
+Build the commit-body lines as concrete strings, e.g.:
+
+```
+- 12.6 BlogLayout max-w-6xl: KEEP (Scenario B: agent removes constraint without rationale)
+- 12.7 Frontmatter parser scope: CUT (TypeScript types document the supported subset)
+- 12.10 next-themes single-theme keep: KEEP (§5 alone insufficient — operator runtime context required)
+- 12.13 Mobile orb override: MIGRATE to DESIGN.md §Elevation & Depth (visual rationale only)
+```
+
+(These are EXAMPLES of valid commit-body lines, not pre-decided outcomes — your scenario-walks determine the actual decisions.)
+
+- [ ] **Step 8: Commit (with composed message)**
+
+```bash
 git -C the-digital-matrix add ARCHITECTURE.md DESIGN.md
-git -C the-digital-matrix commit -m "$(cat <<'EOF'
+git -C the-digital-matrix commit -m "$(cat <<EOF
 docs(arch): resolve §12 candidate entries via scenario-walk
 
 Per memory-injection-tiers.md "scenario-walk before commit" rule, each
 CUT/MIGRATE candidate from spec §6.3 was tested against ≥2 scenarios.
 
-Resolutions (recorded in /tmp/blog-doc-dedup/scenario-walks.md):
-- 12.6 BlogLayout max-w-6xl: <KEEP|CUT — fill in based on actual walk>
-- 12.7 Frontmatter parser scope: <KEEP|CUT>
-- 12.10 next-themes single-theme keep: <KEEP|CUT>
-- 12.13 Mobile orb override: <KEEP|MIGRATE to DESIGN.md §Elevation & Depth>
-
-§12 final entry count: <N>. Section numbering preserved.
+Resolutions (composed in Step 7 from scenario-walk summary):
 EOF
-)"
+)
+$(cat /tmp/blog-doc-dedup/scenario-walk-summary.txt)
+$(printf '\n§12 final entry count: %s. Section numbering preserved.' "$(grep -cE '^### ' <(sed -n '/^## 12\. Implementation Notes/,/^## 13\. References/p' the-digital-matrix/ARCHITECTURE.md))")
+"
 ```
 
-(Engineer: replace `<KEEP|CUT>` etc. with the actual scenario-walk results.)
+In Step 7, write the per-candidate resolution lines into `/tmp/blog-doc-dedup/scenario-walk-summary.txt` BEFORE running this commit. Verify no placeholder-leak before commit:
+
+```bash
+grep -nE '<(KEEP|CUT|MIGRATE)\|' .git/COMMIT_EDITMSG 2>/dev/null && echo "PLACEHOLDER LEAK — abort commit" || echo "Commit body clean"
+```
+
+Expected: `Commit body clean`.
 
 ---
 
@@ -1446,14 +1526,16 @@ EOF
 
 ---
 
-### Task 11: Patch 2 line-references in motion-policy spec
+### Task 11: Patch 2 §-references in motion-policy spec — RUN IN WAVE 1, NOT WAVE 3
+
+**REV 2 NOTE:** Per spec §3.2, this patch MUST land in the SAME Wave as the DESIGN.md rename (Task 2). Original plan placement under "Wave 3" left an 8-task window where every intermediate commit had broken inbound references. The header label below ("Wave 3") is preserved for cross-doc continuity but the task now runs in Wave 1 immediately after Task 2 commits. Recommended sequencing: Task 1 → Task 2 → **Task 11** → Task 3 → Task 4 → Task 5 → Wave 2.
 
 **Files:**
-- Modify: `the-digital-matrix/docs/superpowers/specs/2026-04-24-device-tier-motion-policy-design.md` (lines 92 and 392)
+- Modify: `the-digital-matrix/docs/superpowers/specs/2026-04-24-device-tier-motion-policy-design.md` (2 references; current line numbers ~92 and ~392 — re-grep at execution time)
 
 **Steps:**
 
-- [ ] **Step 1: Confirm line numbers**
+- [ ] **Step 1: Re-locate the references via grep (line numbers drift)**
 
 ```bash
 grep -n "DESIGN\.md §" the-digital-matrix/docs/superpowers/specs/2026-04-24-device-tier-motion-policy-design.md
@@ -1473,7 +1555,7 @@ Use Edit:
 - `old_string`: `DESIGN.md §7 callout writes`
 - `new_string`: `DESIGN.md §Motion callout writes`
 
-(There is also a "M4 DESIGN.md callout notation drift" finding referencing `§7` in the same spec — patch any other `DESIGN.md §7` occurrences via `replace_all` if Edit reports the string is non-unique.)
+(REV 2 NOTE: Verified at spec write time that `DESIGN.md §7 callout writes` is unique within this spec file — the "M4 DESIGN.md callout notation drift" entry is the SAME line, not a separate occurrence. Original plan suggested `replace_all` as a fallback; this is unnecessary since the string is unique. If Edit reports non-unique unexpectedly, re-grep to find the additional occurrence and disambiguate via surrounding context, but `replace_all` is not the recommended path.)
 
 - [ ] **Step 4: Verify the design-refs anchor diff matches expectation**
 
@@ -1529,7 +1611,7 @@ cd the-digital-matrix
 npx @google/design.md lint DESIGN.md 2>&1 | tee /tmp/blog-doc-dedup/stitch-lint-final.txt
 ```
 
-Pass criterion: 0 errors. Acceptable warnings: section-order on Motion+References extensions, orphaned-tokens on body-level color tokens, contrast-ratio on intentional-low-contrast pairs.
+Pass criterion: 0 errors. **Expected: 0 `section-order` warnings** (extensions Motion + References are placed AFTER §Do's and Don'ts per spec §4.3 — placement PREVENTS the warning, doesn't accept it). Acceptable warnings: orphaned-tokens on body-level color tokens; contrast-ratio on intentional-low-contrast pairs (body-level only). If `section-order` warnings appear, the placement is wrong — fix before commit.
 
 - [ ] **Step 2: ARCHITECTURE anchor stability**
 
@@ -1547,7 +1629,12 @@ Pass criterion: empty diff.
 diff /tmp/blog-doc-dedup/design-refs-before.txt /tmp/blog-doc-dedup/design-refs-after.txt
 ```
 
-Pass criterion: 2 line changes (`§1 → §Overview`, `§7 → §Motion`); no other diffs.
+Pass criterion: diff shows EXACTLY:
+- 2 lines MODIFIED in motion-policy spec (`§1 → §Overview`, `§7 → §Motion`)
+- ≥2 lines ADDED in ARCHITECTURE.md (Wave 2 added `→ DESIGN.md §Colors` from §5 trim and `→ DESIGN.md §Motion` from §6 trim, possibly `→ DESIGN.md §Components` / `→ DESIGN.md §Layout` from §12 migrations)
+- 0 lines REMOVED (the original 2 motion-policy refs are edits, not deletions)
+
+Any OTHER diff line (e.g., a §-anchored ref appearing/disappearing in an unrelated spec/plan) is unexpected — investigate before declaring this gate passed.
 
 - [ ] **Step 4: Word-count dedup proof**
 
@@ -1570,19 +1657,22 @@ Pass criteria:
 - DESIGN.md and README.md may grow.
 - Net inner-repo delta (sum of 4 files): ≥ 1,200 word reduction.
 
-- [ ] **Step 5: CRLF guard on all touched files**
+- [ ] **Step 5: CRLF guard on all touched files (no `cd ..` inside loop — violates `submodule-cd-trap.md`)**
 
 ```bash
-for f in DESIGN.md ARCHITECTURE.md CLAUDE.md README.md \
-         docs/superpowers/specs/2026-04-24-device-tier-motion-policy-design.md \
-         docs/superpowers/specs/2026-04-28-blog-doc-deduplication-design.md \
-         docs/superpowers/plans/2026-04-28-blog-doc-deduplication.md; do
-  cd the-digital-matrix
-  count=$(head -1 "$f" 2>/dev/null | cat -A | grep -c '\^M\$' || true)
+# Iterate without cd — use the-digital-matrix/ prefix on each path.
+# REV 2 NOTE: original Step 5 used `cd the-digital-matrix; ...; cd ..` inside a for-loop;
+# if any iteration fails before the cd .., subsequent iterations operate from wrong cwd.
+# Per ~/.claude/rules/submodule-cd-trap.md, use git -C / explicit paths instead.
+for rel in DESIGN.md ARCHITECTURE.md CLAUDE.md README.md \
+           docs/superpowers/specs/2026-04-24-device-tier-motion-policy-design.md \
+           docs/superpowers/specs/2026-04-28-blog-doc-deduplication-design.md \
+           docs/superpowers/plans/2026-04-28-blog-doc-deduplication.md; do
+  full="the-digital-matrix/$rel"
+  count=$(head -1 "$full" 2>/dev/null | cat -A | grep -c '\^M\$' || true)
   if [ "$count" != "0" ]; then
-    echo "CRLF FOUND in $f"
+    echo "CRLF FOUND in $rel"
   fi
-  cd ..
 done
 echo "CRLF guard complete"
 ```
@@ -1593,13 +1683,32 @@ Pass criterion: no `CRLF FOUND` lines printed.
 
 ```bash
 git -C the-digital-matrix fetch origin --prune
+
+# Local branches with commits not on main
+echo "=== Local branches ==="
 for b in $(git -C the-digital-matrix for-each-ref --format='%(refname:short)' refs/heads | grep -v '^main$'); do
+  n=$(git -C the-digital-matrix log main.."$b" --oneline 2>/dev/null | wc -l)
+  [ "$n" -gt 0 ] && echo "$b: $n unmerged commits"
+done
+
+# REV 2 NOTE: original step omitted the remote-branch loop. The cited
+# rule (~/.claude/rules/audit-stray-branches-before-main-clean.md) mandates
+# BOTH local AND remote iteration. Remote branches with PR drafts or
+# Dependabot-managed branches would be invisible to local-only audit.
+echo "=== Remote branches ==="
+for b in $(git -C the-digital-matrix for-each-ref --format='%(refname:short)' refs/remotes/origin | grep -v '^origin/HEAD\|^origin/main$'); do
   n=$(git -C the-digital-matrix log main.."$b" --oneline 2>/dev/null | wc -l)
   [ "$n" -gt 0 ] && echo "$b: $n unmerged commits"
 done
 ```
 
-Pass criterion: empty output (no stray branches with content that would resurrect deleted material). If any branches have unmerged commits, classify them per the rule.
+Pass criterion: any reported branch is classified per the rule's table:
+- Active feature, not yet ready → leave (tracked elsewhere)
+- Old experiment, abandoned → delete (`git branch -D` local, `git push origin :<branch>` remote)
+- Has fix commits that should be on main → cherry-pick or merge before continuing
+- Dependabot / Renovate branch → leave (bot-managed)
+
+If the middle two appear, classify and act before declaring this step passed.
 
 - [ ] **Step 7: Generate verification report**
 
@@ -1611,11 +1720,48 @@ Create `/tmp/blog-doc-dedup/verification-report.md` summarizing:
 - CRLF guard: PASS / FAIL
 - Stray-branch audit: PASS / FAIL
 
-If ANY pass criterion fails, STOP. Do not proceed to Task 13. Address the failure first.
+If ANY pass criterion fails, STOP. Do not proceed to Task 13. See "Recovery procedures" section at the end of this plan for fix-forward vs revert guidance.
 
-- [ ] **Step 8: Commit the verification report (referenced from spec, not committed itself — it's a /tmp artifact)**
+- [ ] **Step 8: Mechanical re-verification of spec §11.3 acceptance criteria (REV 2 ADDED)**
 
-No commit at this step. Verification proof lives ephemerally in `/tmp/blog-doc-dedup/`. The submodule's commit history serves as the durable record.
+The original Task 12 covered AC#1, #2, #9, #10, #11, #12, #13. This step adds mechanical checks for AC#3 (YAML schema), #4 (DESIGN.md section order), #5 (ARCH 13 sections), #6 (CLAUDE.md ≤120 lines), #7 (README ≥50 lines), #14 (heading-order recheck), #15 (ARCH-section-count recheck) — gate-level re-verification, not just task-end.
+
+```bash
+# AC#3 — DESIGN.md YAML schema fields present
+echo "=== AC#3: DESIGN.md YAML required fields ==="
+for field in "version: alpha" "name: Night City" "^colors:" "^typography:" "^components:"; do
+  count=$(grep -cE "^---|$field" the-digital-matrix/DESIGN.md)
+  echo "  '$field' present: $([ "$count" -ge 1 ] && echo PASS || echo FAIL)"
+done
+
+# AC#4 — DESIGN.md section order matches spec §4.1 canonical sequence
+echo "=== AC#4: DESIGN.md section order ==="
+expected_order="Overview Colors Typography Layout Elevation Shapes Components Do References"
+actual_order=$(grep -E "^## " the-digital-matrix/DESIGN.md | grep -oE "(Overview|Colors|Typography|Layout|Elevation|Shapes|Components|Do|Motion|References)" | head -10 | tr '\n' ' ')
+echo "  Expected order (canonical + Motion ext + References ext): $expected_order"
+echo "  Actual order: $actual_order"
+
+# AC#5 — ARCHITECTURE.md retains 13 numbered sections
+echo "=== AC#5: ARCHITECTURE.md section count ==="
+arch_count=$(grep -cE "^## [0-9]+\." the-digital-matrix/ARCHITECTURE.md)
+echo "  Numbered sections: $arch_count ($([ "$arch_count" = "13" ] && echo PASS || echo FAIL — expected 13))"
+
+# AC#6 — CLAUDE.md ≤120 lines
+echo "=== AC#6: CLAUDE.md line count ==="
+claude_lines=$(wc -l < the-digital-matrix/CLAUDE.md)
+echo "  Lines: $claude_lines ($([ "$claude_lines" -le 120 ] && echo PASS || echo FAIL — expected ≤120))"
+
+# AC#7 — README.md ≥50 lines
+echo "=== AC#7: README.md line count ==="
+readme_lines=$(wc -l < the-digital-matrix/README.md)
+echo "  Lines: $readme_lines ($([ "$readme_lines" -ge 50 ] && echo PASS || echo FAIL — expected ≥50))"
+```
+
+Pass criterion: every line ends with `PASS`. Any `FAIL` blocks Task 13.
+
+- [ ] **Step 9: Generate verification report (was Step 7)**
+
+Create `/tmp/blog-doc-dedup/verification-report.md` summarizing all results from Steps 1-8 + the previous Generate Verification Report step. The verification report itself lives in `/tmp` (not committed) — the submodule's commit history is the durable record.
 
 ---
 
@@ -1626,22 +1772,25 @@ No commit at this step. Verification proof lives ephemerally in `/tmp/blog-doc-d
 
 **Steps:**
 
-- [ ] **Step 1: Spawn `reviewer-consistency` agent for §12 audit**
+- [ ] **Step 1: Spawn `general-purpose` agent for §12 adversarial audit**
 
-Use the Agent tool with `subagent_type: reviewer-consistency`. Brief:
+**REV 2 NOTE:** Original plan used `subagent_type: reviewer-consistency`, but per spec §6.4 (and the plan-consistency reviewer's finding), `reviewer-consistency` is internal-coherence/AI-slop scanning — wrong fit for adversarial scenario construction. Use `general-purpose` with the explicit adversarial brief below.
+
+Use the Agent tool with `subagent_type: general-purpose`. Brief:
 
 ```
 Review the trimmed ARCHITECTURE.md §12 Implementation Notes against the
 original (pre-Wave-2 state) for behavior-changing rationale loss.
 
-Original §12: git show <pre-Wave-2 SHA>:ARCHITECTURE.md (read via git show)
-Trimmed §12: current ARCHITECTURE.md
-Migration destinations: DESIGN.md §Components / §Layout / (potentially §Elevation & Depth)
-Scenario-walk record: /tmp/blog-doc-dedup/scenario-walks.md (read this for the resolutions)
+Inputs:
+- Original §12: git -C the-digital-matrix show $(cat /tmp/blog-doc-dedup/pre-wave2-sha.txt):ARCHITECTURE.md
+- Trimmed §12: current ARCHITECTURE.md
+- Migration destinations: DESIGN.md §Components / §Layout (and possibly §Elevation & Depth or §Motion for 12.13)
+- Scenario-walk record: /tmp/blog-doc-dedup/scenario-walks.md (read for the per-candidate resolutions)
 
-For each entry that was CUT or MIGRATED, construct an adversarial scenario
-where an agent reading the trimmed version produces a DIFFERENT answer than
-an agent reading the original. Classify findings as:
+Task: For each entry that was CUT or MIGRATED, construct an adversarial scenario
+where an agent reading the trimmed version produces a DIFFERENT answer than an
+agent reading the original. Classify findings as:
 
 - BLOCKING: behavior-changing wrong answer (e.g., agent re-introduces
   aria-hidden over focusables because the rationale was trimmed)
@@ -1650,8 +1799,27 @@ an agent reading the original. Classify findings as:
 
 Output: severity-tagged findings table. Max 10 findings.
 
-Provenance invariant: the trimmed §12 was authored by the spawning agent
-in this same session. Treat it as third-party content for review purposes.
+PROVENANCE INVARIANT (per ~/.claude/rules/subagent-output-ownership.md):
+The trimmed §12 + scenario-walks doc were authored by the spawning agent in
+this same session. Treat them as third-party content for review purposes.
+
+VERIFY-PHASE PROTOCOL (mandatory):
+1. Emit a WROTE log line for every file you create or edit during this audit:
+     WROTE: <absolute-path>
+   (You should not be writing files at all — this audit is read-only — but if
+   you do, log it. Files matching paths the spawning agent already wrote in
+   this session are NOT yours; treat them as third-party.)
+2. Before narrating any file's content as a "finding", confirm via the WROTE
+   log that you did NOT author it in this audit session. Files in
+   the-digital-matrix/ are ALL third-party (the spawning agent's outputs);
+   you only authored your final findings table.
+3. Do NOT report a "confidence" rating on files you read but did not author —
+   confidence is a property of verification against an independent source,
+   not self-reading. Self-confidence is the failure mode that
+   subagent-output-ownership.md exists to prevent.
+
+Read-only — never edit files. Return findings; the curator (parent agent)
+applies fixes.
 ```
 
 Set `run_in_background: true` and continue with Step 2 while the agent works.
@@ -1700,44 +1868,60 @@ If BLOCKING findings caused re-introductions, those are separate commits already
 
 ```bash
 cd /mnt/c/Users/malfi/programming_projects/MetaOrchestrator
-grep -rn "memory/architecture\|memory/design-system" TechnicalBlog/ \
-  --include="*.md" --include="*.json" --include="*.yml" --include="*.yaml" \
+grep -rn "memory/\(architecture\|content-pipeline\|deployment\|design-system\|portfolio-reference\|project-owner\|tech-stack\)" \
+  TechnicalBlog/ --include="*.md" --include="*.json" --include="*.yml" --include="*.yaml" \
   --include="*.ts" --include="*.tsx" --include="*.js"
 ```
 
-Expected: empty.
+Expected: empty (no inbound references to any of the 7 files).
 
-- [ ] **Step 2: Confirm the files exist (we're about to delete)**
+- [ ] **Step 2: Confirm the 7 files exist (we're about to delete)**
 
 ```bash
-ls -la TechnicalBlog/technical-blog/memory/
+ls TechnicalBlog/technical-blog/memory/
 ```
 
-Expected: shows `architecture.md` and `design-system.md`. If files don't exist, someone else already cleaned them up — STOP and ask user.
+Expected exactly these 7 files:
+```
+architecture.md
+content-pipeline.md
+deployment.md
+design-system.md
+portfolio-reference.md
+project-owner.md
+tech-stack.md
+```
 
-- [ ] **Step 3: Delete the memory files**
+If MORE files exist than these 7: STOP. Spec inventory is incomplete; audit each new file against spec §1 staleness criteria before deleting the directory. If FEWER than 7: someone else partially cleaned up — STOP and ask user before proceeding (the partial state may indicate an in-flight migration we should not stomp).
+
+- [ ] **Step 3: Delete all 7 memory files**
 
 ```bash
 git -C /mnt/c/Users/malfi/programming_projects/MetaOrchestrator rm \
   TechnicalBlog/technical-blog/memory/architecture.md \
-  TechnicalBlog/technical-blog/memory/design-system.md
+  TechnicalBlog/technical-blog/memory/content-pipeline.md \
+  TechnicalBlog/technical-blog/memory/deployment.md \
+  TechnicalBlog/technical-blog/memory/design-system.md \
+  TechnicalBlog/technical-blog/memory/portfolio-reference.md \
+  TechnicalBlog/technical-blog/memory/project-owner.md \
+  TechnicalBlog/technical-blog/memory/tech-stack.md
 ```
 
-Use `git rm` (not `rm`) so the deletion is staged in git directly.
+Use `git rm` (not `rm`) so the deletions are staged in git directly.
 
-- [ ] **Step 4: Check if memory/ directory is now empty**
+- [ ] **Step 4: Confirm memory/ directory is now empty and remove it**
 
 ```bash
 ls -la TechnicalBlog/technical-blog/memory/ 2>&1
 ```
 
-If empty (only `.` and `..`): remove the directory:
+Expected: only `.` and `..` (directory empty). If unexpected file appears, investigate before proceeding to rmdir.
 
 ```bash
 rmdir TechnicalBlog/technical-blog/memory/
 ```
 
-If other files remain: leave the directory.
+The empty-directory removal is itself a tracked change in the outer repo (git tracks file deletions, not directory existence — but no longer staging the directory cleans up tooling cruft).
 
 - [ ] **Step 5: Update submodule pointer**
 
@@ -1772,45 +1956,147 @@ git status
 
 Expected staged changes:
 - `D TechnicalBlog/technical-blog/memory/architecture.md`
+- `D TechnicalBlog/technical-blog/memory/content-pipeline.md`
+- `D TechnicalBlog/technical-blog/memory/deployment.md`
 - `D TechnicalBlog/technical-blog/memory/design-system.md`
+- `D TechnicalBlog/technical-blog/memory/portfolio-reference.md`
+- `D TechnicalBlog/technical-blog/memory/project-owner.md`
+- `D TechnicalBlog/technical-blog/memory/tech-stack.md`
 - `M TechnicalBlog/technical-blog/the-digital-matrix` (submodule)
 
 - [ ] **Step 7: Final CRLF guard (outer repo — should be clean since we only deleted)**
 
 No CRLF check needed for deletions.
 
-- [ ] **Step 8: Commit**
+- [ ] **Step 8a: Capture submodule PR URL into a variable**
+
+```bash
+# Inner PR's URL (from the GitHub PR page after Wave 1-4 PR merges):
+SUBMODULE_PR_URL="<paste-actual-merged-PR-URL-here>"
+
+# Verify variable is set and not the placeholder:
+case "$SUBMODULE_PR_URL" in
+  *"<paste-actual"*|"") echo "ERROR: SUBMODULE_PR_URL not set"; exit 1 ;;
+  *) echo "PR URL: $SUBMODULE_PR_URL" ;;
+esac
+```
+
+If the verify step fails, STOP and obtain the URL before proceeding.
+
+- [ ] **Step 8b: Commit using the captured URL (no placeholders in commit body)**
 
 ```bash
 git add TechnicalBlog/technical-blog/the-digital-matrix
 # memory/* deletions are already staged via git rm in Step 3
 
-git commit -m "$(cat <<'EOF'
+git commit -m "$(cat <<EOF
 docs(blog): delete stale memory/* mirrors + bump submodule pointer
 
 Wave 5 of the doc-dedup migration — outer-repo half.
 
-Deletes:
-- TechnicalBlog/technical-blog/memory/architecture.md (stale; described
-  wouter/MatrixRain/LanguageProvider — none in current code)
-- TechnicalBlog/technical-blog/memory/design-system.md (stale; described
-  green Matrix palette replaced by Night City)
+Deletes all 7 files in TechnicalBlog/technical-blog/memory/:
+- architecture.md (stale; described wouter/MatrixRain/LanguageProvider)
+- content-pipeline.md (uses DEPRECATED labeled-callout convention)
+- deployment.md (Vite port 5173, Docker+Nginx alt-deploy not in code)
+- design-system.md (OLD green Matrix palette)
+- portfolio-reference.md (documents original fork-source dar-kow/Portfolio)
+- project-owner.md (violates [redacted-employer]-obfuscation rule + stale)
+- tech-stack.md (Wouter/Vite 6/shared/components/ui — none in code)
 
-Verified zero inbound references via grep across .md/.ts/.tsx/.js/.json/.yml/.yaml
-in TechnicalBlog/. Files described a different codebase entirely; no
-content migration needed (nothing was salvageable).
+Verified zero inbound references via grep across
+.md/.ts/.tsx/.js/.json/.yml/.yaml in TechnicalBlog/. All 7 described a
+different codebase entirely; no content migration needed.
 
 Bumps the-digital-matrix submodule pointer to merged Wave 1-4 commit:
 DESIGN.md → Google Stitch spec format, ARCHITECTURE.md trimmed,
 CLAUDE.md slimmed to ~100 lines, README.md expanded to project entry point.
 
-Submodule PR: <link to merged PR>
+Submodule PR: $SUBMODULE_PR_URL
 Spec: TechnicalBlog/technical-blog/the-digital-matrix/docs/superpowers/specs/2026-04-28-blog-doc-deduplication-design.md
 EOF
 )"
 ```
 
-(Engineer: replace `<link to merged PR>` with the actual GitHub PR URL after the inner PR merges.)
+- [ ] **Step 8c: Verify no placeholder leaked into the commit**
+
+```bash
+git log -1 --format=%B | grep -E '<paste-actual|<link to merged|<KEEP|<CUT' \
+  && echo "PLACEHOLDER LEAK — amend the commit before pushing" \
+  || echo "Commit body clean"
+```
+
+Expected: `Commit body clean`. If a placeholder leaked, the engineer must `git commit --amend` to fix before pushing.
+
+---
+
+## Recovery procedures
+
+If a Wave N verification fails after Wave N-1 commits already landed, the engineer faces a fix-forward vs revert decision per wave. Default heuristic: **fix-forward** for content errors (typo, missed substitution, mis-categorized §12 entry); **revert** for structural errors (broken numbering invariant, lint regression that doesn't reverse with a small patch, mis-applied edit that cascades).
+
+**Per-wave recovery procedures:**
+
+### Wave 1 failure (DESIGN.md spec migration + README + Task 11 spec patches)
+
+State after Wave 1: DESIGN.md has YAML + reordered sections + Stitch lint pass; README.md expanded; motion-policy spec lines patched.
+
+| Failure | Fix-forward | Revert |
+|---|---|---|
+| Stitch lint error (broken-ref, contrast-ratio) | Edit DESIGN.md YAML to add missing token / fix component pair; re-lint | Only if YAML structure is fundamentally broken |
+| DESIGN.md section order wrong | Edit headings to canonical order (no commit revert needed) | — |
+| Section-order warning fires | Re-place extension section AFTER §Do's and Don'ts | — |
+| README content wrong | Edit + amend the Task 5 commit | — |
+| Motion-policy spec patch failed (string non-unique) | Re-grep, find unique substring, redo Edit | — |
+
+To revert Wave 1 entirely: `git -C the-digital-matrix reset --hard $(cat /tmp/blog-doc-dedup/pre-wave2-sha.txt)`. **CAUTION:** discards all Wave 1 commits — discuss with operator before running.
+
+### Wave 2 failure (ARCHITECTURE.md trim)
+
+State after Wave 2: ARCHITECTURE.md trimmed in §1, §5, §6, §12, §13; numbering preserved.
+
+| Failure | Fix-forward | Revert |
+|---|---|---|
+| ARCHITECTURE anchor diff non-empty | Identify which §-numbered ref changed; restore that subsection's heading | — |
+| §12 entry count out of expected range (21-25) | Re-count; if too low, re-introduce the over-cut entries; if too high, re-classify | — |
+| Stitch lint regresses (e.g., new broken-ref pointing into ARCH) | Fix the §5 / §6 pointer text to use correct DESIGN.md section name | — |
+
+To revert Wave 2 only: `git -C the-digital-matrix reset --hard <Wave-1-end-SHA>`. The Wave-1-end SHA is the last commit before Task 6's first commit; locate via `git log --oneline | grep -A1 "Task 6\|§1, §5, §6"`.
+
+### Wave 3 failure (CLAUDE.md slim)
+
+State after Wave 3: CLAUDE.md slimmed to ≤120 lines; Agent Prompt Guide migrated in.
+
+| Failure | Fix-forward | Revert |
+|---|---|---|
+| CLAUDE.md > 120 lines | Trim further (env-vars table can compress; Agent Prompt Guide can move some prompts to a follow-up issue) | — |
+| Author Override duplicated | Re-grep `Author override — quick reference`; delete second occurrence | — |
+| Pointer to ARCHITECTURE §N broken | Re-check §N exists in current ARCHITECTURE.md; fix CLAUDE.md text | — |
+
+To revert Wave 3: `git -C the-digital-matrix reset --hard <Wave-2-end-SHA>`.
+
+### Wave 4 verification gate failure (any of 13+ acceptance criteria)
+
+State: all Wave 1-3 commits landed; verification turns up an issue.
+
+| Failing AC | Action |
+|---|---|
+| AC#1 (Stitch lint) | Wave 1 / Wave 2 fix-forward |
+| AC#2 (ARCH anchor diff) | Wave 2 fix-forward (re-introduce broken anchor) |
+| AC#3-7 (schema / counts / line targets) | Wave 1 / Wave 3 fix-forward depending on which doc |
+| AC#10 (adversarial audit) | Re-introduce the BLOCKING-flagged entry; Task 13 Step 3 |
+| AC#11 (word-count delta) | If shortfall, identify which doc shrank too little (most likely ARCH §12 too conservative); revisit scenario-walks |
+| AC#12 (CRLF) | Run `sed -i 's/\r$//' <file>` on the offender; amend |
+| AC#13 (stray branches) | Classify per the rule's table; cherry-pick or delete; do not merge until resolved |
+
+### Wave 5 failure (outer repo memory/* deletion)
+
+State: submodule PR merged; outer repo PR opens deleting 7 memory files.
+
+| Failure | Action |
+|---|---|
+| `ls memory/` shows MORE than 7 files | STOP. Audit each new file against spec §1 staleness criteria; update spec if a new file should also be deleted; or whitelist if it's legitimate |
+| `ls memory/` shows FEWER than 7 files | STOP. Check if someone partially cleaned up; do not stomp in-flight work |
+| Submodule pointer not advancing | `git -C TechnicalBlog/technical-blog/the-digital-matrix checkout main && git pull origin main` from outer repo |
+| PR URL placeholder leaked into commit | `git commit --amend` after replacing `$SUBMODULE_PR_URL` |
 
 ---
 
