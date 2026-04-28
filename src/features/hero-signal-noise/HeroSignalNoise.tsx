@@ -117,9 +117,6 @@ const HeroSignalNoise = ({
             </Link>
           </motion.div>
 
-          {/* Outer plain div owns the scroll-fade so framer-motion's inline
-              opacity (from variants={heroItem}) on the inner div doesn't fight
-              with Tailwind's opacity-0/100. */}
           <div
             className={`transition-opacity duration-300 ${scrolled ? "opacity-0 pointer-events-none" : "opacity-100"}`}
             aria-hidden={scrolled ? "true" : undefined}
