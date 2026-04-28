@@ -584,11 +584,11 @@ A module-level `authorOverrideWarned` latch ensures the activation `console.info
 
 The `heroReplaySkip` parameter is a documented contract — only `src/pages/Index.tsx` is allowed to pass it. No runtime enforcement; the contract is policed at review time.
 
-### Hero cascade — DEV gate, focus management, inert semantics
+### Hero cascade — replay-skip persistence, focus management, inert semantics
 
-`isDevBuild()` in `Index.tsx` returns `import.meta.env.DEV === true`. Vercel preview AND production both run `vite build`, so DEV is false there and the cascade-replay flag persists as designed. A previous hostname-based gate (`*.vercel.app`) treated the live production subdomain as dev and the back-button suppression never armed for real visitors — build-time DEV is the durable signal.
+`writeHeroReplayFlag()` in `Index.tsx` always persists `sessionStorage["hero-cascade-played"] = "1"` after the cascade settles or after SKIP, regardless of build mode. The earlier DEV-gate (`isDevBuild()` no-op under `import.meta.env.DEV`) was removed 2026-04-28: the dev server is the operative live-preview surface for Meshnet phone smoke testing, and the no-op caused a "cascade replays on every reload" regression report. New tab semantics still come for free — `sessionStorage` is per-tab/per-origin, so closing the tab and opening a fresh one replays the cascade naturally. To force-replay during cascade iteration, clear the flag from DevTools (`sessionStorage.removeItem("hero-cascade-played")`).
 
-`writeHeroReplayFlag()` is a no-op under DEV. This is the developer escape hatch: iterate on the cascade locally without clearing sessionStorage between reloads. A `devHostWriteSkipWarned` latch prevents log spam.
+`e2e/functional/hero-skip-and-badge.spec.ts` locks the new contract: flag persists after SKIP, reload-in-tab lands directly in `phase3` with no SKIP button, fresh browser context replays.
 
 The `skipToPhase3` handler schedules `setTimeout(() => viewProjectsRef.current?.focus(), 0)` so keyboard users aren't stranded on the unmounted SKIP button. Resolves Wave 3 review B5 / F-UX-05. The `react-router-dom` `<Link>` ref-forwarding contract is what makes this work; if it changes, `e2e/functional/hero-focus-management.spec.ts` fails loudly.
 
@@ -688,6 +688,57 @@ The mobile-wrap test asserts distinct row Y-coordinates rather than a row count 
 - **Off-by-one neighbors** at 767 and 1023 — confirms the `min-width` media-query semantics (`< 768 = mobile`, `768 ≤ x < 1024 = tablet`, `≥ 1024 = desktop`).
 - **Reactive matchMedia change events.** The Wave 2 test fires `renderHook` at a fixed width and asserts once; it never simulates an `MediaQueryList` `change` event, so a regression to a non-reactive `isMobileViewport()` snapshot would pass that suite. A custom `matchMedia` stub captures registered handlers so we trigger them manually, mimicking a real resize crossing a tier boundary. Three transitions covered: desktop→tablet (1440→900), tablet→mobile (900→400), mobile→desktop (375→1440).
 - **iPad 10th-gen rotation case.** Portrait 810×1080 → tablet, landscape 1080×810 → desktop by width-only rule. Spec §1 explicitly defers tablet-regardless-of-orientation (`pointer:coarse`) to §8.1 open questions, NOT shipping. The test pins the width-only contract (1080 → desktop) so a future change toward orientation-aware tiering is forced through spec review, not slipped in silently.
+
+### Hero asymmetric stagger — gated negative margins
+
+`.hero-h .h-row.left` and `.h-row.right` (`src/index.css`) use `margin-left` / `margin-right` of `clamp(-120px, -6vw, 0px)` to pull BREAK leftward and PROVE rightward beyond the 960px hero container. The negative-margin block is gated to `@media (min-width: 1280px)` because at narrower viewports the 960px container collapses to fill the viewport and the negative margin pushes content past the screen edge — phone-landscape (~720–960px) and tablet (~768–1023px) showed BREAK clipping off the left and PROVE clipping off the right when the original `min-width: 768px` gate fired.
+
+The 768–1279px tier still gets visible asymmetric stagger from padding alone (`padding-left: clamp(0, 4vw, 48px)` on `.left`, `padding-right: 0` on `.right`). Mobile (<768px) keeps both rows centered.
+
+`docs-over-code-comments.md` mandates that the WHY for the threshold lives here, not inline; the rule itself only carries the threshold value.
+
+### Reading-mode code-block frame + background unification
+
+Two related bugs were fixed in the same surface:
+
+1. **`.theme-reading .code-block-wrapper` border** — the original border declaration sat on `pre[class*="language-"]`, which never renders in this codebase because `CodeBlock.tsx` replaces `<pre>` with `<div class="code-block-wrapper">`. Re-anchored to `.code-block-wrapper` with a warm-brown tone (`hsl(30 25% 45%)`) tuned against the cream page bg (NOT the dark code bg) plus a faint box-shadow lift so the frame reads on mobile WebKit at low DPI.
+
+2. **`<pre>`/`<code>` background unification** — both `.theme-reading .markdown-body pre[class*="language-"]` and `.theme-reading .markdown-body code[class*="language-"]` use `#2d2d2d !important` to match the `CodeBlock.tsx` inline style on `.code-block-wrapper`. Earlier value `hsl(220 13% 15%)` (= `#21252b`) sat ~5 lightness units darker than the wrapper. Because `<code>` renders `display: inline; white-space: pre`, ANY background mismatch tiles only behind text on each visual line — producing a per-line stripe regression visually identical to the inline-pill border leak (next section) but structurally distinct (bg mismatch, not border leak).
+
+Regression history: this exact bg mismatch has been reported three times. Lock the invariant via `e2e/functional/code-block-styling.spec.ts` — `codeBg === wrapperBg === rgb(45, 45, 45)` at every code-block on the page, both desktop and mobile.
+
+### Inline-code pill — language-class anchor
+
+The reading-mode inline-code pill rule (background, padding, radius, hairline border) uses `.theme-reading .markdown-body code:not([class*="language-"])` — NOT `:not(pre code)`. The `:not(pre code)` form was inert: `CodeBlock.tsx` replaces the `<pre>` parent with a `<div class="code-block-wrapper">`, so `pre code` no longer matches anything in the rendered DOM and the exclusion silently fired on fenced `<code>` too. With `display: inline; white-space: pre` on the highlighted `<code>` plus a 1px border + 0.1em padding on the pill rule, `box-decoration-break: slice` tiled the pill outline onto every visual line — the per-line pill border regression.
+
+The `language-*` class that `rehype-prism-plus` stamps on every fenced `<code>` is invariant across tag substitution. The same `:not([class*="language-"])` anchor applies to the theme-agnostic `overflow-wrap: anywhere` rule for consistency, even though the cascading `code[class*="language-"] { overflow-wrap: normal !important }` at the prism-bg block was already neutralizing it.
+
+`e2e/functional/code-block-styling.spec.ts` "Fenced code excluded from inline-pill styling" guards the new selector — `border-top-width === 0px` AND `padding-left === 0px` on every `code[class*="language-"]` on the page.
+
+### Inline-code overflow guard — defensive containment
+
+`.markdown-body { overflow-x: hidden }` is intentional, NOT cargo-culted. Long unbreakable identifiers in inline `<code>` (e.g. `message.usage.cache_creation.ephemeral_5m_input_tokens`) used to push document width past viewport width on mobile, triggering horizontal page scroll that clipped the navbar/title/tags off-screen. Two-layer fix:
+
+- **Semantic** — `.markdown-body code:not([class*="language-"]) { overflow-wrap: anywhere }` lets the long identifier wrap inside the pill.
+- **Defensive** — `.markdown-body { overflow-x: hidden }` clips any future unbreakable element inside the article instead of letting it force page scroll. Fenced code blocks already scroll within their own `.code-block-wrapper` and are unaffected.
+
+Style-test fixture `src/pages/content/blog/style-test.md` includes a deliberately-long identifier (tagged `DO_NOT_REMOVE` in the prose) so `e2e/functional/code-block-styling.spec.ts` "Inline-code overflow guard" has something to assert on. Removing that line breaks the regression test.
+
+### SCROLL TO EXPLORE arrow — outer-div scroll-fade pattern
+
+`HeroSignalNoise.tsx` wraps the SCROLL TO EXPLORE prompt in TWO nested elements: an outer plain `<div>` carries the scroll-driven `transition-opacity` + `opacity-0/100` Tailwind classes; an inner `<motion.div variants={heroItem}>` carries the cascade entrance animation. They MUST be split because Framer Motion sets inline `opacity: 1` after the variant resolves, and inline styles always win over CSS classes on the same element — putting `opacity-0` on the same element that has `variants={heroItem}` does nothing.
+
+Same shape as the `inert` boolean prop split on the CTA wrapper a few lines above (Wave 3 B5) and the `data-cta-wrap` split on the CTA flex container — all three are cases where one element needs CSS-driven semantics AND framer-motion-driven animation, and the framer's inline styles win unless the concerns live on different elements.
+
+Scroll trigger: `useEffect` listens for `window.scrollY > 40`, sets a `scrolled` boolean, the outer div toggles `opacity-100 ↔ opacity-0 pointer-events-none` with a 300ms transition. `aria-hidden` flips when scrolled so screen readers stop announcing the prompt once it's no longer relevant.
+
+`e2e/functional/hero-skip-and-badge.spec.ts` "Hero scroll-to-explore arrow" reads computed opacity on the closest `.transition-opacity` ancestor — explicitly NOT on the inner element, since framer-motion's inline opacity would leak into that read and produce false-positive passes.
+
+### IdStrip mobile balance
+
+`.id-strip` (`src/index.css`) uses `justify-content: center` so when content wraps on phone-portrait, all rows are centered (symmetric) instead of left-aligned. A `@media (max-width: 480px)` block tightens font-size 10→8px, gap 18→6px, letter-spacing 0.22em→0.12em, padding 6×14→5×8 — combined, four segments (NODE / OP / TS / UTC) fit on one row at 375px and `SEC: OK` lands centered on row 2.
+
+The hero `<section>` itself uses `flex items-start md:items-center` (`Index.tsx`) so on mobile portrait the IdStrip sits right under the navbar (top-aligned) instead of being centered with ~150px of dead space above. Desktop keeps the dramatic vertically-centered cascade because `min-h-screen` provides the slack `items-center` needs to feel intentional.
 
 ---
 
