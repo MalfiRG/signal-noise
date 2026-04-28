@@ -1,9 +1,19 @@
 # Blog Architecture Doc Deduplication — Design Spec
 
-**Status:** HARD SPEC — pre-implementation. Authoritative source of truth for the doc-deduplication migration until landed.
+**Status:** Rev 2 — post-adversarial-review (2026-04-28). 1 BLOCKING + 6 HIGH + 16 MEDIUM + 10 LOW findings consolidated across 4 reviewers (2 spec + 2 plan) and applied. HARD SPEC — pre-implementation. Authoritative source of truth for the doc-deduplication migration until landed.
 **Date:** 2026-04-28
 **Owner:** Piotr Tarach (operator) + Claude Code (implementer)
 **Repos:** `the-digital-matrix` (submodule, primary surgery) + MetaOrchestrator (outer, memory/* deletion)
+
+**Rev 2 changes (vs Rev 1 commit `46acaea`):**
+- Memory deletion scope expanded from 2 → **7 files** (adversarial review surfaced 5 untouched stale files; `project-owner.md` additionally violates the workspace-global [redacted-employer]-obfuscation rule).
+- ARCHITECTURE.md inbound-reference count corrected from `~14` → **20** (across 5 files including `the-digital-matrix/CLAUDE.md`).
+- DESIGN.md §Motion absorption strategy fixed: pointer to **existing** `### Subtle vs cyber stagger variants` subsection instead of creating a duplicate (would have violated the spec's own dedup goal).
+- Spec line-patch wave moved from Wave 3 → **Wave 1** (per §3.2 "same/adjacent commit" timing rule; previous placement left 8-task window of broken inbound refs).
+- Author-override deletion choice resolved: **keep first occurrence** (source-order convention; both copies are byte-identical so no content-distinguisher exists).
+- §11.3 acceptance criteria expanded from 13 → 15 (added §-order check + ARCHITECTURE-section-count check at gate, not only task-end).
+- Volatile line numbers replaced with grep anchors per `lessons/lesson-docs-drop-volatile-line-numbers-2026-04-16.md`.
+- Word-delta math recomputed: `-870 to -1,370` (was incorrectly cited as `-1,000 to -1,500`).
 
 ---
 
@@ -19,10 +29,15 @@ The blog's architecture-tier docs have entered a **3-tier echo failure mode**: t
 | `the-digital-matrix/DESIGN.md` | 369 | 2,760 | inner | Canonical visual/UX design system (11 sections) |
 | `the-digital-matrix/CLAUDE.md` | 312 | 2,062 | inner | Agent instructions; restates stack, structure, routes, decisions, styling |
 | `technical-blog/memory/architecture.md` | 129 | 644 | outer | Compressed mirror — describes `wouter`/`MatrixRain`/`LanguageProvider`/`client/src/` (none exist in current code) |
+| `technical-blog/memory/content-pipeline.md` | 113 | ~640 | outer | Content-pipeline reference; uses DEPRECATED labeled-callout convention (`💡 Key Insight`) per workspace `TechnicalBlog/CLAUDE.md` "Callout Convention (Updated 2026-04-04)" |
+| `technical-blog/memory/deployment.md` | 89 | ~480 | outer | Deployment reference; says Vite port 5173 (current: 8080), output `dist/public` (likely `dist/`), Docker+Nginx alt-deploy (not in current code), missing current env vars (`VITE_MOTION_OVERRIDE`, `VITE_VERCEL_ENV`) |
 | `technical-blog/memory/design-system.md` | 92 | 518 | outer | Compressed mirror — describes green Matrix palette `#22b455` (replaced by Night City `#f3e600`) |
+| `technical-blog/memory/portfolio-reference.md` | 109 | ~770 | outer | Documents original fork-source (dar-kow/Portfolio); references removed components (`MatrixRain`, `Wouter`, `shared/` structure) |
+| `technical-blog/memory/project-owner.md` | 37 | ~260 | outer | Operator profile; **violates workspace-global [redacted-employer]-obfuscation rule** (line 4: "Role: QA Engineer at [redacted-employer]") in addition to being stale |
+| `technical-blog/memory/tech-stack.md` | 52 | ~410 | outer | Tech-stack reference; says **Wouter 3.6.0** (current: React Router DOM 6), Vite 6 (current: Vite 7), `shared/components/ui/` (current: `src/components/ui/`), references Drizzle/Express/Passport (none in current code) |
 | `the-digital-matrix/README.md` | 16 | 28 | inner | Tech-stack one-pager (overlaps `CLAUDE.md` "Tech Stack") |
 
-**Total: ~12,800 words across 6 docs.**
+**Total: ~14,400 words across 11 docs.** (Memory directory has all 7 `.md` files dated 2026-03-12, evidently from a single context-pipeline export. The 5 newly-discovered files were uncovered during adversarial plan review.)
 
 ### Confirmed duplication (cross-doc)
 
@@ -39,9 +54,11 @@ The blog's architecture-tier docs have entered a **3-tier echo failure mode**: t
 
 `CLAUDE.md` lines 286 + 296 contain the **"Author override — quick reference"** subsection twice, verbatim. Pure copy-paste artifact.
 
-### Confirmed staleness (memory/* describe a different codebase)
+### Confirmed staleness (all 7 memory/* files describe a different codebase)
 
-`memory/architecture.md` references — none of which exist in current code:
+All 7 files in `technical-blog/memory/` were created on 2026-03-12 (same-day timestamps suggest a single context-pipeline export). All 7 share the same staleness pattern. **Verification: `grep -rE '(wouter|MatrixRain|LanguageProvider|BackgroundProvider|GA4 PageTracker)' the-digital-matrix/src/` returns 0 matches** (run 2026-04-28); none of the symbols enumerated below exist in current code.
+
+**`memory/architecture.md` references that don't exist in current code:**
 - `wouter` Switch (current: React Router DOM 6)
 - `MatrixRain` component (removed in PR #27)
 - `LanguageProvider` for pl/en (no language toggle exists)
@@ -49,17 +66,40 @@ The blog's architecture-tier docs have entered a **3-tier echo failure mode**: t
 - `client/src/` directory layout (current: flat `src/`)
 - `features/articles/` (current: `features/blog/`)
 - Routes `/articles`, `/references`, `/how-i-do-it/:page` (current: `/blog`, `/blog/:slug`, `/how-i-do-it`, `/how-i-do-it/:slug`)
-- GitHub API integration for projects (does not exist)
-- Seasonal mode detection (does not exist)
-- GA4 PageTracker (does not exist)
+- GitHub API integration for projects, seasonal mode detection, GA4 PageTracker (none exist)
 
-`memory/design-system.md` describes:
-- Green Matrix palette (`--matrix-primary: #22b455`, `--matrix-hover: #92e5a1`) — the OLD theme
-- Light shadcn theme — the OLD config
-- System sans-serif body font — the OLD font
-- Heading hierarchy h1=primary green / h2=light green / h3=hover / h4=white — the OLD colors
+**`memory/design-system.md` describes the OLD green palette:**
+- `--matrix-primary: #22b455`, `--matrix-hover: #92e5a1` (current: Night City `#f3e600` primary + `#52e3c8` accent + `#f78a1a` learning)
+- Light shadcn theme + system sans-serif body font (current: dark theme + Chakra Petch / Orbitron / Rajdhani / Share Tech Mono / Atkinson Hyperlegible)
 
-**Current code uses Night City** (yellow `#f3e600` primary + cyan `#52e3c8` accent + amber `#f78a1a` learning) on dark backgrounds, with Chakra Petch / Orbitron / Rajdhani / Share Tech Mono / Atkinson Hyperlegible fonts. The `memory/*` files have rotted past usefulness — every paragraph contains false claims about the current codebase.
+**`memory/content-pipeline.md` uses DEPRECATED callout convention:**
+- Lists `💡 Key Insight`, `🔥 Hot Take`, `⚙️ Tech Note` labeled callouts — explicitly DEPRECATED per `TechnicalBlog/CLAUDE.md` "Callout Convention (Updated 2026-04-04)" which mandates *"Do NOT use labeled callout boxes"*. Following this file's guidance would silently regress the post-2026-04-04 voice convention.
+
+**`memory/deployment.md` describes wrong infrastructure:**
+- Says `Vite dev server (localhost:5173)` (current: port 8080)
+- Says output `dist/public` (current: likely `dist/` — verify via `cat the-digital-matrix/vercel.json` + `cat the-digital-matrix/vite.config.ts` at execution time)
+- Includes Docker + Nginx alt-deploy setup (not in current code; current is Vercel-only)
+- Missing current env vars `VITE_MOTION_OVERRIDE` + `VITE_VERCEL_ENV`
+
+**`memory/tech-stack.md` describes the wrong stack:**
+- `Wouter 3.6.0` (current: React Router DOM 6)
+- `Vite 6.2.2` (current: Vite 7)
+- `rehype-highlight 7.0.2` (current: `rehype-prism-plus`)
+- References `shared/components/ui/` (current: `src/components/ui/`)
+- Lists `Drizzle ORM`, `Express`, `Passport.js` as "available" (verify absence in current `package.json` at execution time)
+- `@emailjs/browser` + `react-ga4` (verify via `grep -nE '(emailjs|react-ga4)' the-digital-matrix/package.json` at execution time)
+
+**`memory/project-owner.md` violates workspace-global obfuscation rule:**
+- Line 4: *"Role: QA Engineer at [redacted-employer]"* — directly violates `MetaOrchestrator/CLAUDE.md §2`: *"[redacted-employer] obfuscation: NO [redacted-employer] name in ANY output (global scrub rule, all sensitivity tiers)"*. Same axiom as `~/.claude/rules/audit-artifact-scrubbing.md` "Enforcer Artifacts" extension applies at the inventory surface — a checked-in artifact naming the prior employer is a leak whether the file is read by humans or agents.
+- This file deletion has TWO independent justifications: (1) staleness (lists a published post that's no longer the only one; references skill levels superseded by current state), AND (2) obfuscation policy compliance. Either one alone justifies deletion.
+
+**`memory/portfolio-reference.md` is a historical fork-source artifact:**
+- Documents the ORIGINAL fork-source `dar-kow/Portfolio` repository
+- Inventory of "inherited components" includes `MatrixRain` (REMOVED in PR #27), `Wouter` (REPLACED), `shared/` structure (REMOVED)
+- "Portfolio Feature Inventory" table refers to features (`features/articles/`, `features/references/`, `features/how-i-do-it/`) that match the OLD codebase shape, not the current one
+- Could be archived as a one-off retrospective doc, but is NOT architecture-tier and has nowhere to live in the post-migration documentation map
+
+**Current code uses Night City** (yellow `#f3e600` primary + cyan `#52e3c8` accent + amber `#f78a1a` learning) on dark backgrounds. **Conclusion: every paragraph of every memory/* file contains false claims about the current codebase, OR violates an obfuscation rule.** Migrating any of this content into the canonical docs would inject incorrect/policy-violating claims. Action: delete all 7 files outright; no migration of any content (nothing is salvageable).
 
 ---
 
@@ -88,23 +128,46 @@ The blog's architecture-tier docs have entered a **3-tier echo failure mode**: t
 
 ### 3.1 ARCHITECTURE.md numbering is frozen
 
-`grep -rEn "ARCHITECTURE\.md §[0-9]+"` against the blog corpus returns ~14 references across:
-- `docs/superpowers/specs/2026-04-19-e2e-flakiness-remediation-design.md` (~6 references to `§3`, `§8`, `§9`, `§12`)
-- `docs/superpowers/plans/2026-04-19-e2e-flakiness-remediation.md` (~6 references to `§9`)
-- `docs/superpowers/specs/2026-04-24-device-tier-motion-policy-design.md` (~1 reference to `§6`)
-- `docs/superpowers/specs/2026-04-27-signal-noise-hero-port-design.md` (~1 reference to `§12`)
+**Verification (run 2026-04-28):**
+```bash
+grep -rEn "ARCHITECTURE\.md §[0-9]+" the-digital-matrix/ --include="*.md" \
+  | grep -v "docs/superpowers/specs/2026-04-28-\|docs/superpowers/plans/2026-04-28-" \
+  | sort -u | wc -l
+```
+
+Returns **20 inbound references across 5 files** (excluding this spec and its plan, which themselves enumerate the numbering as part of the migration framing rather than depending on it):
+
+| File | Refs | Sections cited |
+|---|---:|---|
+| `docs/superpowers/specs/2026-04-19-e2e-flakiness-remediation-design.md` | 11 | §3, §7, §8, §9, §12 |
+| `docs/superpowers/plans/2026-04-19-e2e-flakiness-remediation.md` | 7 | §9 |
+| `docs/superpowers/specs/2026-04-24-device-tier-motion-policy-design.md` | 1 | §6 |
+| `docs/superpowers/specs/2026-04-27-signal-noise-hero-port-design.md` | 1 | §12 |
+| `the-digital-matrix/CLAUDE.md` | 1 | §12 (line 22) |
+
+(Counts surfaced by the spec coverage adversarial review on 2026-04-28; the original draft of this spec said `~14` based on a stale earlier estimate — corrected here.)
 
 All trimming MUST happen INSIDE these numbered sections. No section may be removed, renamed, or re-ordered. Any content removed from a numbered section MUST be either:
 - migrated to a different section in the SAME numbered hierarchy (still inside §N for the same N), OR
 - deleted entirely with a scenario-walk justification.
 
+The CLAUDE.md self-reference at line 22 is also rewritten in Wave 3 (per §7.2), but must continue to cite `§12` correctly post-rewrite. The Wave 4 anchor diff catches any silent breakage.
+
 ### 3.2 DESIGN.md cross-references — exactly 2
 
-`grep -rn "DESIGN\.md §"` returns exactly 2 hits, both in `docs/superpowers/specs/2026-04-24-device-tier-motion-policy-design.md`:
-- Line 92: references `DESIGN.md §1` (current "Visual Theme & Atmosphere", new "Overview")
-- Line 392: references `DESIGN.md §7` (current "Motion Design", new "Motion" extension)
+**Verification (run 2026-04-28):**
+```bash
+grep -rn "DESIGN\.md §" the-digital-matrix/ --include="*.md" \
+  | grep -v "docs/superpowers/specs/2026-04-28-\|docs/superpowers/plans/2026-04-28-"
+```
 
-These 2 lines MUST be patched in the same submodule PR as the DESIGN.md rename — same commit or strict adjacent commit.
+Returns 2 hits, both in `docs/superpowers/specs/2026-04-24-device-tier-motion-policy-design.md`:
+- One `DESIGN.md §1` reference (current section: "Visual Theme & Atmosphere"; post-Wave-1 section: "Overview")
+- One `DESIGN.md §7` reference (current section: "Motion Design"; post-Wave-1 section: "Motion" extension)
+
+**Line numbers are intentionally NOT cited** here per `lessons/lesson-docs-drop-volatile-line-numbers-2026-04-16.md` — line numbers in upstream specs drift on edits. At execution time, re-run the grep above to get current locations.
+
+**Patch timing — patches MUST land in the same Wave as the DESIGN.md rename.** The patches were originally placed in Wave 3 (per §10.1), but the spec coverage review on 2026-04-28 surfaced that this leaves an 8-task window in which all intermediate commits have broken inbound references — bisecting any Wave-2 commit shows `DESIGN.md §1` referring to a section that no longer exists. **Resolution: patches move from Wave 3 to Wave 1, immediately after the rename commit.** See updated wave decomposition in §10.1.
 
 ### 3.3 CSS-as-SOT for design tokens
 
@@ -274,7 +337,7 @@ npx @google/design.md lint DESIGN.md
 Acceptable output: 0 errors. Warnings on:
 - `missing-sections` for `spacing` if a default value is absent (acceptable).
 - `orphaned-tokens` for color tokens not referenced by any component (acceptable — many tokens are body/nav/border level, not component-bound).
-- `section-order` warnings if extension sections (Motion, References) are inserted between canonical sections (will be placed AFTER §8 Do's and Don'ts to avoid).
+- `section-order` warning fires ONLY if extension sections (Motion, References) are inserted between canonical sections. Extensions MUST be placed AFTER §Do's and Don'ts to keep this warning from firing — design intent is **0 section-order warnings**, not "warnings are acceptable". If `section-order` warnings appear at lint time, the placement is wrong; fix before commit.
 
 Errors that block:
 - `broken-ref` (token reference doesn't resolve)
@@ -293,8 +356,8 @@ Errors that block:
 | 2 | Directory Structure | KEEP verbatim. Canonical, not duplicated outside this doc. | 0 |
 | 3 | Routing | KEEP verbatim. Already canonical. CLAUDE.md "Routes" gets stripped, replaced by `→ ARCHITECTURE.md §3` pointer. | 0 |
 | 4 | Content Pipeline | KEEP verbatim. Canonical. CLAUDE.md "Content Pipeline (Blog Posts)" gets stripped, replaced by `→ ARCHITECTURE.md §4` pointer. | 0 |
-| 5 | Styling Architecture | TRIM. Subsection "Theme tokens" (current lines 194-218) → 3-line `→ DESIGN.md §Colors` pointer + 1-line "How `:root` HSL maps to Tailwind utilities". Keep "Layer order", "Reading mode", "next-themes role" — those are architectural, not visual-identity. | -250 |
-| 6 | Motion Design System | TRIM. Keep "Two coexisting timing systems" + "JS variant exports" + "Variant-selection hooks" tables (architectural impl). Move "Why two stagger hooks?" rationale to DESIGN.md §Motion. Add `→ DESIGN.md §Motion` pointer for easing-grammar semantics. | -150 |
+| 5 | Styling Architecture | TRIM. Subsection "Theme tokens" (locate via `grep -n '^### Theme tokens' ARCHITECTURE.md`) → 3-line `→ DESIGN.md §Colors` pointer + 1-line "How `:root` HSL maps to Tailwind utilities". Keep "Layer order", "Reading mode", "next-themes role" — those are architectural, not visual-identity. | -250 |
+| 6 | Motion Design System | TRIM. Keep "Two coexisting timing systems" + "JS variant exports" + "Variant-selection hooks" tables (architectural impl). **DO NOT create a new subsection in DESIGN.md §Motion** — the existing `### Subtle vs cyber stagger variants` subsection already absorbs the "Why two stagger hooks?" rationale (verified: see DESIGN.md §Motion subsection covering `staggerItem`/`staggerItemCyber` + mobile/reduced-motion fallbacks). Replace ARCHITECTURE.md's "Why two stagger hooks?" paragraph with a 1-line `→ DESIGN.md §Motion / Subtle vs cyber stagger variants` pointer. Add `→ DESIGN.md §Motion` pointer for easing-grammar semantics. | -150 |
 | 7 | Hero Cascade Architecture | KEEP verbatim. State-machine impl detail, not duplicated. | 0 |
 | 8 | Build & Deploy | KEEP verbatim. | 0 |
 | 9 | Testing Architecture | KEEP verbatim. | 0 |
@@ -303,7 +366,7 @@ Errors that block:
 | 12 | Implementation Notes | PER-ENTRY classify (see §6 below). | -300 to -800 estimated |
 | 13 | References | KEEP. Add 1-line entry pointing to this spec doc + the Stitch lint command. | +30 |
 
-**Net target:** ARCHITECTURE.md drops from ~6,800 words to ~5,300-5,800 words depending on §12 outcome. Section numbering unchanged.
+**Net target:** Per-section word delta sums to **-870 to -1,370** words (-200 + -250 + -150 + (-300 to -800) + +30). ARCHITECTURE.md drops from ~6,800 words to ~5,430-5,930 words depending on §12 scenario-walk outcomes. Section numbering unchanged.
 
 ### 5.2 Subsections that move to DESIGN.md (visual surface)
 
@@ -381,7 +444,7 @@ For high-confidence cuts (≥40% reduction): construct ≥3 scenarios, dispatch 
 
 ### 6.4 Adversarial agent audit
 
-After per-entry classification + scenario-walks complete, spawn a fresh `reviewer-consistency` agent (internal-coherence specialist) — or `general-purpose` with an explicit adversarial brief — with:
+After per-entry classification + scenario-walks complete, spawn a fresh `general-purpose` agent with an explicit adversarial-review brief. (`reviewer-consistency` is the wrong fit because its remit is internal-coherence/AI-slop scanning across documents — the §12 audit needs adversarial scenario construction, which is `general-purpose` territory.) Provide the agent with:
 
 - The original §12 (verbatim, all 28 entries)
 - The trimmed §12
@@ -440,7 +503,7 @@ Block the merge on any **Blocking** finding: either re-apply via curator (re-int
 - Development Conventions → `→ ARCHITECTURE.md §11`.
 - Styling Rules (sub of Dev Conventions) → `→ DESIGN.md`.
 - Key Files → `→ ARCHITECTURE.md §10`.
-- The duplicated "Author override" copy at lines 286-307 → DELETE entirely (keep the line-296 instance only, or vice versa — pick whichever is more recent per `git log -p CLAUDE.md`).
+- The duplicated "Author override" subsection: **KEEP the FIRST occurrence (currently at line ~286), DELETE the SECOND (currently at line ~296)**. Both headers are byte-identical (`### Author override — quick reference`), so the choice is by source-order convention (keep-first), not by content. See §12.6 for the decision record. Re-locate at execution time via `grep -n 'Author override — quick reference' the-digital-matrix/CLAUDE.md` (line numbers may have drifted).
 
 ---
 
@@ -513,33 +576,56 @@ canonical command pattern.
 
 ## 9. memory/* deletion (outer repo)
 
-### 9.1 Files
+### 9.1 Files (all 7)
 
-- `technical-blog/memory/architecture.md` — 129 lines / 644 words, describes a different codebase.
-- `technical-blog/memory/design-system.md` — 92 lines / 518 words, describes the OLD green Matrix palette.
+The original spec listed only 2 files for deletion (`architecture.md`, `design-system.md`). The plan-adversarial review on 2026-04-28 surfaced that `memory/` actually contains 7 .md files, all dated 2026-03-12 (single context-pipeline export). Spot-reading the additional 5 confirmed the staleness pattern + an obfuscation-rule violation. Updated deletion scope:
 
-### 9.2 Verification (already done; re-run on day-of)
+| File | Lines | Justification |
+|---|---:|---|
+| `technical-blog/memory/architecture.md` | 129 | Describes a different codebase (wouter / MatrixRain / LanguageProvider — none in current code) |
+| `technical-blog/memory/content-pipeline.md` | 113 | Uses DEPRECATED labeled-callout convention (`💡 Key Insight`, `🔥 Hot Take`, `⚙️ Tech Note`) per `TechnicalBlog/CLAUDE.md` "Callout Convention (Updated 2026-04-04)" — following it would silently regress voice |
+| `technical-blog/memory/deployment.md` | 89 | Vite port 5173 (current: 8080), `dist/public` output, Docker+Nginx alt-deploy not in code, missing current env vars |
+| `technical-blog/memory/design-system.md` | 92 | OLD green Matrix palette (`#22b455`); replaced by Night City |
+| `technical-blog/memory/portfolio-reference.md` | 109 | Documents original fork-source `dar-kow/Portfolio`; references removed components |
+| `technical-blog/memory/project-owner.md` | 37 | **Violates [redacted-employer]-obfuscation rule** (`TechnicalBlog/CLAUDE.md §2`) at line 4 PLUS is stale; either justification alone supports deletion |
+| `technical-blog/memory/tech-stack.md` | 52 | Wouter / Vite 6 / `shared/` structure (none in current code); `Drizzle ORM` / `Express` / `Passport.js` / `@emailjs/browser` / `react-ga4` (verify absence at execution time) |
+
+### 9.2 Pre-deletion verification (re-run on day-of)
 
 ```bash
-grep -rn "memory/architecture\|memory/design-system" \
+# A. Zero inbound references to the file paths
+grep -rn "memory/\(architecture\|content-pipeline\|deployment\|design-system\|portfolio-reference\|project-owner\|tech-stack\)" \
   /mnt/c/Users/malfi/programming_projects/MetaOrchestrator/TechnicalBlog/ \
   --include="*.md" --include="*.json" --include="*.yml" --include="*.yaml" \
   --include="*.ts" --include="*.tsx" --include="*.js"
 # Expected: empty
+
+# B. Zero references to symbols defined ONLY in the memory/* files
+grep -rE '(wouter|MatrixRain|LanguageProvider|BackgroundProvider|GA4 PageTracker)' \
+  /mnt/c/Users/malfi/programming_projects/MetaOrchestrator/TechnicalBlog/the-digital-matrix/src/
+# Expected: empty (already verified 2026-04-28)
+
+# C. Confirm memory/ has only these 7 files
+ls /mnt/c/Users/malfi/programming_projects/MetaOrchestrator/TechnicalBlog/technical-blog/memory/
+# Expected: architecture.md content-pipeline.md deployment.md design-system.md portfolio-reference.md project-owner.md tech-stack.md
+# If MORE files than these 7 exist, STOP — spec inventory is incomplete; audit the extras before deletion.
 ```
 
 ### 9.3 Action
 
-Delete outright. NO migration of unique content (every paragraph contains false claims about the current codebase; any "unique" content is wrong content).
+Delete all 7 files outright via `git rm`. NO migration of unique content (every paragraph either contains false claims about the current codebase OR violates the [redacted-employer]-obfuscation rule; nothing salvageable).
 
 ### 9.4 Cleanup
 
-After both files are deleted, audit whether `technical-blog/memory/` directory is empty. If empty, remove the directory. If not (other files remain), leave it.
+After all 7 deletions, the `memory/` directory should be empty (no other files were enumerated). Remove the empty directory:
 
 ```bash
-git -C the-digital-matrix-parent ls-files memory/   # outer repo, not submodule
-# If only the 2 files exist + nothing else → remove memory/ directory after deletion
+ls -la /mnt/c/Users/malfi/programming_projects/MetaOrchestrator/TechnicalBlog/technical-blog/memory/
+# Expected: only . and .. — directory is empty
+rmdir /mnt/c/Users/malfi/programming_projects/MetaOrchestrator/TechnicalBlog/technical-blog/memory/
 ```
+
+If extra files appeared (someone added new memory/* between spec write and execution), STOP and re-audit each new file against the spec staleness criteria before deleting the directory.
 
 ---
 
@@ -560,35 +646,47 @@ Wave 1 (parallel — no inter-dependencies):
   │   - Rename §4 "Component Stylings" → §7 "Components" (separate component-token entries)
   │   - Keep §8 "Do's and Don'ts" position
   │   - Move §10 "Agent Prompt Guide" → CLAUDE.md (Wave 3 deletes it from DESIGN.md)
-  │   - Drop §9 "Responsive Behavior" (merged into §4 Layout)
-  │   - Keep §7 "Motion Design" → renamed to ext "Motion"
-  │   - Keep §11 "References" → ext "References"
+  │   - Fold §9 "Responsive Behavior" into §4 Layout (no content loss; spec §4.1)
+  │   - Keep §7 "Motion Design" content → rename heading to ext "## Motion" (preserves the existing
+  │     `### Subtle vs cyber stagger variants` subsection, which is the canonical destination for
+  │     ARCHITECTURE.md §6 "Why two stagger hooks?" pointer in Wave 2 — DO NOT create a duplicate
+  │     subsection in DESIGN.md §Motion)
+  │   - Keep §11 "References" → ext "## References"
   │   - Run npx @google/design.md lint DESIGN.md → 0 errors
   │
-  └─ README.md expansion (project pitch + tech stack canonical home + quick start + doc map)
+  ├─ README.md expansion (project pitch + tech stack canonical home + quick start + doc map)
+  │
+  └─ Patch 2 line-references in 2026-04-24-device-tier-motion-policy-design.md
+     (MUST land in same Wave as DESIGN.md rename per §3.2 "same commit or strict adjacent commit"
+     timing rule — moved from Wave 3 here to avoid an 8-task window of broken inbound refs):
+      - Re-grep at execution time: `grep -n 'DESIGN\.md §' docs/superpowers/specs/2026-04-24-...md`
+      - Patch "DESIGN.md §1" → "DESIGN.md §Overview"
+      - Patch "DESIGN.md §7" → "DESIGN.md §Motion"
 
 Wave 2 (depends on Wave 1):
   ├─ ARCHITECTURE.md trim:
   │   - §1 tech-stack table → 3-row architectural-essentials + → README.md pointer
   │   - §5 theme-tokens subsection → 3-line → DESIGN.md §Colors pointer
-  │   - §6 "Why two stagger hooks?" rationale → migrate to DESIGN.md §Motion ext
-  │   - §6 add → DESIGN.md §Motion pointer for easing-grammar semantics
-  │   - §12 per-entry classify with scenario-walks (KEEP=22, MIGRATE=3, CUT=3 candidates)
-  │   - §12 migrations (12.24, 12.25, 12.28) carry verbatim WHY into DESIGN.md
+  │   - §6 "Why two stagger hooks?" rationale → 1-line `→ DESIGN.md §Motion / Subtle vs cyber
+  │     stagger variants` pointer (DO NOT create new subsection in DESIGN.md §Motion — the
+  │     existing one already covers this rationale; see spec §5.1 §6 row)
+  │   - §6 add `→ DESIGN.md §Motion` pointer for easing-grammar semantics
+  │   - §12 per-entry classify with scenario-walks. **Outcome ranges per §6.3:**
+  │     Definite KEEP=21, Definite MIGRATE=3 (12.24, 12.25, 12.28), CUT-candidates pending=3
+  │     (12.6, 12.7, 12.10), MIGRATE-candidate pending=1 (12.13). Final post-walk:
+  │     KEEP between 21-25, MIGRATE between 3-4, CUT between 0-3.
+  │   - §12 definite MIGRATEs (12.24, 12.25, 12.28) carry verbatim WHY into DESIGN.md
   │   - §13 add 1-line entry pointing to this spec doc + Stitch lint command
 
 Wave 3 (depends on Wave 2):
-  ├─ CLAUDE.md slim:
-  │   - Strip Tech Stack, Project Structure, Architecture Decisions, Content Pipeline,
-  │     Blog Post Format, Development Conventions, Styling Rules, Key Files
-  │   - Replace each with → <doc> §<n> pointers
-  │   - Eliminate the duplicated "Author override" subsection (keep one instance)
-  │   - Insert Agent Prompt Guide migrated from DESIGN.md §10
-  │   - Expand "Authoritative documents (lazy-load)" into the full routing manifest
-  │
-  └─ Patch 2 line-references in 2026-04-24-device-tier-motion-policy-design.md:
-      - Line 92: "DESIGN.md §1" → "DESIGN.md §Overview"
-      - Line 392: "DESIGN.md §7" → "DESIGN.md §Motion"
+  └─ CLAUDE.md slim:
+      - Strip Tech Stack, Project Structure, Architecture Decisions, Content Pipeline,
+        Blog Post Format, Development Conventions, Styling Rules, Key Files
+      - Replace each with → <doc> §<n> pointers
+      - Eliminate the duplicated "Author override" subsection (keep the FIRST occurrence;
+        delete the SECOND — see §7.3 + §12.6)
+      - Insert Agent Prompt Guide migrated from DESIGN.md §10
+      - Expand "Authoritative documents (lazy-load)" into the full routing manifest
 
 Wave 4 (verification gate — must pass before merge):
   ├─ npx @google/design.md lint DESIGN.md → 0 errors
@@ -603,10 +701,11 @@ Wave 4 (verification gate — must pass before merge):
 
 ```
 Wave 5 (one commit):
-  ├─ Delete technical-blog/memory/architecture.md
-  ├─ Delete technical-blog/memory/design-system.md
-  ├─ Remove technical-blog/memory/ directory if empty
-  └─ Bump technical-blog/the-digital-matrix submodule pointer to merged commit SHA
+  ├─ Delete all 7 files in technical-blog/memory/ via `git rm`:
+  │   architecture.md, content-pipeline.md, deployment.md, design-system.md,
+  │   portfolio-reference.md, project-owner.md, tech-stack.md
+  ├─ Remove technical-blog/memory/ directory (now empty)
+  └─ Bump technical-blog/the-digital-matrix submodule pointer to merged Wave 1-4 commit SHA
 ```
 
 ---
@@ -616,22 +715,25 @@ Wave 5 (one commit):
 ### 11.1 Pre-flight (before any edit)
 
 ```bash
-# A. Stash baseline word counts
+# A. Stash baseline word counts (all 11 docs in scope)
 cd /mnt/c/Users/malfi/programming_projects/MetaOrchestrator/TechnicalBlog/technical-blog
 wc -w the-digital-matrix/DESIGN.md the-digital-matrix/ARCHITECTURE.md \
   the-digital-matrix/CLAUDE.md the-digital-matrix/README.md \
-  memory/architecture.md memory/design-system.md > /tmp/blog-doc-baseline.txt
+  memory/*.md > /tmp/blog-doc-baseline.txt
 
-# B. Stash ARCHITECTURE.md anchor list
+# B. Capture pre-Wave-2 SHA (Task 13 adversarial audit references this)
+git -C the-digital-matrix rev-parse HEAD > /tmp/pre-wave2-sha.txt
+
+# C. Stash ARCHITECTURE.md anchor list
 grep -rEn "ARCHITECTURE\.md §[0-9]+" the-digital-matrix/ --include="*.md" \
   | sort -u > /tmp/arch-refs-before.txt
 
-# C. Stash DESIGN.md anchor list
+# D. Stash DESIGN.md anchor list
 grep -rEn "DESIGN\.md §" the-digital-matrix/ --include="*.md" \
   | sort -u > /tmp/design-refs-before.txt
 
-# D. Confirm zero memory/* references (re-verify)
-grep -rn "memory/architecture\|memory/design-system" \
+# E. Confirm zero memory/* references for ALL 7 files (re-verify)
+grep -rn "memory/\(architecture\|content-pipeline\|deployment\|design-system\|portfolio-reference\|project-owner\|tech-stack\)" \
   /mnt/c/Users/malfi/programming_projects/MetaOrchestrator/TechnicalBlog/ \
   --include="*.md" --include="*.json" --include="*.yml" --include="*.yaml" \
   --include="*.ts" --include="*.tsx" --include="*.js"
@@ -652,11 +754,20 @@ grep -rEn "ARCHITECTURE\.md §[0-9]+" . --include="*.md" \
 diff /tmp/arch-refs-before.txt /tmp/arch-refs-after.txt
 # Expected: identical (no §-numbered references invalidated)
 
-# C. DESIGN.md anchor patches verified
+# C. DESIGN.md anchor patches + new pointers verified
 grep -rEn "DESIGN\.md §" . --include="*.md" \
   | sort -u > /tmp/design-refs-after.txt
 diff /tmp/design-refs-before.txt /tmp/design-refs-after.txt
-# Expected: 2 lines changed (§1 → §Overview, §7 → §Motion in motion-policy spec)
+# Expected diff:
+#   - 2 lines MODIFIED in motion-policy spec (§1 → §Overview, §7 → §Motion)
+#   - ≥2 lines ADDED in ARCHITECTURE.md (`→ DESIGN.md §Colors` from §5 trim,
+#     `→ DESIGN.md §Motion` from §6 trim, possibly `→ DESIGN.md §Components` /
+#     `→ DESIGN.md §Layout` from §12 migrations)
+#   - 0 lines REMOVED (the original 2 references in motion-policy spec are
+#     edits, not deletions, so they shift from numeric to named anchor)
+# Pass criterion: every diff line is one of the above three categories. Any
+# OTHER diff (e.g., a §-anchored ref appearing/disappearing in an unrelated
+# spec/plan) is unexpected — investigate before declaring this gate passed.
 
 # D. Word-count dedup proof
 echo "=== Before ==="
@@ -692,12 +803,14 @@ The migration is **done** when ALL of the following hold:
 5. ARCHITECTURE.md retains all 13 numbered sections with original numbering.
 6. CLAUDE.md is ≤120 lines (target ~100).
 7. README.md is ≥50 lines and contains the canonical Tech Stack table.
-8. `technical-blog/memory/architecture.md` and `memory/design-system.md` are deleted in the outer PR.
-9. `2026-04-24-device-tier-motion-policy-design.md` lines 92 and 392 patched to new section names.
+8. **All 7 files in `technical-blog/memory/`** are deleted in the outer PR (architecture, content-pipeline, deployment, design-system, portfolio-reference, project-owner, tech-stack), and the now-empty `memory/` directory is removed.
+9. `2026-04-24-device-tier-motion-policy-design.md` `DESIGN.md §1` and `§7` references patched to `§Overview` and `§Motion` (re-locate at execution time via grep — line numbers drift).
 10. Adversarial agent pass on §12: no blocking findings, OR all findings addressed.
-11. Word-count dedup proof shows: (a) net ≥1,200 word reduction across the inner-repo corpus (sum of DESIGN.md + ARCHITECTURE.md + CLAUDE.md + README.md, post-migration vs pre-migration); (b) ARCHITECTURE.md and CLAUDE.md each shrink (negative delta); (c) DESIGN.md and README.md may grow (positive delta is expected — DESIGN absorbs ≥3 migrated §12 entries + YAML front matter; README absorbs the canonical Tech Stack table + doc map). Outer-repo deletion of `memory/*.md` removes an additional ~1,162 words but is counted separately because it's a different PR.
-12. No flipped line endings (CRLF guard passes).
-13. No stray branches with unmerged content that would resurrect deleted material (audit per `~/.claude/rules/audit-stray-branches-before-main-clean.md`).
+11. Word-count dedup proof shows: (a) net ≥1,200 word reduction across the inner-repo corpus (sum of DESIGN.md + ARCHITECTURE.md + CLAUDE.md + README.md, post-migration vs pre-migration); (b) ARCHITECTURE.md and CLAUDE.md each shrink (negative delta); (c) DESIGN.md and README.md may grow (positive delta is expected — DESIGN absorbs 3 firm migrations + 0-1 conditional (12.13 pending scenario-walk) + YAML front matter; README absorbs the canonical Tech Stack table + doc map). Outer-repo deletion of all 7 `memory/*.md` files removes an additional ~3,000 words but is counted separately because it's a different PR.
+12. No flipped line endings (CRLF guard passes — checked via blob-level comparison per `~/.claude/rules/crlf-guard.md`).
+13. No stray branches with unmerged content that would resurrect deleted material (audit BOTH local AND remote branches per `~/.claude/rules/audit-stray-branches-before-main-clean.md`).
+14. DESIGN.md `## ` heading order matches the spec §4.1 canonical sequence — re-verified at gate, not just at task-end.
+15. ARCHITECTURE.md `^## [0-9]+\.` count = 13 — re-verified at gate.
 
 ---
 
@@ -730,7 +843,7 @@ grep -rn "DESIGN\.md §\|DESIGN\.md#" the-digital-matrix/ \
 
 ### 12.6 Open question: CLAUDE.md "Author override" — keep in CLAUDE.md OR move full version to ARCHITECTURE.md §12?
 
-**Decided in this spec:** ARCHITECTURE.md §12 holds the canonical control-plane explanation (already there); CLAUDE.md keeps a 5-line operator quick-ref pointing back. The duplicate copy at lines 296-307 is the one to delete (keep line-286 as the operator quick-ref, since the section header at 286 reads "Author override — quick reference" and matches the operator-runtime tier).
+**Decided in this spec:** ARCHITECTURE.md §12 holds the canonical control-plane explanation (already there); CLAUDE.md keeps a 5-line operator quick-ref pointing back. **Keep the FIRST occurrence of the duplicated `### Author override — quick reference` subsection in CLAUDE.md; delete the SECOND.** Both headers and bodies are byte-identical (verified: `diff <(sed -n '286,294p' CLAUDE.md) <(sed -n '296,304p' CLAUDE.md)` returns empty), so the rationale is "keep-first" by source-order convention, NOT by header text or content (which don't distinguish). Line numbers will drift; re-locate at execution time via `grep -n 'Author override — quick reference' the-digital-matrix/CLAUDE.md`.
 
 ---
 
