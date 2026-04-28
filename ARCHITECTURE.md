@@ -39,21 +39,15 @@ A static React SPA serving Piotr Tarach's personal blog and portfolio. No backen
 └─────────────────────────────────────────────────────────┘
 ```
 
-**Tech stack:**
+**Tech stack (architectural essentials):**
 
-| Layer        | Technology                          | Notes                                          |
-|--------------|--------------------------------------|------------------------------------------------|
-| Framework    | React 18 + TypeScript 5.8           | Path alias `@/` → `src/`                       |
-| Bundler      | Vite 7 + `@vitejs/plugin-react-swc` | SWC for fast transforms                        |
-| Routing      | React Router DOM 6                  | `BrowserRouter` + `Routes`/`Route`             |
-| State        | React Query (TanStack)              | For async state where needed (minimal usage)   |
-| Animations   | Framer Motion 12                    | Page transitions, staggered lists              |
-| Markdown     | react-markdown + rehype/remark       | GFM, Prism syntax, Mermaid, TOC, slug-from-id  |
-| Icons        | Lucide React                         | UI iconography                                 |
-| UI Components| shadcn/ui (Radix primitives)        | Sheets, dropdowns, tabs                        |
-| Styling      | Tailwind CSS 3 + CSS custom properties | All colors via `:root` tokens                  |
-| Theme        | next-themes (single theme: cyberpunk-gold) | `attribute="class"` on `<html>`                |
-| Deployment   | Vercel (auto from `main`)           | Includes Analytics + Speed Insights            |
+| Layer        | Technology                                | Architectural rationale                                       |
+|--------------|-------------------------------------------|---------------------------------------------------------------|
+| Theme        | next-themes (single theme: cyberpunk-gold) | FOUC prevention via inline script; preserves wiring for future themes (see §12) |
+| Animations   | Framer Motion 12 + custom variants in `motion.ts` | Two-tier coexisting timing systems (JS variants + CSS vars) — see §6 |
+| Deployment   | Vercel (auto from `main`) + Analytics + Speed Insights | SPA rewrite via `vercel.json`; Speed Insights affects test timing — see §9 |
+
+Full Tech Stack table → `README.md`.
 
 ---
 
@@ -193,29 +187,9 @@ CSS is layered for predictable cascade resolution:
 
 ### Theme tokens
 
-All colors are HSL CSS custom properties on `:root`:
+Color tokens live as HSL CSS custom properties on `:root` in `src/index.css`. `tailwind.config.ts` maps each token to a Tailwind utility (e.g., `text-primary` → `color: hsl(var(--primary))`). Single source of truth: the CSS `:root` block.
 
-```css
-:root {
-  --primary: 57 100% 48%;          /* yellow */
-  --accent: 171 77% 60%;           /* cyan */
-  --learning: 25 95% 55%;          /* amber — distinct semantic slot */
-  /* ... */
-}
-```
-
-`tailwind.config.ts` maps these to Tailwind utilities:
-
-```ts
-colors: {
-  primary: { DEFAULT: "hsl(var(--primary))", foreground: "hsl(var(--primary-foreground))" },
-  accent:  { DEFAULT: "hsl(var(--accent))",  foreground: "hsl(var(--accent-foreground))" },
-  learning:{ DEFAULT: "hsl(var(--learning))",foreground: "hsl(var(--learning-foreground))" },
-  /* ... */
-}
-```
-
-So `text-primary` resolves to `color: hsl(var(--primary))` which resolves to `hsl(57 100% 48%)`. Single source of truth.
+**Token list and brand rationale:** `→ DESIGN.md §Colors` (the YAML front matter mirrors the CSS tokens; the prose explains semantic roles and usage rules).
 
 ### Reading mode
 
@@ -294,7 +268,7 @@ The systems share design intent (durations match, easings match) but aren't mech
 | `useItemVariant()`         | reduced → `reducedVariant`, mobile → `staggerItemMobile`, else `staggerItemCyber` |
 | `useHeroStaggerVariant()`  | reduced → `reducedVariant`, mobile → `staggerItemMobile`, else `staggerItem` (subtle) |
 
-**Why two stagger hooks?** Hero already runs heavy entrance theater (`hero-glitch-entrance` + `hero-stamp-entrance`). The Phase 3 stagger should be **subtle** to not compete; cyber stagger would fight the headline. Other pages get the cyber variant for first-impression drama.
+**Stagger semantics:** `→ DESIGN.md §Motion / Subtle vs cyber stagger variants` covers the rationale (hero subtitle uses subtle variant so the Phase 3 cascade doesn't fight the headline theater above; other pages get the cyber variant for first-impression drama). The hook indirection (which lives here as architecture) enforces mobile-fallback and reduced-motion handling — always use the hook, never import variants directly.
 
 ---
 
