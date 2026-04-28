@@ -205,9 +205,11 @@ Why a descendant div instead of `<html>`? It scopes the swap to content area onl
 ### `next-themes` role (single-theme)
 
 After consolidation, `next-themes` is technically vestigial — there's only one theme to "switch" to. But we keep `ThemeProvider` because:
-1. It applies `theme-cyberpunk-gold` class to `<html>` BEFORE first paint, preventing FOUC
-2. It injects the inline `<script>` that reads `localStorage` synchronously (also FOUC prevention)
-3. It preserves wiring for future theme additions without restructuring
+1. It applies `theme-cyberpunk-gold` class to `<html>` BEFORE first paint via inline `<script>`, preventing FOUC
+2. It synchronously reads `localStorage` (also FOUC prevention)
+3. It preserves the wiring point if a future theme is added — re-introducing themes wouldn't require restructuring
+
+The `theme-cyberpunk-gold` class itself is currently a no-op at the CSS level (color tokens live in `:root`), but it serves as a defensive marker that hydration completed — useful for any future hydration-state-dependent CSS or JS that needs to know "themes are wired".
 
 ---
 
@@ -516,16 +518,6 @@ In `index.css`, code-block selection-color rules (`pre ::selection`, `code ::sel
 
 The same principle protects the `body` font swap to Chakra Petch (in `@layer base`, edited in-place rather than added unlayered).
 
-### Why we keep `next-themes` despite single-theme
-
-`ThemeProvider` (`src/App.tsx`) is configured with `themes={["cyberpunk-gold"]}` — only one theme. We keep the provider because:
-
-1. It applies `theme-cyberpunk-gold` class to `<html>` BEFORE first paint via inline `<script>`, preventing FOUC
-2. It synchronously reads `localStorage` (FOUC prevention)
-3. It preserves the wiring point if a future theme is added — re-introducing themes wouldn't require restructuring
-
-The class itself is currently a no-op (color tokens live in `:root`), but it serves as a defensive marker that hydration completed.
-
 ### Sonner toast theme — hardcoded "dark"
 
 Sonner's `Toaster` accepts `theme="light" | "dark" | "system"`. Passing the next-themes value (`"cyberpunk-gold"`) silently falls back to `"light"` and renders toasts on a white background against our dark UI. We hardcode `theme="dark"` in `src/components/ui/sonner.tsx` to avoid this.
@@ -537,10 +529,6 @@ If a future theme adds a light reading-mode for toasts (currently reading mode i
 Elements using `.hero-glitch-entrance` or `.glitch-hover` CSS classes MUST also set the `data-text="..."` attribute matching their visible text. The pseudo-elements (`::before`, `::after`) read `content: attr(data-text)` to render the chromatic-aberration overlays.
 
 Forgetting `data-text` produces silent failure: animation runs, but the overlay layers are blank.
-
-### Mobile orb override scope
-
-`@media (max-width: 640px)` in `index.css` redefines `.animate-hero-glow-slow` and `.animate-hero-glow-slower` to use the `hero-glow-mobile` keyframe. This keyframe has tighter scale (1.04 vs 1.12 desktop) and tighter opacity (0.75-0.85 vs 0.6-1.0), at slower tempo (16s/22s vs 8s/11s). Reason: on mobile the orbs sit closer to the eye and compete with the hero entrance cascade if they breathe too actively.
 
 ### Motion override precedence (control plane)
 
