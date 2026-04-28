@@ -14,6 +14,7 @@ export default defineConfig({
     // 127.0.0.1 not localhost — avoids IPv4/IPv6 mismatch with webServer bind
     baseURL: "http://127.0.0.1:8080",
     trace: "on-first-retry",
+    timezoneId: "UTC",
   },
   projects: [
     {

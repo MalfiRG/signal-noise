@@ -3,7 +3,7 @@ import { useRef, useEffect, useState } from "react";
 interface LetterRevealProps {
   text: string;
   className?: string;
-  tag?: "h1" | "h2" | "h3" | "span";
+  tag?: "h1" | "h2" | "h3" | "span" | "p";
   delayPerLetter?: number;
   startDelay?: number;
   skipAnimation?: boolean;

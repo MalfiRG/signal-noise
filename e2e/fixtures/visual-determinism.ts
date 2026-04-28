@@ -38,6 +38,57 @@ export async function skipHeroCascadeViaInitScript(page: Page) {
   });
 }
 
+/**
+ * Freeze Date.now / new Date(...) AND performance.now() to a fixed instant
+ * so the IdStrip's live clock and any monotonic-clock-driven CSS animation
+ * (e.g. cursor-blink) produce stable visual baselines.
+ *
+ * Fixed instant: 2026-04-27T12:00:00.000Z. Run BEFORE freezeAnimationsViaInitScript
+ * to avoid setTimeout(0) re-entrancy issues during page boot.
+ *
+ * Note: process.env.TZ=UTC must also be set in playwright.config.ts so
+ * formatTimeOfDay() (which uses local zone in production) renders the same
+ * local hours as the UTC instant — otherwise CI (UTC) and local-dev (Prague)
+ * baselines diverge.
+ */
+export async function freezeClockViaInitScript(page: Page) {
+  await page.addInitScript(() => {
+    const FIXED_INSTANT_MS = Date.UTC(2026, 3, 27, 12, 0, 0); // April = month 3 (0-indexed)
+    const RealDate = Date;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    function FrozenDate(this: unknown, ...args: any[]): unknown {
+      if (!(this instanceof FrozenDate)) {
+        // Date() called without `new` — return a string of the FIXED instant.
+        return new RealDate(FIXED_INSTANT_MS).toString();
+      }
+      if (args.length === 0) {
+        return new RealDate(FIXED_INSTANT_MS);
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return new (RealDate as any)(...args);
+    }
+    FrozenDate.prototype = RealDate.prototype;
+    (FrozenDate as unknown as { now: () => number }).now = () => FIXED_INSTANT_MS;
+    (FrozenDate as unknown as { parse: typeof Date.parse }).parse = RealDate.parse;
+    (FrozenDate as unknown as { UTC: typeof Date.UTC }).UTC = RealDate.UTC;
+    (window as unknown as { Date: unknown }).Date = FrozenDate;
+
+    // performance.now → fixed value relative to navigation start.
+    const realPerfNow = performance.now.bind(performance);
+    const frozenPerfStart = realPerfNow();
+    try {
+      Object.defineProperty(performance, "now", {
+        configurable: true,
+        writable: true,
+        value: () => frozenPerfStart,
+      });
+    } catch {
+      // Some browsers make performance.now non-configurable; fallback no-op.
+    }
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Post-goto primitives — call AFTER page.goto.
 // ---------------------------------------------------------------------------
@@ -100,8 +151,11 @@ export async function settleStyles(page: Page) {
 
 export async function prepareContext(
   page: Page,
-  opts?: { skipHeroCascade?: boolean; freezeKeyframes?: boolean }
+  opts?: { skipHeroCascade?: boolean; freezeKeyframes?: boolean; freezeClock?: boolean }
 ) {
+  if (opts?.freezeClock) {
+    await freezeClockViaInitScript(page);
+  }
   if (opts?.freezeKeyframes !== false) {
     await freezeAnimationsViaInitScript(page);
   }
