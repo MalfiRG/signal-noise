@@ -63,3 +63,158 @@ test.describe("Blog code-block — uniform background (regression)", () => {
     });
   }
 });
+
+// Regression: long inline-code identifiers used to push the document past
+// viewport width on mobile, triggering horizontal page scroll that clipped
+// navbar/title. Two-layer fix: overflow-wrap: anywhere on inline <code>,
+// plus overflow-x: hidden on .markdown-body as a defensive containment.
+// Style-test post contains an intentionally long identifier as a fixture.
+test.describe("Inline-code overflow guard (regression)", () => {
+  for (const viewport of [
+    { width: 375, height: 812, name: "iphone-se" },
+    { width: 414, height: 900, name: "iphone-pro" },
+  ]) {
+    test(`document does not exceed viewport width with long inline-code @ ${viewport.name}`, async ({ page }) => {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.goto(STYLE_TEST_URL, { waitUntil: "networkidle" });
+      await page.waitForSelector(".markdown-body code", { timeout: 5000 });
+
+      const widths = await page.evaluate(() => ({
+        scrollWidth: document.documentElement.scrollWidth,
+        innerWidth: window.innerWidth,
+        bodyWidth: document.body.getBoundingClientRect().width,
+      }));
+      // Allow 1px tolerance for sub-pixel rounding.
+      expect(widths.scrollWidth).toBeLessThanOrEqual(widths.innerWidth + 1);
+      expect(widths.bodyWidth).toBeLessThanOrEqual(widths.innerWidth + 1);
+    });
+
+    test(`inline-code element wraps inside the pill (overflow-wrap: anywhere) @ ${viewport.name}`, async ({ page }) => {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.goto(STYLE_TEST_URL, { waitUntil: "networkidle" });
+      await page.waitForSelector(".markdown-body code", { timeout: 5000 });
+
+      const wrap = await page.evaluate(() => {
+        const inline = Array.from(document.querySelectorAll(".markdown-body code"))
+          .find((c) => !(c as HTMLElement).matches('[class*="language-"]')) as HTMLElement | undefined;
+        return inline ? getComputedStyle(inline).overflowWrap : null;
+      });
+      // Both "anywhere" and "break-word" produce the wrap; the css-wide value
+      // "normal" is the broken state.
+      expect(wrap === "anywhere" || wrap === "break-word", `overflowWrap=${wrap}`).toBe(true);
+    });
+  }
+});
+
+// Regression: when the inline-code pill rule used :not(pre code) as its
+// fenced-code exclusion, CodeBlock.tsx replaced <pre> with <div>, the
+// selector silently became inert, and the pill border + padding tiled
+// across each visual line of fenced code. Anchor on language-* class
+// instead — that survives wrapper-tag substitution.
+test.describe("Fenced code excluded from inline-pill styling (regression)", () => {
+  for (const viewport of [
+    { width: 1280, height: 720, name: "desktop" },
+    { width: 375, height: 812, name: "mobile" },
+  ]) {
+    test(`fenced <code> has zero border + zero pill padding @ ${viewport.name}`, async ({ page }) => {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.goto(STYLE_TEST_URL, { waitUntil: "networkidle" });
+      await page.waitForSelector('code[class*="language-"]', { timeout: 5000 });
+
+      const violations = await page.evaluate(() => {
+        const codes = Array.from(document.querySelectorAll('code[class*="language-"]')) as HTMLElement[];
+        return codes
+          .map((code, i) => {
+            const cs = getComputedStyle(code);
+            return {
+              i,
+              borderTopWidth: cs.borderTopWidth,
+              paddingLeft: cs.paddingLeft,
+              borderRadius: cs.borderTopLeftRadius,
+            };
+          })
+          .filter((r) => r.borderTopWidth !== "0px" || r.paddingLeft !== "0px");
+      });
+      expect(violations, JSON.stringify(violations)).toHaveLength(0);
+    });
+  }
+});
+
+// Regression: reading-mode .code-block-wrapper used to inherit a frame
+// border via pre[class*="language-"], but CodeBlock.tsx replaced <pre>
+// with <div class="code-block-wrapper"> so the rule never fired —
+// frame went missing, code blocks looked like floating bg patches on
+// the cream page. Border was re-anchored to .code-block-wrapper with
+// a warm-brown tone tuned against the cream page bg.
+test.describe("Reading-mode code-block frame (regression)", () => {
+  for (const viewport of [
+    { width: 1280, height: 720, name: "desktop" },
+    { width: 375, height: 812, name: "mobile" },
+  ]) {
+    test(`.code-block-wrapper has visible frame in reading mode @ ${viewport.name}`, async ({ page }) => {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.goto(STYLE_TEST_URL, { waitUntil: "networkidle" });
+      await page.waitForSelector(".theme-reading .code-block-wrapper", { timeout: 5000 });
+
+      const frame = await page.evaluate(() => {
+        const wrapper = document.querySelector(".theme-reading .code-block-wrapper") as HTMLElement | null;
+        if (!wrapper) return null;
+        const cs = getComputedStyle(wrapper);
+        return {
+          borderWidth: cs.borderTopWidth,
+          borderRadius: cs.borderTopLeftRadius,
+          boxShadow: cs.boxShadow,
+        };
+      });
+      expect(frame, "no .theme-reading .code-block-wrapper found").not.toBeNull();
+      // Border must be at least 1px.
+      const borderPx = parseFloat(String(frame!.borderWidth));
+      expect(borderPx).toBeGreaterThanOrEqual(1);
+      // Radius must be visible (>= 4px so the corners read as rounded).
+      const radiusPx = parseFloat(String(frame!.borderRadius));
+      expect(radiusPx).toBeGreaterThanOrEqual(4);
+      // Box-shadow must NOT be "none" — the frame needs a slight lift.
+      expect(frame!.boxShadow).not.toBe("none");
+    });
+  }
+});
+
+// Regression: reading-mode inline-code pill used to use a darker bg than
+// the cream page (looked like a dingy stripe) and lacked the GitHub-style
+// padding+radius+border convention. Verify the pill has visible padding,
+// rounded corners, and a hairline border.
+test.describe("Reading-mode inline-code pill styling (regression)", () => {
+  for (const viewport of [
+    { width: 1280, height: 720, name: "desktop" },
+    { width: 375, height: 812, name: "mobile" },
+  ]) {
+    test(`inline <code> has pill styling (padding, radius, border, bg) @ ${viewport.name}`, async ({ page }) => {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.goto(STYLE_TEST_URL, { waitUntil: "networkidle" });
+      await page.waitForSelector(".markdown-body code", { timeout: 5000 });
+
+      const pill = await page.evaluate(() => {
+        const inline = Array.from(document.querySelectorAll(".markdown-body code"))
+          .find((c) => !(c as HTMLElement).matches('[class*="language-"]')) as HTMLElement | undefined;
+        if (!inline) return null;
+        const cs = getComputedStyle(inline);
+        return {
+          paddingLeft: cs.paddingLeft,
+          borderRadius: cs.borderTopLeftRadius,
+          borderWidth: cs.borderTopWidth,
+          backgroundColor: cs.backgroundColor,
+        };
+      });
+      expect(pill, "no inline <code> found in markdown-body").not.toBeNull();
+      // Padding must be > 4px (browser default) so the pill looks like a pill.
+      const padPx = parseFloat(String(pill!.paddingLeft));
+      expect(padPx).toBeGreaterThan(4);
+      // Radius must be visible (>= 3px).
+      expect(parseFloat(String(pill!.borderRadius))).toBeGreaterThanOrEqual(3);
+      // Hairline border must be at least 1px.
+      expect(parseFloat(String(pill!.borderWidth))).toBeGreaterThanOrEqual(1);
+      // Bg must NOT be transparent (rgba(0, 0, 0, 0)).
+      expect(pill!.backgroundColor).not.toBe("rgba(0, 0, 0, 0)");
+    });
+  }
+});

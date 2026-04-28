@@ -223,6 +223,8 @@ exit $EXIT_CODE
 
 Use `npm run test` to execute the suite. The `--coverage` flag enables Istanbul coverage collection. Results are written to `./coverage/lcov-report/index.html`.
 
+Long-identifier wrap regression: `message.usage.cache_creation.ephemeral_5m_input_tokens_very_long_field_name_for_overflow_regression_test_DO_NOT_REMOVE` should wrap inside the pill, NOT push the page width past the viewport.
+
 ---
 
 ## Tables
