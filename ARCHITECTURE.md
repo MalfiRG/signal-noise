@@ -433,7 +433,7 @@ See §6 above. The hook indirection (instead of importing variants directly) is 
 - Frontmatter: `title, slug, date, tags (3-6), category, reading_time, description, og_image, draft: true`
 - Tone dial: 4-5/10 polish. No AI-isms (`delve`, `landscape`, `it's worth noting`)
 - No labeled callout boxes — weave insights into prose
-- Obfuscation: follow workspace-global content policy
+
 
 ### Polish character handling
 
