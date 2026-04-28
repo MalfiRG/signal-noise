@@ -39,10 +39,10 @@ async function getOpacity(page: Page, selector: string): Promise<number> {
 
 const SEL = {
   initText: "p.tracking-\\[0\\.3em\\]",
-  h1: "h1.font-display",
+  h1: "h1.hero-h",
   breakIt: '[data-text="BREAK IT"]',
-  buildIt: 'h1 span[aria-label="BUILD IT"], h1 span.block',
-  proveIt: "span.hero-stamp-entrance, h1 > span:last-child",
+  buildIt: "[data-row='build']",
+  proveIt: "[data-row='prove']",
   subtitle: "p.text-foreground\\/80",
   buttons: ".flex.gap-4.justify-center",
   scrollHint: "p.animate-glow-pulse",
@@ -67,7 +67,7 @@ test.describe("Desktop — full animations", () => {
     );
     expect(hasGlitch).toBe(true);
 
-    await waitForVisible(page, 'h1 span[aria-label="BUILD IT"]', 5000);
+    await waitForVisible(page, "[data-row='build']", 5000);
 
     await waitForVisible(page, SEL.subtitle, 8000);
     await waitForVisible(page, SEL.buttons, 8000);
