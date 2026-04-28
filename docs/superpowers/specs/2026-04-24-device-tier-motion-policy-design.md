@@ -89,7 +89,7 @@ Inverted positive form (`motionAllowed = !animationsDisabled`) is acceptable in 
 
 Mobile/tablet brand trade-off (accepted, documented):
 
-DESIGN.md §1 describes the site as "every surface has weight, every motion has function" — a cyberdeck boot-sequence brand. That brand is DESKTOP-ONLY by this spec. Mobile and tablet first-visits render in settled state with no entrance theater. This is an accepted trade-off for:
+DESIGN.md §Overview describes the site as "every surface has weight, every motion has function" — a cyberdeck boot-sequence brand. That brand is DESKTOP-ONLY by this spec. Mobile and tablet first-visits render in settled state with no entrance theater. This is an accepted trade-off for:
 
 1. Performance (mobile GPUs struggle with blur and brightness transforms).
 2. User expectations (touch devices rarely see cinematic intros).
@@ -389,7 +389,7 @@ This section records curator decisions made under ambiguity during the Rev 2 pas
 
 **H7 pseudocode ordering:** The `authorOverride` check is placed after `heroReplaySkip` and before the tier check. This means: if the user has explicitly opted in to animations AND the hero replay-skip fires, replay-skip still wins (the cascade does not replay twice per session even if the user opted in). This is the most conservative ordering.
 
-**M4 DESIGN.md callout notation drift:** DESIGN.md §7 callout writes `tablet 768–1023`; this spec writes `>= 768 && < 1024`. Numerically equivalent for integer pixels, but notationally inconsistent. A follow-up doc PR should align DESIGN.md to use the spec's explicit half-open interval form. (Curator cannot edit DESIGN.md — scope constraint.)
+**M4 DESIGN.md callout notation drift:** DESIGN.md §Motion callout writes `tablet 768–1023`; this spec writes `>= 768 && < 1024`. Numerically equivalent for integer pixels, but notationally inconsistent. A follow-up doc PR should align DESIGN.md to use the spec's explicit half-open interval form. (Curator cannot edit DESIGN.md — scope constraint.)
 
 **L1 ARCHITECTURE.md wording:** ARCHITECTURE.md §6 callout simplifies the current state as "2-tier 640px cutoff" — this is directionally correct but elides the 768 mobile hook. A follow-up doc PR should update the callout to "inconsistent 640/768 breakpoints (no tablet tier)". (Curator cannot edit ARCHITECTURE.md — scope constraint.)
 
