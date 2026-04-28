@@ -39,21 +39,15 @@ A static React SPA serving Piotr Tarach's personal blog and portfolio. No backen
 └─────────────────────────────────────────────────────────┘
 ```
 
-**Tech stack:**
+**Tech stack (architectural essentials):**
 
-| Layer        | Technology                          | Notes                                          |
-|--------------|--------------------------------------|------------------------------------------------|
-| Framework    | React 18 + TypeScript 5.8           | Path alias `@/` → `src/`                       |
-| Bundler      | Vite 7 + `@vitejs/plugin-react-swc` | SWC for fast transforms                        |
-| Routing      | React Router DOM 6                  | `BrowserRouter` + `Routes`/`Route`             |
-| State        | React Query (TanStack)              | For async state where needed (minimal usage)   |
-| Animations   | Framer Motion 12                    | Page transitions, staggered lists              |
-| Markdown     | react-markdown + rehype/remark       | GFM, Prism syntax, Mermaid, TOC, slug-from-id  |
-| Icons        | Lucide React                         | UI iconography                                 |
-| UI Components| shadcn/ui (Radix primitives)        | Sheets, dropdowns, tabs                        |
-| Styling      | Tailwind CSS 3 + CSS custom properties | All colors via `:root` tokens                  |
-| Theme        | next-themes (single theme: cyberpunk-gold) | `attribute="class"` on `<html>`                |
-| Deployment   | Vercel (auto from `main`)           | Includes Analytics + Speed Insights            |
+| Layer        | Technology                                | Architectural rationale                                       |
+|--------------|-------------------------------------------|---------------------------------------------------------------|
+| Theme        | next-themes (single theme: cyberpunk-gold) | FOUC prevention via inline script; preserves wiring for future themes (see §12) |
+| Animations   | Framer Motion 12 + custom variants in `motion.ts` | Two-tier coexisting timing systems (JS variants + CSS vars) — see §6 |
+| Deployment   | Vercel (auto from `main`) + Analytics + Speed Insights | SPA rewrite via `vercel.json`; Speed Insights affects test timing — see §9 |
+
+Full Tech Stack table → `README.md`.
 
 ---
 
@@ -193,29 +187,9 @@ CSS is layered for predictable cascade resolution:
 
 ### Theme tokens
 
-All colors are HSL CSS custom properties on `:root`:
+Color tokens live as HSL CSS custom properties on `:root` in `src/index.css`. `tailwind.config.ts` maps each token to a Tailwind utility (e.g., `text-primary` → `color: hsl(var(--primary))`). Single source of truth: the CSS `:root` block.
 
-```css
-:root {
-  --primary: 57 100% 48%;          /* yellow */
-  --accent: 171 77% 60%;           /* cyan */
-  --learning: 25 95% 55%;          /* amber — distinct semantic slot */
-  /* ... */
-}
-```
-
-`tailwind.config.ts` maps these to Tailwind utilities:
-
-```ts
-colors: {
-  primary: { DEFAULT: "hsl(var(--primary))", foreground: "hsl(var(--primary-foreground))" },
-  accent:  { DEFAULT: "hsl(var(--accent))",  foreground: "hsl(var(--accent-foreground))" },
-  learning:{ DEFAULT: "hsl(var(--learning))",foreground: "hsl(var(--learning-foreground))" },
-  /* ... */
-}
-```
-
-So `text-primary` resolves to `color: hsl(var(--primary))` which resolves to `hsl(57 100% 48%)`. Single source of truth.
+**Token list and brand rationale:** `→ DESIGN.md §Colors` (the YAML front matter mirrors the CSS tokens; the prose explains semantic roles and usage rules).
 
 ### Reading mode
 
@@ -231,9 +205,11 @@ Why a descendant div instead of `<html>`? It scopes the swap to content area onl
 ### `next-themes` role (single-theme)
 
 After consolidation, `next-themes` is technically vestigial — there's only one theme to "switch" to. But we keep `ThemeProvider` because:
-1. It applies `theme-cyberpunk-gold` class to `<html>` BEFORE first paint, preventing FOUC
-2. It injects the inline `<script>` that reads `localStorage` synchronously (also FOUC prevention)
-3. It preserves wiring for future theme additions without restructuring
+1. It applies `theme-cyberpunk-gold` class to `<html>` BEFORE first paint via inline `<script>`, preventing FOUC
+2. It synchronously reads `localStorage` (also FOUC prevention)
+3. It preserves the wiring point if a future theme is added — re-introducing themes wouldn't require restructuring
+
+The `theme-cyberpunk-gold` class itself is currently a no-op at the CSS level (color tokens live in `:root`), but it serves as a defensive marker that hydration completed — useful for any future hydration-state-dependent CSS or JS that needs to know "themes are wired".
 
 ---
 
@@ -294,7 +270,7 @@ The systems share design intent (durations match, easings match) but aren't mech
 | `useItemVariant()`         | reduced → `reducedVariant`, mobile → `staggerItemMobile`, else `staggerItemCyber` |
 | `useHeroStaggerVariant()`  | reduced → `reducedVariant`, mobile → `staggerItemMobile`, else `staggerItem` (subtle) |
 
-**Why two stagger hooks?** Hero already runs heavy entrance theater (`hero-glitch-entrance` + `hero-stamp-entrance`). The Phase 3 stagger should be **subtle** to not compete; cyber stagger would fight the headline. Other pages get the cyber variant for first-impression drama.
+**Stagger semantics:** `→ DESIGN.md §Motion / Subtle vs cyber stagger variants` covers the rationale (hero subtitle uses subtle variant so the Phase 3 cascade doesn't fight the headline theater above; other pages get the cyber variant for first-impression drama). The hook indirection (which lives here as architecture) enforces mobile-fallback and reduced-motion handling — always use the hook, never import variants directly.
 
 ---
 
@@ -542,16 +518,6 @@ In `index.css`, code-block selection-color rules (`pre ::selection`, `code ::sel
 
 The same principle protects the `body` font swap to Chakra Petch (in `@layer base`, edited in-place rather than added unlayered).
 
-### Why we keep `next-themes` despite single-theme
-
-`ThemeProvider` (`src/App.tsx`) is configured with `themes={["cyberpunk-gold"]}` — only one theme. We keep the provider because:
-
-1. It applies `theme-cyberpunk-gold` class to `<html>` BEFORE first paint via inline `<script>`, preventing FOUC
-2. It synchronously reads `localStorage` (FOUC prevention)
-3. It preserves the wiring point if a future theme is added — re-introducing themes wouldn't require restructuring
-
-The class itself is currently a no-op (color tokens live in `:root`), but it serves as a defensive marker that hydration completed.
-
 ### Sonner toast theme — hardcoded "dark"
 
 Sonner's `Toaster` accepts `theme="light" | "dark" | "system"`. Passing the next-themes value (`"cyberpunk-gold"`) silently falls back to `"light"` and renders toasts on a white background against our dark UI. We hardcode `theme="dark"` in `src/components/ui/sonner.tsx` to avoid this.
@@ -563,10 +529,6 @@ If a future theme adds a light reading-mode for toasts (currently reading mode i
 Elements using `.hero-glitch-entrance` or `.glitch-hover` CSS classes MUST also set the `data-text="..."` attribute matching their visible text. The pseudo-elements (`::before`, `::after`) read `content: attr(data-text)` to render the chromatic-aberration overlays.
 
 Forgetting `data-text` produces silent failure: animation runs, but the overlay layers are blank.
-
-### Mobile orb override scope
-
-`@media (max-width: 640px)` in `index.css` redefines `.animate-hero-glow-slow` and `.animate-hero-glow-slower` to use the `hero-glow-mobile` keyframe. This keyframe has tighter scale (1.04 vs 1.12 desktop) and tighter opacity (0.75-0.85 vs 0.6-1.0), at slower tempo (16s/22s vs 8s/11s). Reason: on mobile the orbs sit closer to the eye and compete with the hero entrance cascade if they breathe too actively.
 
 ### Motion override precedence (control plane)
 
@@ -697,24 +659,6 @@ The 768–1279px tier still gets visible asymmetric stagger from padding alone (
 
 `docs-over-code-comments.md` mandates that the WHY for the threshold lives here, not inline; the rule itself only carries the threshold value.
 
-### Reading-mode code-block frame + background unification
-
-Two related bugs were fixed in the same surface:
-
-1. **`.theme-reading .code-block-wrapper` border** — the original border declaration sat on `pre[class*="language-"]`, which never renders in this codebase because `CodeBlock.tsx` replaces `<pre>` with `<div class="code-block-wrapper">`. Re-anchored to `.code-block-wrapper` with a warm-brown tone (`hsl(30 25% 45%)`) tuned against the cream page bg (NOT the dark code bg) plus a faint box-shadow lift so the frame reads on mobile WebKit at low DPI.
-
-2. **`<pre>`/`<code>` background unification** — both `.theme-reading .markdown-body pre[class*="language-"]` and `.theme-reading .markdown-body code[class*="language-"]` use `#2d2d2d !important` to match the `CodeBlock.tsx` inline style on `.code-block-wrapper`. Earlier value `hsl(220 13% 15%)` (= `#21252b`) sat ~5 lightness units darker than the wrapper. Because `<code>` renders `display: inline; white-space: pre`, ANY background mismatch tiles only behind text on each visual line — producing a per-line stripe regression visually identical to the inline-pill border leak (next section) but structurally distinct (bg mismatch, not border leak).
-
-Regression history: this exact bg mismatch has been reported three times. Lock the invariant via `e2e/functional/code-block-styling.spec.ts` — `codeBg === wrapperBg === rgb(45, 45, 45)` at every code-block on the page, both desktop and mobile.
-
-### Inline-code pill — language-class anchor
-
-The reading-mode inline-code pill rule (background, padding, radius, hairline border) uses `.theme-reading .markdown-body code:not([class*="language-"])` — NOT `:not(pre code)`. The `:not(pre code)` form was inert: `CodeBlock.tsx` replaces the `<pre>` parent with a `<div class="code-block-wrapper">`, so `pre code` no longer matches anything in the rendered DOM and the exclusion silently fired on fenced `<code>` too. With `display: inline; white-space: pre` on the highlighted `<code>` plus a 1px border + 0.1em padding on the pill rule, `box-decoration-break: slice` tiled the pill outline onto every visual line — the per-line pill border regression.
-
-The `language-*` class that `rehype-prism-plus` stamps on every fenced `<code>` is invariant across tag substitution. The same `:not([class*="language-"])` anchor applies to the theme-agnostic `overflow-wrap: anywhere` rule for consistency, even though the cascading `code[class*="language-"] { overflow-wrap: normal !important }` at the prism-bg block was already neutralizing it.
-
-`e2e/functional/code-block-styling.spec.ts` "Fenced code excluded from inline-pill styling" guards the new selector — `border-top-width === 0px` AND `padding-left === 0px` on every `code[class*="language-"]` on the page.
-
 ### Inline-code overflow guard — defensive containment
 
 `.markdown-body { overflow-x: hidden }` is intentional, NOT cargo-culted. Long unbreakable identifiers in inline `<code>` (e.g. `message.usage.cache_creation.ephemeral_5m_input_tokens`) used to push document width past viewport width on mobile, triggering horizontal page scroll that clipped the navbar/title/tags off-screen. Two-layer fix:
@@ -734,12 +678,6 @@ Scroll trigger: `useEffect` listens for `window.scrollY > 40`, sets a `scrolled`
 
 `e2e/functional/hero-skip-and-badge.spec.ts` "Hero scroll-to-explore arrow" reads computed opacity on the closest `.transition-opacity` ancestor — explicitly NOT on the inner element, since framer-motion's inline opacity would leak into that read and produce false-positive passes.
 
-### IdStrip mobile balance
-
-`.id-strip` (`src/index.css`) uses `justify-content: center` so when content wraps on phone-portrait, all rows are centered (symmetric) instead of left-aligned. A `@media (max-width: 480px)` block tightens font-size 10→8px, gap 18→6px, letter-spacing 0.22em→0.12em, padding 6×14→5×8 — combined, four segments (NODE / OP / TS / UTC) fit on one row at 375px and `SEC: OK` lands centered on row 2.
-
-The hero `<section>` itself uses `flex items-start md:items-center` (`Index.tsx`) so on mobile portrait the IdStrip sits right under the navbar (top-aligned) instead of being centered with ~150px of dead space above. Desktop keeps the dramatic vertically-centered cascade because `min-h-screen` provides the slack `items-center` needs to feel intentional.
-
 ---
 
 ## 13. References
@@ -750,7 +688,8 @@ The hero `<section>` itself uses `flex items-start md:items-center` (`Index.tsx`
 - **Operator profile:** repo's `CLAUDE.md` + workspace `CLAUDE.md`
 - **Repo:** https://github.com/MalfiRG/the-digital-matrix
 - **Hosting:** Vercel (auto from `main`)
+- **Doc deduplication migration spec:** `docs/superpowers/specs/2026-04-28-blog-doc-deduplication-design.md` (HARD SPEC for the architecture-tier doc dedup; see also the Stitch lint command `npx --yes @google/design.md lint DESIGN.md` for ongoing DESIGN.md format validation)
 
 ---
 
-*Last updated: 2026-04-19 — single-theme consolidation commit `9ad49e1`*
+*Last updated: 2026-04-28 — doc deduplication migration; see §13 spec link*

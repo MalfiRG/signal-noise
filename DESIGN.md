@@ -1,10 +1,127 @@
+---
+version: alpha
+name: Night City
+description: >
+  Cyberpunk-gold (Cyberpunk 2077 palette grammar) personal blog and portfolio
+  for Piotr Tarach. Yellow primary + cyan accent + amber learning-state on
+  near-black backgrounds. Mechanical, decisive, terminal-aesthetic — reads as
+  "system boot sequence" rather than "polished SaaS".
+colors:
+  primary: "#f3e600"
+  primary-foreground: "#0b0d12"
+  accent: "#52e3c8"
+  learning: "#f78a1a"
+  background: "#0b0d12"
+  foreground: "#f5e9a3"
+  card: "#11141a"
+  secondary: "#1d2230"
+  muted: "#1f2329"
+  muted-foreground: "#7080a4"
+  border: "#1d2436"
+  destructive: "#ef4444"
+  reading-background: "#dbd0c4"
+  reading-foreground: "#2b2722"
+  reading-primary: "#5c5246"
+  reading-border: "#cbc5be"
+  reading-learning: "#8e5e22"
+typography:
+  hero-h1:
+    fontFamily: Orbitron
+    fontSize: 4.5rem
+    fontWeight: 900
+    lineHeight: 1.1
+  h2:
+    fontFamily: Rajdhani
+    fontSize: 1.5rem
+    fontWeight: 700
+    lineHeight: 1.3
+  h3:
+    fontFamily: Rajdhani
+    fontSize: 1.25rem
+    fontWeight: 600
+    lineHeight: 1.4
+  body:
+    fontFamily: Chakra Petch
+    fontSize: 1rem
+    fontWeight: 400
+    lineHeight: 1.7
+  reading-body:
+    fontFamily: Atkinson Hyperlegible
+    fontSize: 1rem
+    fontWeight: 400
+    lineHeight: 1.7
+  subhead:
+    fontFamily: Chakra Petch
+    fontSize: 0.875rem
+    fontWeight: 400
+    letterSpacing: 0.1em
+  label-caps:
+    fontFamily: Chakra Petch
+    fontSize: 0.75rem
+    fontWeight: 400
+    letterSpacing: 0.3em
+  code:
+    fontFamily: Share Tech Mono
+    fontSize: 0.875rem
+    fontWeight: 400
+    lineHeight: 1.6
+rounded:
+  sm: 4px
+  full: 9999px
+spacing:
+  base: 16px
+  xs: 4px
+  sm: 8px
+  md: 16px
+  lg: 32px
+  xl: 64px
+  section-y-mobile: 48px
+  section-y-desktop: 64px
+components:
+  button-primary:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.primary-foreground}"
+    rounded: "{rounded.sm}"
+    padding: 12px
+  button-primary-hover:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.primary-foreground}"
+  button-secondary:
+    backgroundColor: "transparent"
+    textColor: "{colors.muted-foreground}"
+    rounded: "{rounded.sm}"
+    padding: 12px
+  button-secondary-hover:
+    textColor: "{colors.foreground}"
+  card:
+    backgroundColor: "{colors.card}"
+    rounded: "{rounded.sm}"
+    padding: 24px
+  nav-link:
+    textColor: "{colors.foreground}"
+  nav-link-active:
+    textColor: "{colors.primary}"
+  tab-active:
+    textColor: "{colors.primary}"
+  tab-active-learning:
+    textColor: "{colors.learning}"
+  code-block:
+    backgroundColor: "#2d2d2d"
+    textColor: "{colors.foreground}"
+    rounded: "{rounded.sm}"
+  code-inline:
+    backgroundColor: "{colors.muted}"
+    textColor: "{colors.foreground}"
+    rounded: "{rounded.sm}"
+---
+
 # DESIGN.md — The Digital Matrix
 
 > AI-agent-readable design system spec for Piotr Tarach's personal blog and portfolio. Optimized for coding agents (Claude, Stitch, etc.) to generate UI consistent with the established visual identity.
 
 ---
 
-## 1. Visual Theme & Atmosphere
+## Overview
 
 **Identity name:** Night City (cyberpunk-gold).
 **Origin:** Cyberpunk 2077 palette grammar — yellow primary + cyan accent + amber learning-state on near-black backgrounds.
@@ -21,7 +138,7 @@
 
 ---
 
-## 2. Color Palette & Roles
+## Colors
 
 All colors live as HSL CSS custom properties on `:root` in `src/index.css`. Tailwind utilities (`text-primary`, `bg-accent`, `text-learning`) map to these via `tailwind.config.ts`.
 
@@ -65,7 +182,7 @@ Code blocks inside reading mode stay dark (Tomorrow Night palette via Prism) for
 
 ---
 
-## 3. Typography Rules
+## Typography
 
 | Use                        | Font family                | Weight  | Tailwind utility | Notes                                          |
 |----------------------------|----------------------------|---------|------------------|------------------------------------------------|
@@ -96,82 +213,9 @@ Code blocks inside reading mode stay dark (Tomorrow Night palette via Prism) for
 
 ---
 
-## 4. Component Stylings
+## Layout
 
-### Buttons
-
-Two variants on the home page hero:
-
-**Primary CTA** (`VIEW PROJECTS` style):
-```html
-border border-primary/50 bg-primary/10 px-8 py-3 text-sm tracking-widest
-text-primary hover:bg-primary/20 hover:border-primary
-transition-all box-glow btn-interactive glitch-hover
-```
-- Outline button with primary-tinted fill (10% opacity)
-- Yellow border at 50% opacity, brightens on hover
-- `box-glow` adds yellow glow via `--matrix-glow` var
-- `btn-interactive` adds 1px lift + glow on hover, instant settle on active
-- `glitch-hover` adds the chromatic aberration text-glitch on hover (data-text attribute required)
-
-**Secondary CTA** (`READ BLOG` style):
-```html
-border border-border px-8 py-3 text-sm tracking-widest
-text-muted-foreground hover:border-primary/50 hover:text-foreground
-transition-all btn-interactive glitch-hover
-```
-- Subtle outline, no fill
-- Muted text, brightens to foreground on hover, border picks up primary tint
-
-### Nav links (top navbar)
-
-```html
-text-sm tracking-widest transition-colors hover:text-primary
-nav-link-motion glitch-hover
-[active]:text-primary text-glow
-```
-- Active link gets the glow
-- `nav-link-motion` adds the underline-grow indicator on hover
-- `glitch-hover` always on (single-theme reality)
-
-### Cards (Project cards, blog cards, skill rows)
-
-```html
-bg-card border border-border rounded-md p-6
-hover:border-primary/50 transition-colors
-neon-border-trace
-```
-- `--radius` is `0.25rem` — sharp corners are intentional
-- `neon-border-trace` adds the rotating gradient border on hover (CSS `@property --border-angle`)
-
-### Theme dot / social icon (the corner button pattern)
-
-```html
-w-5 h-5 rounded-full border-2 p-2.5 box-content
-transition-all duration-200
-border-transparent opacity-50 hover:opacity-80
-inline-flex items-center justify-center text-foreground
-```
-- 20×20 content + 10px box-content padding = 44×44 touch target (WCAG 2.5.8)
-- Used for GitHub/LinkedIn icons in navbar (replaces former theme dots)
-
-### Tabs (Skills page)
-
-- Container: `bg-secondary/50 border border-border` — subtle inset feel
-- Active SKILLS tab: `text-primary text-glow` (yellow)
-- Active LEARNING tab: `text-learning` (amber) — distinct semantic slot
-
-### Code blocks (in markdown)
-
-- Wrapped in `.code-block-wrapper` with scroll shadows (left/right gradients fade in when content overflows horizontally)
-- Tomorrow Night Prism palette
-- Language badge in top-right (`.code-lang-badge`)
-- Copy button (`button[aria-label="Copy code"]`)
-- Reading mode keeps the dark background (preserves contrast)
-
----
-
-## 5. Layout Principles
+Layout combines spacing scale, grid system, whitespace philosophy, z-index hierarchy, and responsive collapse strategies.
 
 ### Spacing scale (Tailwind)
 
@@ -200,9 +244,44 @@ Default Tailwind 4px scale (1=4px, 2=8px, 4=16px, 6=24px, 8=32px, 12=48px, 16=64
 | Scan-sweep line     | `9998`       | Above content but below dropdowns  |
 | Scanline pattern    | `9999`       | Topmost ambient effect             |
 
+### Breakpoints (Tailwind defaults)
+
+| Token   | Min-width | Notes                                       |
+|---------|-----------|---------------------------------------------|
+| `sm`    | 640px     | Hero orbs threshold (now: always on)        |
+| `md`    | 768px     | Mobile nav → desktop nav switch             |
+| `lg`    | 1024px    | Sidebar TOC appears on blog post pages      |
+| `xl`    | 1280px    | Container padding stops growing             |
+
+### Mobile-first overrides
+
+- **Glow intensity** softened (`--matrix-text-glow: 0 0 6px ...` vs `0 0 10px`)
+- **Scan-sweep** killed (single CSS rule in mobile @media)
+- **Glitch-hover pseudo-elements** killed (no hover on touch devices, hero glitch animation kept)
+- **Hero stamp** animation duration shortened (0.6s vs 1s)
+- **Stagger items** swap to `staggerItemMobile` (opacity-only, no transform/blur)
+
+### Touch targets
+
+- Hamburger: 44×44 minimum (`min-h-[44px] min-w-[44px]` on the button)
+- All nav items in mobile sheet: `min-h-[48px]`
+- EXPLORER button on blog: `min-h-[44px]` + `affordance-pulse` animation to signal tappability
+
+### Collapse strategies
+
+- **Desktop nav (`hidden md:flex`)** ↔ **Mobile sheet (`md:hidden`)** — hard switch at `md` breakpoint, no transition
+- **Blog TOC sidebar (`hidden lg:block`)** ↔ **Mobile EXPLORER button + drawer** — sidebar disappears below `lg`, EXPLORER button + Sheet drawer takes over
+- **Hero text scaling** — `text-5xl md:text-7xl` (from 48px → 72px at md+)
+
+### IdStrip responsive balance
+
+`.id-strip` (`src/index.css`) uses `justify-content: center` so when content wraps on phone-portrait, all rows are centered (symmetric) instead of left-aligned. A `@media (max-width: 480px)` block tightens font-size 10→8px, gap 18→6px, letter-spacing 0.22em→0.12em, padding 6×14→5×8 — combined, four segments (NODE / OP / TS / UTC) fit on one row at 375px and `SEC: OK` lands centered on row 2.
+
+The hero `<section>` itself uses `flex items-start md:items-center` (`Index.tsx`) so on mobile portrait the IdStrip sits right under the navbar (top-aligned) instead of being centered with ~150px of dead space above. Desktop keeps the dramatic vertically-centered cascade because `min-h-screen` provides the slack `items-center` needs to feel intentional.
+
 ---
 
-## 6. Depth & Elevation
+## Elevation & Depth
 
 This is a flat design with **glow as the depth metaphor**. No traditional shadows on cards or surfaces.
 
@@ -218,12 +297,181 @@ This is a flat design with **glow as the depth metaphor**. No traditional shadow
 
 ---
 
-## 7. Motion Design
+## Shapes
+
+The shape language is sharp — `--radius: 0.25rem` (4px) on cards and buttons. Pill / circular forms (`rounded-full`) are reserved for the corner-button pattern (theme dot, social icons) and the hero glow orbs.
+
+| Token       | Value    | Used for                                              |
+|-------------|----------|-------------------------------------------------------|
+| `rounded.sm`  | 4px      | Cards, buttons, code-block wrappers, inline-code pill (in reading mode) |
+| `rounded.full`| 9999px   | Theme dot / social icons (44×44 touch target), hero orbs (visual blur) |
+
+**Rule:** sharp corners are intentional — they support the "cyberdeck UI" identity. Do not introduce intermediate radii (`rounded-md = 6px`, `rounded-lg = 8px`) without a brand-fit justification. The two-tier scale (sm + full) is the full vocabulary.
+
+---
+
+## Components
+
+Each component below maps 1:1 to a key in the YAML `components` map at the top of this file. Variants (hover, active) are separate entries per Stitch spec §4.1. The `### theme-dot` subsection is description-only — its primary properties (`rounded.full`, 44×44 touch target) are already covered by `rounded.full` in the YAML root, so it has no YAML mirror.
+
+### button-primary
+
+The primary CTA — outline button with primary-tinted fill (10% opacity) and a yellow border at 50% opacity that brightens on hover. Used for the home-page `VIEW PROJECTS` style and any "this is the action you came here for" surface.
+
+```html
+border border-primary/50 bg-primary/10 px-8 py-3 text-sm tracking-widest
+text-primary hover:bg-primary/20 hover:border-primary
+transition-all box-glow btn-interactive glitch-hover
+```
+
+- `box-glow` adds yellow glow via `--matrix-glow` var
+- `btn-interactive` adds 1px lift + glow on hover, instant settle on active
+- `glitch-hover` adds the chromatic aberration text-glitch on hover; **`data-text` attribute required** on every element using `glitch-hover` (the `::before` / `::after` pseudo-elements read `content: attr(data-text)`)
+
+### button-primary-hover
+
+State variant — fill brightens to `bg-primary/20`, border to `border-primary` (full opacity). The 1px hover lift from `btn-interactive` settles back on `:active`.
+
+### button-secondary
+
+Subtle outline, no fill. Used for the `READ BLOG` style — secondary actions that share visual hierarchy with primary but defer to it.
+
+```html
+border border-border px-8 py-3 text-sm tracking-widest
+text-muted-foreground hover:border-primary/50 hover:text-foreground
+transition-all btn-interactive glitch-hover
+```
+
+- Muted text on rest, brightens to foreground on hover
+- Border picks up primary tint on hover (`border-primary/50`)
+
+### button-secondary-hover
+
+State variant — border tints to `border-primary/50`; text brightens from `text-muted-foreground` to `text-foreground`. No fill applied; the rest state has none.
+
+### nav-link
+
+Top navbar links. Always on `glitch-hover` (single-theme reality — no conditional). Active state is yellow with a text-glow.
+
+```html
+text-sm tracking-widest transition-colors hover:text-primary
+nav-link-motion glitch-hover
+[active]:text-primary text-glow
+```
+
+- `nav-link-motion` adds the underline-grow indicator on hover
+- `glitch-hover` always on; requires `data-text` attribute
+
+### nav-link-active
+
+Active route variant — `text-primary` (yellow) plus `text-glow` (text-shadow from `--matrix-text-glow`). Set via the `[active]` state in the markup above; no separate Tailwind block.
+
+### card
+
+Project cards, blog cards, skill rows. Sharp corners (`--radius: 0.25rem`) are intentional — they support the cyberdeck identity. Hover swaps to `border-primary/50` and triggers `neon-border-trace`.
+
+```html
+bg-card border border-border rounded-md p-6
+hover:border-primary/50 transition-colors
+neon-border-trace
+```
+
+- `--radius` is `0.25rem` — sharp corners are intentional
+- `neon-border-trace` adds the rotating gradient border on hover (CSS `@property --border-angle`)
+
+### theme-dot
+
+The corner-button pattern — borderless circular icon container, 44×44 touch target. Used for GitHub / LinkedIn icons in the navbar (replaces former theme dots from the multi-theme era). Description-only — has no YAML mirror because its properties (`rounded.full`, padding to hit 44×44) are already in the YAML root.
+
+```html
+w-5 h-5 rounded-full border-2 p-2.5 box-content
+transition-all duration-200
+border-transparent opacity-50 hover:opacity-80
+inline-flex items-center justify-center text-foreground
+```
+
+- 20×20 content + 10px box-content padding = 44×44 touch target (WCAG 2.5.8)
+
+### tab-active
+
+Skills-page active tab indicator. `text-primary` (yellow) + `text-glow` for the SKILLS tab. Container is `bg-secondary/50 border border-border` (subtle inset feel).
+
+### tab-active-learning
+
+Active LEARNING tab variant — uses `text-learning` (amber) instead of `text-primary`. Distinct semantic slot signals "still acquiring", never confused with primary/active.
+
+### code-block
+
+Markdown code blocks. Wrapped in `.code-block-wrapper` with horizontal scroll shadows. Tomorrow Night Prism palette stays dark even in reading mode (preserves contrast).
+
+```html
+relative bg-[#2d2d2d] text-foreground rounded-md
+.code-block-wrapper > pre + scroll-shadow gradients
+```
+
+- Language badge in top-right (`.code-lang-badge`)
+- Copy button (`button[aria-label="Copy code"]`)
+
+#### Reading-mode override
+
+Two related bugs were fixed on this surface (regression history: the bg-mismatch has been reported three times):
+
+1. **`.theme-reading .code-block-wrapper` border** — the original border declaration sat on `pre[class*="language-"]`, which never renders in this codebase because `CodeBlock.tsx` replaces `<pre>` with `<div class="code-block-wrapper">`. Re-anchored to `.code-block-wrapper` with a warm-brown tone (`hsl(30 25% 45%)`) tuned against the cream page bg (NOT the dark code bg) plus a faint box-shadow lift so the frame reads on mobile WebKit at low DPI.
+2. **`<pre>`/`<code>` background unification** — both `.theme-reading .markdown-body pre[class*="language-"]` and `.theme-reading .markdown-body code[class*="language-"]` use `#2d2d2d !important` to match the `CodeBlock.tsx` inline style on `.code-block-wrapper`. Earlier value `hsl(220 13% 15%)` (= `#21252b`) sat ~5 lightness units darker than the wrapper. Because `<code>` renders `display: inline; white-space: pre`, ANY background mismatch tiles only behind text on each visual line — producing a per-line stripe regression visually identical to the inline-pill border leak (next entry) but structurally distinct (bg mismatch, not border leak).
+
+**Test anchor:** `e2e/functional/code-block-styling.spec.ts` locks the invariant — `codeBg === wrapperBg === rgb(45, 45, 45)` at every code-block on the page, both desktop and mobile.
+
+### code-inline
+
+Inline `<code>` rendered inside markdown prose — pills out the code from surrounding text in reading mode. Uses the muted background + sm radius. Applied via `.theme-reading .markdown-body code:not([class*="language-"])` — language-class anchor required.
+
+```html
+inline-block px-1 py-0.5 rounded-sm bg-muted/40
+text-foreground border border-border/60
+```
+
+- Language-class anchor: the rule uses `:not([class*="language-"])` — NOT `:not(pre code)`. The `:not(pre code)` form is inert because `CodeBlock.tsx` replaces `<pre>` with `<div class="code-block-wrapper">`, so `pre code` no longer matches anything in the rendered DOM and the exclusion silently fired on fenced `<code>` too.
+- Failure mode (without language-class anchor): with `display: inline; white-space: pre` on the highlighted `<code>` plus a 1px border + 0.1em padding on the pill rule, `box-decoration-break: slice` tiles the pill outline onto every visual line — the per-line pill border regression. Same shape as the bg-mismatch stripe regression in `code-block` reading-mode override.
+- The `language-*` class that `rehype-prism-plus` stamps on every fenced `<code>` is invariant across tag substitution. The same `:not([class*="language-"])` anchor applies to the theme-agnostic `overflow-wrap: anywhere` rule for consistency.
+
+**Test anchor:** `e2e/functional/code-block-styling.spec.ts` "Fenced code excluded from inline-pill styling" — `border-top-width === 0px` AND `padding-left === 0px` on every `code[class*="language-"]` on the page.
+
+---
+
+## Do's and Don'ts
+
+### DO
+
+- ✅ Use the `--learning` token for in-progress skill state (preserves info hierarchy)
+- ✅ Wrap interactive elements in `btn-interactive` for consistent hover lift
+- ✅ Apply `glitch-hover` to nav + CTA buttons (always-on cyber theme; no conditional)
+- ✅ Use `text-glow` on the primary headline of every section
+- ✅ Soften ambient effects on mobile via `@media (max-width:640px)` overrides
+- ✅ Set `data-text` attribute on every element using `glitch-hover` or `hero-glitch-entrance` (the pseudo-elements read it)
+- ✅ Use 44×44px touch targets for all mobile-tappable elements (WCAG 2.5.8)
+- ✅ Reserve PROVE IT–style stamp impact for ONE element per page max
+
+### DON'T
+
+- ❌ Hardcode hex/HSL colors in components — use Tailwind utilities or `hsl(var(--token))`
+- ❌ Use `text-amber-500` / `bg-amber-500` Tailwind utilities — use `text-learning` / `bg-learning` instead (matches Night City palette)
+- ❌ Add `Co-Authored-By: Claude` to commits (project rule)
+- ❌ Use Title Case for headlines — choose all-caps + wide tracking, OR sentence case
+- ❌ Use the cyan accent for primary text color (poor contrast on dark bg)
+- ❌ Stack heavy entrance animations (cyber stagger + glitch + stamp simultaneously) — pick subtle stagger if the page already has theater
+- ❌ Mention prior-employer name anywhere in published content (workspace-global rule per CLAUDE.md §2)
+- ❌ Use `Co-Authored-By` lines, callout boxes (`> **Key Insight:**`), or "delve" / "landscape" / "it's worth noting" / "let's dive in" AI-isms in blog posts
+- ❌ Use scan-sweep on mobile (re-enabled = distracting at small viewports)
+- ❌ Use `font-mono` on body — body is `Chakra Petch` (sans), `font-mono` is for code/badges only
+
+---
+
+## Motion
 
 > **Device-tier policy → `docs/superpowers/specs/2026-04-24-device-tier-motion-policy-design.md`** (HARD SPEC).
 > Three tiers (mobile `<768`, tablet `[768, 1024)`, desktop `≥1024`) + one public flag `animationsDisabled`. Desktop defaults to animations-on; mobile/tablet default to animations-off. OS reduced-motion and per-session replay-skip override on top. Uses half-open interval notation to match the spec's `>= 768 && < 1024` contract.
 
-Two timing systems coexist (deliberate trade-off, see ARCHITECTURE.md §Motion):
+Two timing systems coexist (deliberate trade-off, see ARCHITECTURE.md §6):
 - **JS constants** (`src/lib/motion.ts`) — Framer Motion variants for entrance/transition
 - **CSS custom properties** (`src/index.css`) — `--motion-instant`, `--motion-fast`, `--motion-normal` for hover/ambient effects
 
@@ -265,97 +513,11 @@ Reduced-motion (`prefers-reduced-motion: reduce`) compresses to 100/600/1200ms w
 - **Scan-sweep** — single horizontal line traveling top→bottom every 6s. Desktop only (suppressed on mobile via `@media`).
 - **Hero orbs** — two large `blur-3xl` divs in opposite corners, breathing animation (`hero-glow` keyframe, 8s + 11s offset). Always on at all viewport sizes.
 
----
-
-## 8. Do's and Don'ts
-
-### DO
-
-- ✅ Use the `--learning` token for in-progress skill state (preserves info hierarchy)
-- ✅ Wrap interactive elements in `btn-interactive` for consistent hover lift
-- ✅ Apply `glitch-hover` to nav + CTA buttons (always-on cyber theme; no conditional)
-- ✅ Use `text-glow` on the primary headline of every section
-- ✅ Soften ambient effects on mobile via `@media (max-width:640px)` overrides
-- ✅ Set `data-text` attribute on every element using `glitch-hover` or `hero-glitch-entrance` (the pseudo-elements read it)
-- ✅ Use 44×44px touch targets for all mobile-tappable elements (WCAG 2.5.8)
-- ✅ Reserve PROVE IT–style stamp impact for ONE element per page max
-
-### DON'T
-
-- ❌ Hardcode hex/HSL colors in components — use Tailwind utilities or `hsl(var(--token))`
-- ❌ Use `text-amber-500` / `bg-amber-500` Tailwind utilities — use `text-learning` / `bg-learning` instead (matches Night City palette)
-- ❌ Add `Co-Authored-By: Claude` to commits (project rule)
-- ❌ Use Title Case for headlines — choose all-caps + wide tracking, OR sentence case
-- ❌ Use the cyan accent for primary text color (poor contrast on dark bg)
-- ❌ Stack heavy entrance animations (cyber stagger + glitch + stamp simultaneously) — pick subtle stagger if the page already has theater
-- ❌ Mention "[redacted-employer]" anywhere in published content (workspace-global rule)
-- ❌ Use `Co-Authored-By` lines, callout boxes (`> **Key Insight:**`), or "delve" / "landscape" / "it's worth noting" / "let's dive in" AI-isms in blog posts
-- ❌ Use scan-sweep on mobile (re-enabled = distracting at small viewports)
-- ❌ Use `font-mono` on body — body is `Chakra Petch` (sans), `font-mono` is for code/badges only
+**Mobile orb override scope:** `@media (max-width: 640px)` (`src/index.css`) redefines `.animate-hero-glow-slow` and `.animate-hero-glow-slower` to use the `hero-glow-mobile` keyframe — tighter scale (1.04 vs 1.12 desktop), tighter opacity (0.75-0.85 vs 0.6-1.0), slower tempo (16s/22s vs 8s/11s). Mobile orbs sit closer to the eye and compete with the hero entrance cascade if they breathe too actively.
 
 ---
 
-## 9. Responsive Behavior
-
-### Breakpoints (Tailwind defaults)
-
-| Token   | Min-width | Notes                                       |
-|---------|-----------|---------------------------------------------|
-| `sm`    | 640px     | Hero orbs threshold (now: always on)        |
-| `md`    | 768px     | Mobile nav → desktop nav switch             |
-| `lg`    | 1024px    | Sidebar TOC appears on blog post pages      |
-| `xl`    | 1280px    | Container padding stops growing             |
-
-### Mobile-first overrides
-
-- **Glow intensity** softened (`--matrix-text-glow: 0 0 6px ...` vs `0 0 10px`)
-- **Scan-sweep** killed (single CSS rule in mobile @media)
-- **Glitch-hover pseudo-elements** killed (no hover on touch devices, hero glitch animation kept)
-- **Hero stamp** animation duration shortened (0.6s vs 1s)
-- **Stagger items** swap to `staggerItemMobile` (opacity-only, no transform/blur)
-
-### Touch targets
-
-- Hamburger: 44×44 minimum (`min-h-[44px] min-w-[44px]` on the button)
-- All nav items in mobile sheet: `min-h-[48px]`
-- EXPLORER button on blog: `min-h-[44px]` + `affordance-pulse` animation to signal tappability
-
-### Collapse strategies
-
-- **Desktop nav (`hidden md:flex`)** ↔ **Mobile sheet (`md:hidden`)** — hard switch at `md` breakpoint, no transition
-- **Blog TOC sidebar (`hidden lg:block`)** ↔ **Mobile EXPLORER button + drawer** — sidebar disappears below `lg`, EXPLORER button + Sheet drawer takes over
-- **Hero text scaling** — `text-5xl md:text-7xl` (from 48px → 72px at md+)
-
----
-
-## 10. Agent Prompt Guide
-
-### Quick color reference (copy into prompts)
-
-```
-Night City palette:
-- Primary: #f3e600 (yellow, hsl 57 100% 48%)
-- Accent:  #52e3c8 (cyan, hsl 171 77% 60%)
-- Learning: #f78a1a (amber, hsl 25 95% 55%)
-- Background: #0b0d12 (near-black, hsl 222 15% 5%)
-- Foreground: #f5e9a3 (warm cream-yellow, hsl 57 80% 82%)
-- Border: #1d2436 (dark slate, hsl 222 30% 16%)
-```
-
-### Ready-to-use prompts
-
-**For new component generation:**
-> Generate a [component] for The Digital Matrix blog. Use Night City palette: primary=yellow `text-primary`, accent=cyan `text-accent`, never amber-500 (use `text-learning` if in-progress). Wrap interactive elements in `btn-interactive glitch-hover` (set `data-text` attr). Use Tailwind utilities exclusively — no hardcoded colors. Body font defaults to Chakra Petch; headings use `font-display` (Orbitron) for h1, `font-heading` (Rajdhani) for h2/h3/h4.
-
-**For new page entrance:**
-> Use `useItemVariant()` from `@/lib/motion` for stagger items (NOT `staggerItem` directly — bypasses mobile/reduced-motion guards). Wrap stagger children in a `motion.div` with `staggerContainer` variants. Initial state `hidden`, animate to `visible` on phase ready. For hero pages with their own entrance theater, use `useHeroStaggerVariant()` instead (subtle, doesn't compete).
-
-**For ambient effects on a new full-page route:**
-> Add `<div className="scanline-overlay scan-sweep" />` at App level when `!isTextSection`. Add a glow orb pair in opposite corners with `blur-3xl` + `mix-blend-mode: screen` + `--hero-orb-primary` / `--hero-orb-accent` colors + `animate-hero-glow-slow` / `animate-hero-glow-slower` keyframes.
-
----
-
-## 11. References
+## References
 
 - **Codebase:** `https://github.com/MalfiRG/the-digital-matrix`
 - **Architecture:** see `ARCHITECTURE.md` (component tree, routing, motion system internals)
@@ -363,6 +525,7 @@ Night City palette:
 - **DESIGN.md convention:** Google Stitch / VoltAgent collection (https://github.com/VoltAgent/awesome-design-md)
 - **WCAG 2.5.8 touch targets:** 44×44px minimum, met across all interactive elements
 - **Cyberpunk 2077 palette grammar:** yellow + orange + cyan canonical, on near-black backgrounds
+- **Stitch lint validation:** `npx --yes @google/design.md lint DESIGN.md` — runs against the alpha spec. Acceptable warnings: section-order on extensions (Motion, References), orphaned-tokens on body-level color tokens. See spec at https://github.com/google-labs-code/design.md.
 
 ---
 
