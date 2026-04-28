@@ -688,7 +688,8 @@ Scroll trigger: `useEffect` listens for `window.scrollY > 40`, sets a `scrolled`
 - **Operator profile:** repo's `CLAUDE.md` + workspace `CLAUDE.md`
 - **Repo:** https://github.com/MalfiRG/the-digital-matrix
 - **Hosting:** Vercel (auto from `main`)
+- **Doc deduplication migration spec:** `docs/superpowers/specs/2026-04-28-blog-doc-deduplication-design.md` (HARD SPEC for the architecture-tier doc dedup; see also the Stitch lint command `npx --yes @google/design.md lint DESIGN.md` for ongoing DESIGN.md format validation)
 
 ---
 
-*Last updated: 2026-04-19 — single-theme consolidation commit `9ad49e1`*
+*Last updated: 2026-04-28 — doc deduplication migration; see §13 spec link*
