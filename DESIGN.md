@@ -513,6 +513,8 @@ Reduced-motion (`prefers-reduced-motion: reduce`) compresses to 100/600/1200ms w
 - **Scan-sweep** — single horizontal line traveling top→bottom every 6s. Desktop only (suppressed on mobile via `@media`).
 - **Hero orbs** — two large `blur-3xl` divs in opposite corners, breathing animation (`hero-glow` keyframe, 8s + 11s offset). Always on at all viewport sizes.
 
+**Mobile orb override scope:** `@media (max-width: 640px)` (`src/index.css`) redefines `.animate-hero-glow-slow` and `.animate-hero-glow-slower` to use the `hero-glow-mobile` keyframe — tighter scale (1.04 vs 1.12 desktop), tighter opacity (0.75-0.85 vs 0.6-1.0), slower tempo (16s/22s vs 8s/11s). Mobile orbs sit closer to the eye and compete with the hero entrance cascade if they breathe too actively.
+
 ---
 
 ## References
