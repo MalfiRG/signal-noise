@@ -671,24 +671,6 @@ The 768–1279px tier still gets visible asymmetric stagger from padding alone (
 
 `docs-over-code-comments.md` mandates that the WHY for the threshold lives here, not inline; the rule itself only carries the threshold value.
 
-### Reading-mode code-block frame + background unification
-
-Two related bugs were fixed in the same surface:
-
-1. **`.theme-reading .code-block-wrapper` border** — the original border declaration sat on `pre[class*="language-"]`, which never renders in this codebase because `CodeBlock.tsx` replaces `<pre>` with `<div class="code-block-wrapper">`. Re-anchored to `.code-block-wrapper` with a warm-brown tone (`hsl(30 25% 45%)`) tuned against the cream page bg (NOT the dark code bg) plus a faint box-shadow lift so the frame reads on mobile WebKit at low DPI.
-
-2. **`<pre>`/`<code>` background unification** — both `.theme-reading .markdown-body pre[class*="language-"]` and `.theme-reading .markdown-body code[class*="language-"]` use `#2d2d2d !important` to match the `CodeBlock.tsx` inline style on `.code-block-wrapper`. Earlier value `hsl(220 13% 15%)` (= `#21252b`) sat ~5 lightness units darker than the wrapper. Because `<code>` renders `display: inline; white-space: pre`, ANY background mismatch tiles only behind text on each visual line — producing a per-line stripe regression visually identical to the inline-pill border leak (next section) but structurally distinct (bg mismatch, not border leak).
-
-Regression history: this exact bg mismatch has been reported three times. Lock the invariant via `e2e/functional/code-block-styling.spec.ts` — `codeBg === wrapperBg === rgb(45, 45, 45)` at every code-block on the page, both desktop and mobile.
-
-### Inline-code pill — language-class anchor
-
-The reading-mode inline-code pill rule (background, padding, radius, hairline border) uses `.theme-reading .markdown-body code:not([class*="language-"])` — NOT `:not(pre code)`. The `:not(pre code)` form was inert: `CodeBlock.tsx` replaces the `<pre>` parent with a `<div class="code-block-wrapper">`, so `pre code` no longer matches anything in the rendered DOM and the exclusion silently fired on fenced `<code>` too. With `display: inline; white-space: pre` on the highlighted `<code>` plus a 1px border + 0.1em padding on the pill rule, `box-decoration-break: slice` tiled the pill outline onto every visual line — the per-line pill border regression.
-
-The `language-*` class that `rehype-prism-plus` stamps on every fenced `<code>` is invariant across tag substitution. The same `:not([class*="language-"])` anchor applies to the theme-agnostic `overflow-wrap: anywhere` rule for consistency, even though the cascading `code[class*="language-"] { overflow-wrap: normal !important }` at the prism-bg block was already neutralizing it.
-
-`e2e/functional/code-block-styling.spec.ts` "Fenced code excluded from inline-pill styling" guards the new selector — `border-top-width === 0px` AND `padding-left === 0px` on every `code[class*="language-"]` on the page.
-
 ### Inline-code overflow guard — defensive containment
 
 `.markdown-body { overflow-x: hidden }` is intentional, NOT cargo-culted. Long unbreakable identifiers in inline `<code>` (e.g. `message.usage.cache_creation.ephemeral_5m_input_tokens`) used to push document width past viewport width on mobile, triggering horizontal page scroll that clipped the navbar/title/tags off-screen. Two-layer fix:
@@ -707,12 +689,6 @@ Same shape as the `inert` boolean prop split on the CTA wrapper a few lines abov
 Scroll trigger: `useEffect` listens for `window.scrollY > 40`, sets a `scrolled` boolean, the outer div toggles `opacity-100 ↔ opacity-0 pointer-events-none` with a 300ms transition. `aria-hidden` flips when scrolled so screen readers stop announcing the prompt once it's no longer relevant.
 
 `e2e/functional/hero-skip-and-badge.spec.ts` "Hero scroll-to-explore arrow" reads computed opacity on the closest `.transition-opacity` ancestor — explicitly NOT on the inner element, since framer-motion's inline opacity would leak into that read and produce false-positive passes.
-
-### IdStrip mobile balance
-
-`.id-strip` (`src/index.css`) uses `justify-content: center` so when content wraps on phone-portrait, all rows are centered (symmetric) instead of left-aligned. A `@media (max-width: 480px)` block tightens font-size 10→8px, gap 18→6px, letter-spacing 0.22em→0.12em, padding 6×14→5×8 — combined, four segments (NODE / OP / TS / UTC) fit on one row at 375px and `SEC: OK` lands centered on row 2.
-
-The hero `<section>` itself uses `flex items-start md:items-center` (`Index.tsx`) so on mobile portrait the IdStrip sits right under the navbar (top-aligned) instead of being centered with ~150px of dead space above. Desktop keeps the dramatic vertically-centered cascade because `min-h-screen` provides the slack `items-center` needs to feel intentional.
 
 ---
 
