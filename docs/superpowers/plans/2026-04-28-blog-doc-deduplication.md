@@ -2000,7 +2000,7 @@ Deletes all 7 files in TechnicalBlog/technical-blog/memory/:
 - deployment.md (Vite port 5173, Docker+Nginx alt-deploy not in code)
 - design-system.md (OLD green Matrix palette)
 - portfolio-reference.md (documents original fork-source dar-kow/Portfolio)
-- project-owner.md (violates [redacted-employer]-obfuscation rule + stale)
+- project-owner.md (violates workspace-global obfuscation rule + stale)
 - tech-stack.md (Wouter/Vite 6/shared/components/ui — none in code)
 
 Verified zero inbound references via grep across

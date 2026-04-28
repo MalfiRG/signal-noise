@@ -6,7 +6,7 @@
 **Repos:** `the-digital-matrix` (submodule, primary surgery) + MetaOrchestrator (outer, memory/* deletion)
 
 **Rev 2 changes (vs Rev 1 commit `46acaea`):**
-- Memory deletion scope expanded from 2 → **7 files** (adversarial review surfaced 5 untouched stale files; `project-owner.md` additionally violates the workspace-global [redacted-employer]-obfuscation rule).
+- Memory deletion scope expanded from 2 → **7 files** (adversarial review surfaced 5 untouched stale files; `project-owner.md` additionally violates the workspace-global obfuscation rule).
 - ARCHITECTURE.md inbound-reference count corrected from `~14` → **20** (across 5 files including `the-digital-matrix/CLAUDE.md`).
 - DESIGN.md §Motion absorption strategy fixed: pointer to **existing** `### Subtle vs cyber stagger variants` subsection instead of creating a duplicate (would have violated the spec's own dedup goal).
 - Spec line-patch wave moved from Wave 3 → **Wave 1** (per §3.2 "same/adjacent commit" timing rule; previous placement left 8-task window of broken inbound refs).
@@ -33,7 +33,7 @@ The blog's architecture-tier docs have entered a **3-tier echo failure mode**: t
 | `technical-blog/memory/deployment.md` | 89 | ~480 | outer | Deployment reference; says Vite port 5173 (current: 8080), output `dist/public` (likely `dist/`), Docker+Nginx alt-deploy (not in current code), missing current env vars (`VITE_MOTION_OVERRIDE`, `VITE_VERCEL_ENV`) |
 | `technical-blog/memory/design-system.md` | 92 | 518 | outer | Compressed mirror — describes green Matrix palette `#22b455` (replaced by Night City `#f3e600`) |
 | `technical-blog/memory/portfolio-reference.md` | 109 | ~770 | outer | Documents original fork-source (dar-kow/Portfolio); references removed components (`MatrixRain`, `Wouter`, `shared/` structure) |
-| `technical-blog/memory/project-owner.md` | 37 | ~260 | outer | Operator profile; **violates workspace-global [redacted-employer]-obfuscation rule** (line 4: "Role: QA Engineer at [redacted-employer]") in addition to being stale |
+| `technical-blog/memory/project-owner.md` | 37 | ~260 | outer | Operator profile; **violates workspace-global obfuscation rule** (line 4 names the prior employer in plaintext) in addition to being stale |
 | `technical-blog/memory/tech-stack.md` | 52 | ~410 | outer | Tech-stack reference; says **Wouter 3.6.0** (current: React Router DOM 6), Vite 6 (current: Vite 7), `shared/components/ui/` (current: `src/components/ui/`), references Drizzle/Express/Passport (none in current code) |
 | `the-digital-matrix/README.md` | 16 | 28 | inner | Tech-stack one-pager (overlaps `CLAUDE.md` "Tech Stack") |
 
@@ -90,7 +90,7 @@ All 7 files in `technical-blog/memory/` were created on 2026-03-12 (same-day tim
 - `@emailjs/browser` + `react-ga4` (verify via `grep -nE '(emailjs|react-ga4)' the-digital-matrix/package.json` at execution time)
 
 **`memory/project-owner.md` violates workspace-global obfuscation rule:**
-- Line 4: *"Role: QA Engineer at [redacted-employer]"* — directly violates `MetaOrchestrator/CLAUDE.md §2`: *"[redacted-employer] obfuscation: NO [redacted-employer] name in ANY output (global scrub rule, all sensitivity tiers)"*. Same axiom as `~/.claude/rules/audit-artifact-scrubbing.md` "Enforcer Artifacts" extension applies at the inventory surface — a checked-in artifact naming the prior employer is a leak whether the file is read by humans or agents.
+- Line 4 names the prior employer in plaintext — directly violates `MetaOrchestrator/CLAUDE.md §2` (workspace-global employer-obfuscation rule, applies at all sensitivity tiers). Same axiom as `~/.claude/rules/audit-artifact-scrubbing.md` "Enforcer Artifacts" extension applies at the inventory surface — a checked-in artifact naming the prior employer is a leak whether the file is read by humans or agents.
 - This file deletion has TWO independent justifications: (1) staleness (lists a published post that's no longer the only one; references skill levels superseded by current state), AND (2) obfuscation policy compliance. Either one alone justifies deletion.
 
 **`memory/portfolio-reference.md` is a historical fork-source artifact:**
@@ -587,7 +587,7 @@ The original spec listed only 2 files for deletion (`architecture.md`, `design-s
 | `technical-blog/memory/deployment.md` | 89 | Vite port 5173 (current: 8080), `dist/public` output, Docker+Nginx alt-deploy not in code, missing current env vars |
 | `technical-blog/memory/design-system.md` | 92 | OLD green Matrix palette (`#22b455`); replaced by Night City |
 | `technical-blog/memory/portfolio-reference.md` | 109 | Documents original fork-source `dar-kow/Portfolio`; references removed components |
-| `technical-blog/memory/project-owner.md` | 37 | **Violates [redacted-employer]-obfuscation rule** (`TechnicalBlog/CLAUDE.md §2`) at line 4 PLUS is stale; either justification alone supports deletion |
+| `technical-blog/memory/project-owner.md` | 37 | **Violates workspace-global obfuscation rule** (`TechnicalBlog/CLAUDE.md §2`) at line 4 PLUS is stale; either justification alone supports deletion |
 | `technical-blog/memory/tech-stack.md` | 52 | Wouter / Vite 6 / `shared/` structure (none in current code); `Drizzle ORM` / `Express` / `Passport.js` / `@emailjs/browser` / `react-ga4` (verify absence at execution time) |
 
 ### 9.2 Pre-deletion verification (re-run on day-of)
@@ -613,7 +613,7 @@ ls /mnt/c/Users/malfi/programming_projects/MetaOrchestrator/TechnicalBlog/techni
 
 ### 9.3 Action
 
-Delete all 7 files outright via `git rm`. NO migration of unique content (every paragraph either contains false claims about the current codebase OR violates the [redacted-employer]-obfuscation rule; nothing salvageable).
+Delete all 7 files outright via `git rm`. NO migration of unique content (every paragraph either contains false claims about the current codebase OR violates the workspace-global obfuscation rule; nothing salvageable).
 
 ### 9.4 Cleanup
 

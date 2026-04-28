@@ -83,7 +83,7 @@ This is factually correct now. Phase G might want to update it again to match wh
 - **No theme/palette changes.** Phase G is content-only. The violet/amber theme system stays as-is.
 - **No new components, no React structural changes, no routing changes.** Pure text edits.
 - **No blog post content edits** — the existing posts in `src/pages/content/blog/` stay untouched.
-- **No CLAUDE.md edits** in the blog repo (that file was updated in PR #27 to scrub [redacted-employer] and update the description).
+- **No CLAUDE.md edits** in the blog repo (that file was updated in PR #27 to scrub the employer reference and update the description).
 - **No `voice-style-guide.md` changes** — the voice constraints stay as the rule, the new copy must fit them.
 - **No meta-tags or `index.html` `<title>`** unless the formal blog name itself is changing (which the owner explicitly said it's NOT — "The Digital Matrix" stays as the formal title).
 
@@ -133,7 +133,7 @@ Spawn `adversarial-tl-reviewer` for a hostile pass. Its job: tear down each vari
 - "Does this read as positioning theatre or actual capability?"
 - "Would I believe this if it were on a CV from someone with N years of experience?"
 - "What's the first thing a skeptical reader would ask for proof of?"
-- "Is there any [redacted-employer]-shaped hole in the positioning that an interviewer would probe?"
+- "Is there any employer-shaped hole in the positioning that an interviewer would probe?"
 
 The adversarial review is the most important review step because positioning is the area where wishful thinking gets shipped most often.
 
