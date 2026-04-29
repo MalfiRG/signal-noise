@@ -117,4 +117,12 @@ describe('handleSaveRequest', () => {
     expect(r.status).toBe(400);
     expect(r.body.detail).toMatch(/file:not-in-registry/);
   });
+  it('[β] accepts origin from Vite SPA port 8080 (Phase 1 editor → 8081 listener)', async () => {
+    const r = await handleSaveRequest({
+      headers: headers({ origin: 'http://localhost:8080' }),
+      body: body(), remoteAddress: '127.0.0.1',
+      designIntentsRoot: root, tokenStore: store, allowedFiles,
+    });
+    expect(r.status).toBe(200);
+  });
 });

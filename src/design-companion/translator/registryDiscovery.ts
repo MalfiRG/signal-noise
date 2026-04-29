@@ -27,7 +27,10 @@ export const discoverDesignableSpecs = async (repoRoot: string): Promise<Designa
     const selectors = selMatch
       ? Array.from(selMatch[1].matchAll(/['"]([^'"]+)['"]/g)).map(m => m[1])
       : [];
-    const file = fileMatch?.[1] ?? f;
+    // [γ / spec M13] When the spec omits `file:`, derive the .tsx companion from the .designable.ts location.
+    // The path is relative-from-repo-root to match the editor's `edit.file` convention (e.g., 'src/components/Foo.tsx').
+    const derivedFile = path.relative(repoRoot, f).replace(/\.designable\.ts$/, '.tsx');
+    const file = fileMatch?.[1] ?? derivedFile;
     out.push({ component: compMatch[1], file, selectors });
   }
   return out;
