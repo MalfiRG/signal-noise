@@ -1,8 +1,13 @@
 // __DESIGN_COMPANION_DEV_ONLY__
+// @babel/traverse and @babel/generator are CJS — Vite's ESM transform exposes
+// the namespace `{ default, ... }`, while vitest's interop unwraps it. Read
+// `.default` if present so both runtimes resolve to the function.
 import * as parser from '@babel/parser';
-import generate from '@babel/generator';
-import traverse from '@babel/traverse';
+import _generate from '@babel/generator';
+import _traverse from '@babel/traverse';
 import * as t from '@babel/types';
+const generate = ((_generate as unknown as { default?: typeof _generate }).default ?? _generate) as typeof _generate;
+const traverse = ((_traverse as unknown as { default?: typeof _traverse }).default ?? _traverse) as typeof _traverse;
 import { computeInstanceId } from '../translator/sourceHash';
 
 export interface InjectOptions {

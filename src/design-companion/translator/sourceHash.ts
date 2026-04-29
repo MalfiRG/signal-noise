@@ -2,7 +2,10 @@
 import { createHash } from 'node:crypto';
 import type { ParseResult } from '@babel/parser';
 import type { File, JSXElement, Node } from '@babel/types';
-import traverse from '@babel/traverse';
+// @babel/traverse is CJS — Vite's ESM transform exposes the namespace `{ default, ... }`,
+// while vitest's interop unwraps it. Read `.default` if present to handle both runtimes.
+import _traverse from '@babel/traverse';
+const traverse = ((_traverse as unknown as { default?: typeof _traverse }).default ?? _traverse) as typeof _traverse;
 
 const shortHash = (input: string): string =>
   createHash('sha256').update(input).digest('hex').slice(0, 8);
