@@ -19,6 +19,18 @@ import HowIDoItSlugPage from "./pages/HowIDoItSlugPage";
 import NotFound from "./pages/NotFound";
 import { useScrollRestoration } from "@/hooks/useScrollRestoration";
 
+// [§Task 1.0c — C10/C11/H2] Design-companion is dev-only. The ternary collapses to
+// `null` at build time (Vite substitutes `import.meta.env.DEV` → `false`), and Rollup's
+// DCE removes the dynamic-import branch entirely — no design-companion chunk lands in
+// dist/, satisfying the sentinel sweep. Top-level await is permitted because
+// tsconfig.app.json sets module:ESNext + target:ES2020.
+const DesignCompanion = import.meta.env.DEV
+  ? (await import("./design-companion/core/DesignCompanion")).DesignCompanion
+  : null;
+const DesignToggle = import.meta.env.DEV
+  ? (await import("./design-companion/core/DesignToggle")).DesignToggle
+  : null;
+
 const queryClient = new QueryClient();
 
 export const AppContent = () => {
@@ -49,11 +61,15 @@ export const AppContent = () => {
                 <Route index element={<BlogIndexPage />} />
                 <Route path=":slug" element={<BlogSlugPage />} />
               </Route>
+              {DesignCompanion && (
+                <Route path="/__design/*" element={<DesignCompanion />} />
+              )}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </PageTransition>
         </main>
       </div>
+      {DesignToggle && <DesignToggle />}
     </>
   );
 };
