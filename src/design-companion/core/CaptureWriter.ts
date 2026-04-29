@@ -43,6 +43,7 @@ export class CaptureWriter {
     author: string,
     intent: DesignIntentFile,
     body: { rationale: string; notes?: string },
+    opts: { absolutePath?: string } = {},
   ): Promise<{ path: string }> {
     const date = new Date(intent.timestamp);
     const dateStr = date.toISOString().slice(0, 16).replace('T', ' ');
@@ -58,9 +59,14 @@ export class CaptureWriter {
       '',
       ...(body.notes ? ['## Notes for human reviewer', '', body.notes, ''] : []),
     ].join('\n');
-    const nonce = intent.session_id.split('-').pop() ?? 'noncenull';
-    const filename = generateFilename(date, intent.page, nonce);
-    const target = path.resolve(this.repoRoot, 'pending', author, filename);
+    let target: string;
+    if (opts.absolutePath) {
+      target = opts.absolutePath;
+    } else {
+      const nonce = intent.session_id.split('-').pop() ?? 'noncenull';
+      const filename = generateFilename(date, intent.page, nonce);
+      target = path.resolve(this.repoRoot, 'pending', author, filename);
+    }
     await atomicWrite(target, md);
     return { path: target };
   }
