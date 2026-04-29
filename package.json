@@ -18,7 +18,13 @@
     "test:e2e:visual": "playwright test --config playwright.visual.config.ts",
     "test:e2e:prod-contract": "playwright test --config playwright.prod-contract.config.ts",
     "test:e2e:preview-contract": "playwright test --config playwright.preview-contract.config.ts",
-    "test:e2e:update-baselines": "docker run --rm -v \"$PWD:/work\" -w /work mcr.microsoft.com/playwright:v1.58.2-jammy sh -c 'npm ci --legacy-peer-deps && npx playwright install --with-deps chromium && npm run build && npx playwright test --config playwright.visual.config.ts --update-snapshots=changed'"
+    "test:e2e:update-baselines": "docker run --rm -v \"$PWD:/work\" -w /work mcr.microsoft.com/playwright:v1.58.2-jammy sh -c 'npm ci --legacy-peer-deps && npx playwright install --with-deps chromium && npm run build && npx playwright test --config playwright.visual.config.ts --update-snapshots=changed'",
+    "design:validate": "tsx scripts/design-validate.ts",
+    "design:status": "tsx scripts/design-status.ts",
+    "design:apply": "tsx scripts/design-apply.ts",
+    "design:archive": "tsx scripts/design-archive.ts",
+    "design:assert-stripped": "tsx scripts/assert-design-companion-stripped.ts",
+    "build:check": "VITE_VERCEL_ENV=\"\" vite build"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -86,6 +92,10 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@babel/generator": "^7.29.1",
+    "@babel/parser": "^7.29.2",
+    "@babel/traverse": "^7.29.0",
+    "@babel/types": "^7.29.0",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.59.1",
     "@tailwindcss/typography": "^0.5.19",
@@ -93,6 +103,9 @@
     "@testing-library/jest-dom": "^6.6.0",
     "@testing-library/react": "^16.0.0",
     "@testing-library/user-event": "^14.6.1",
+    "@types/babel__generator": "^7.27.0",
+    "@types/babel__traverse": "^7.28.0",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^25.6.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
@@ -102,8 +115,10 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.5.0",
+    "js-yaml": "^4.1.1",
     "jsdom": "^29.0.2",
     "postcss": "^8.5.10",
+    "prettier": "^3.8.3",
     "tailwindcss": "^3.4.19",
     "tsx": "^4.21.0",
     "typescript": "^6.0.3",
