@@ -10,7 +10,14 @@ import { sanitizePendingPath } from './security/path-sanitize';
 import type { TokenStore } from './security/session-token';
 
 // [C7] Endpoint runs on the loopback listener at port 8081 — same origin checks accept that origin.
-const ALLOWED_ORIGINS = ['http://localhost:8081', 'http://127.0.0.1:8081'];
+// Port 8080 is the Vite SPA host; Phase 1 Task 1.0c registers the editor route at port 8080,
+// and the SPA fetches the listener on 8081 (cross-origin from the listener's perspective). Both ports are loopback-only.
+const ALLOWED_ORIGINS = [
+  'http://localhost:8081',
+  'http://127.0.0.1:8081',
+  'http://localhost:8080',
+  'http://127.0.0.1:8080',
+];
 const LOOPBACK = new Set(['127.0.0.1', '::1', '::ffff:127.0.0.1']);
 
 export interface SaveRequest {

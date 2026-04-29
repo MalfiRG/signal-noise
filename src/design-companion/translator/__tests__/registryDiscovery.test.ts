@@ -35,3 +35,22 @@ describe('ensureRegistryCache [C13]', () => {
     expect(a).toBe(b);
   });
 });
+
+describe('[γ] discoverDesignableSpecs derives .tsx from .designable.ts when file: is omitted', () => {
+  it('produces relative-from-repo-root .tsx path matching editor convention', async () => {
+    // Fresh fixture: spec body with NO `file:` field — exactly the DesignDemoTarget pattern (M13).
+    const subroot = mkdtempSync(path.join(tmpdir(), 'rd-derive-'));
+    mkdirSync(path.join(subroot, 'src/components'), { recursive: true });
+    writeFileSync(path.join(subroot, 'src/components/Bar.tsx'), 'export const Bar = () => null;');
+    writeFileSync(
+      path.join(subroot, 'src/components/Bar.designable.ts'),
+      `export const designable = { component: 'Bar', selectors: ['.bar'] };`,
+    );
+    const specs = await discoverDesignableSpecs(subroot);
+    expect(specs.length).toBe(1);
+    expect(specs[0].component).toBe('Bar');
+    // Critical: `file` is the .tsx companion, NOT the .designable.ts path,
+    // and is relative-from-repo-root to match how the save-endpoint compares against `edit.file`.
+    expect(specs[0].file).toBe('src/components/Bar.tsx');
+  });
+});
