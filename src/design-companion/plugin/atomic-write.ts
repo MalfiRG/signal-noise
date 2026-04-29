@@ -17,7 +17,7 @@ export const atomicWrite = async (target: string, content: string): Promise<void
   try {
     dirReal = await realpath(dir);
   } catch (e) {
-    throw new Error(`refusing: parent dir realpath failed (${dir}): ${(e as Error).message}`);
+    throw new Error(`refusing: parent dir realpath failed (${dir}): ${(e as Error).message}`, { cause: e });
   }
   if (dirReal !== dir) {
     throw new Error(`refusing: parent dir is a symlink chain (${dir} → ${dirReal})`);

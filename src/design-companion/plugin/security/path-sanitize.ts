@@ -10,6 +10,7 @@ const NAME_RE = /^[a-z0-9-]+$/;
 // Allow `T` (uppercase, separator), digits, lowercase, hyphens; reject everything else.
 const FILENAME_RE = /^[0-9][0-9A-Za-z-]*\.md$/;
 
+/* eslint-disable no-control-regex, no-irregular-whitespace -- security regex requires literal NULL byte + bidi/ZWSP codepoints */
 const containsDangerousByte = (s: string): boolean =>
   /\x00/.test(s) ||
   /[​-‏‪-‮⁦-⁩]/.test(s) ||  // bidi-override + zero-width
@@ -20,6 +21,7 @@ const containsDangerousByte = (s: string): boolean =>
   /:/.test(s) ||                                           // NTFS stream syntax
   /[. ]$/.test(s) ||                                       // trailing dot or space
   s.includes('..');
+/* eslint-enable no-control-regex, no-irregular-whitespace */
 
 export const sanitizePendingPath = (
   pendingRoot: string,

@@ -15,7 +15,10 @@ describe('content-addressable ID survives prettier --write', () => {
       .match(/data-design-id="([^"]+)"/)?.[1];
     try {
       execSync(`npx prettier --write ${file}`, { stdio: 'ignore' });
-    } catch {}
+    } catch {
+      // Prettier exit-code is intentionally swallowed; we assert on the file
+      // contents post-format, not on prettier's success/failure status.
+    }
     const afterId = (injectDesignIdInSource(readFileSync(file, 'utf8'), { filename: file }).code ?? '')
       .match(/data-design-id="([^"]+)"/)?.[1];
     expect(beforeId).toBeDefined();

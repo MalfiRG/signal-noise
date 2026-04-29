@@ -4,7 +4,7 @@ import * as path from 'node:path';
 import type { DesignableSpec } from '../types';
 
 const walkDesignable = async (dir: string, out: string[] = []): Promise<string[]> => {
-  let entries: import('node:fs').Dirent[] = [];
+  let entries: import('node:fs').Dirent[];
   try { entries = await readdir(dir, { withFileTypes: true }); } catch { return out; }
   for (const e of entries) {
     if (e.name === 'node_modules' || e.name.startsWith('.')) continue;
