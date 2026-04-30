@@ -27,9 +27,15 @@ describe('DesignToggle', () => {
     const { queryByRole } = renderAt('/__design');
     expect(queryByRole('button', { name: /design this page/i })).toBeNull();
   });
-  it('navigates to /__design with focus= query on click', () => {
+  it('navigates to /__design<pathname> on click (Session 9 §I — path-based nesting)', () => {
     const { getByRole, getByTestId } = renderAt('/blog/some-post');
     fireEvent.click(getByRole('button', { name: /design this page/i }));
-    expect(getByTestId('loc').textContent).toBe('/__design?focus=%2Fblog%2Fsome-post');
+    expect(getByTestId('loc').textContent).toBe('/__design/blog/some-post');
+  });
+
+  it('navigates to /__design (root) when toggled from home (loc.pathname === "/")', () => {
+    const { getByRole, getByTestId } = renderAt('/');
+    fireEvent.click(getByRole('button', { name: /design this page/i }));
+    expect(getByTestId('loc').textContent).toBe('/__design');
   });
 });
