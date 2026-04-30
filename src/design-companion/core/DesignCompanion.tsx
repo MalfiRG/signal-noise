@@ -19,9 +19,14 @@ const ALLOWED_HOSTNAMES = new Set(['localhost', '127.0.0.1', '[::1]']);
 const DesignCompanionInner: React.FC = () => {
   const [selectedId, setSelectedId] = React.useState<string | null>(null);
   const [edits, setEdits] = React.useState<Record<string, string>>({});
-  const overrides = React.useMemo(() => new Map<string, Record<string, unknown>>(), []);
+  const overridesNow = React.useMemo(() => new Map<string, Record<string, unknown>>(), []);
+  const deferredOverrides = React.useDeferredValue(overridesNow);
   const handlesRef = React.useRef<Array<{ revert(): void }>>([]);
   const token = useToken();
+  const [, startTransition] = React.useTransition();
+  const onSelectId = (id: string | null) => {
+    startTransition(() => { setSelectedId(id); setEdits({}); });
+  };
 
   React.useEffect(() => installBeforeUnload(() => Object.keys(edits).length > 0), [edits]);
 
@@ -65,9 +70,9 @@ const DesignCompanionInner: React.FC = () => {
   };
 
   return (
-    <DesignOverridesContext.Provider value={overrides}>
+    <DesignOverridesContext.Provider value={deferredOverrides}>
       <div className="design-companion-shell">
-        <SelectionOverlay onSelect={id => { setSelectedId(id); setEdits({}); }}>
+        <SelectionOverlay onSelect={onSelectId}>
           <Outlet />
         </SelectionOverlay>
         <RightSidebar
