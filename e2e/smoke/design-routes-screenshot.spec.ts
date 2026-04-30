@@ -28,11 +28,29 @@ for (const route of ROUTES) {
     const response = await page.goto(route.path, { waitUntil: "networkidle" });
     expect(response?.status(), `HTTP status for ${route.path}`).toBe(200);
 
-    // Allow editor shell + tree-shaken dynamic import to settle.
-    await page.waitForTimeout(800);
-
     const shell = page.locator(".design-companion-shell");
     await expect(shell, `editor shell present at ${route.path}`).toBeVisible();
+
+    // Home cascade can take ~5-6s to reach phase 3. Wait for the terminal
+    // testid so the screenshot captures the steady state, not a mid-cascade
+    // frame. Other routes don't emit a phase signal — settle briefly.
+    if (route.slug === "home") {
+      await page
+        .locator('[data-testid="hero-phase3"]')
+        .waitFor({ timeout: 12000 })
+        .catch(() => { /* fall through */ });
+      // Wait for the third hero line to settle. LetterReveal staggers per
+      // line at ~0.5s each plus per-letter sub-stagger; PROVE IT is the
+      // last line so its full presence signals the cascade is complete.
+      await page
+        .locator('h1', { hasText: "PROVE IT" })
+        .waitFor({ timeout: 12000 })
+        .catch(() => { /* fall through */ });
+      // Belt-and-suspenders: small settle for any tail animation.
+      await page.waitForTimeout(1500);
+    } else {
+      await page.waitForTimeout(800);
+    }
 
     await page.screenshot({
       path: path.join(OUT_DIR, `${route.slug}.png`),
