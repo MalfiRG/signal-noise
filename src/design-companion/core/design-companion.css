@@ -1,0 +1,53 @@
+/* __DESIGN_COMPANION_DEV_ONLY__ */
+.design-companion-shell {
+  --dc-bg: #14141c;
+  --dc-bg-elev: #1c1c28;
+  --dc-text: #e5e7eb;
+  --dc-accent: #a78bfa;
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  height: 100vh;
+  background: var(--dc-bg);
+  color: var(--dc-text);
+  font-family: ui-sans-serif, system-ui;
+}
+.design-companion-right-sidebar {
+  background: var(--dc-bg-elev);
+  padding: 16px;
+  overflow-y: auto;
+  border-left: 1px solid #2a2a3a;
+}
+.design-companion-shell button {
+  background: var(--dc-accent);
+  color: #000;
+  border: 0;
+  padding: 8px 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.design-companion-shell input,
+.design-companion-shell select {
+  background: var(--dc-bg);
+  color: var(--dc-text);
+  border: 1px solid #2a2a3a;
+  padding: 4px 6px;
+}
+.design-companion-shell *:focus-visible {
+  outline: 2px solid var(--dc-accent);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .design-companion-shell *,
+  .design-companion-shell *::before,
+  .design-companion-shell *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+@media (prefers-color-scheme: light) {
+  .design-companion-shell {
+    --dc-bg: #f9fafb;
+    --dc-bg-elev: #ffffff;
+    --dc-text: #111827;
+  }
+}
