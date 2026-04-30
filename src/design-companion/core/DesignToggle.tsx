@@ -9,7 +9,7 @@ export const DesignToggle = () => {
     <button
       type="button"
       className="design-companion-toggle"
-      onClick={() => nav(`/__design?focus=${encodeURIComponent(loc.pathname)}`)}
+      onClick={() => nav(`/__design${loc.pathname === '/' ? '' : loc.pathname}`)}
       style={{ position: 'fixed', bottom: 16, right: 16, zIndex: 9999 }}
     >
       Design this page

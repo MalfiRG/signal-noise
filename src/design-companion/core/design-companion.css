@@ -62,10 +62,7 @@
     animation: none !important;
   }
 }
-@media (prefers-color-scheme: light) {
-  .design-companion-shell {
-    --dc-bg: #f9fafb;
-    --dc-bg-elev: #ffffff;
-    --dc-text: #111827;
-  }
-}
+/* Blog is dark-only (cyberpunk-gold, enableSystem={false}); editor shell
+   stays dark regardless of OS preference. Light-mode override removed in
+   Session 9 §J — was producing a white-background editor on light-OS
+   defaults that contradicted the blog's forced dark theme. */

@@ -62,7 +62,17 @@ export const AppContent = () => {
                 <Route path=":slug" element={<BlogSlugPage />} />
               </Route>
               {DesignCompanion && (
-                <Route path="/__design/*" element={<DesignCompanion />} />
+                <Route path="/__design" element={<DesignCompanion />}>
+                  <Route index element={<Index />} />
+                  <Route path="projects" element={<ProjectsPage />} />
+                  <Route path="skills" element={<SkillsPage />} />
+                  <Route path="how-i-do-it" element={<HowIDoItIndexPage />} />
+                  <Route path="how-i-do-it/:slug" element={<HowIDoItSlugPage />} />
+                  <Route path="blog" element={<BlogLayoutPage />}>
+                    <Route index element={<BlogIndexPage />} />
+                    <Route path=":slug" element={<BlogSlugPage />} />
+                  </Route>
+                </Route>
               )}
               <Route path="*" element={<NotFound />} />
             </Routes>
