@@ -1,4 +1,5 @@
 // __DESIGN_COMPANION_DEV_ONLY__
+import './design-companion.css';
 import * as React from 'react';
 import { Outlet } from 'react-router-dom';
 import { SelectionOverlay } from './SelectionOverlay';
