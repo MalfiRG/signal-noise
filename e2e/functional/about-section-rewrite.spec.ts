@@ -9,7 +9,7 @@ test.describe("AboutSection rewrite", () => {
   });
 
   test("renders cat-block with $ cat ~/profile.txt header", async ({ page }) => {
-    const head = page.locator(".cat-block .cat-head");
+    const head = page.locator(".cat-block .cat-head").first();
     await expect(head).toBeVisible();
     await expect(head).toContainText("cat");
     await expect(head).toContainText("~/profile.txt");
