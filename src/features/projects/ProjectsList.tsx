@@ -2,6 +2,7 @@ import { ExternalLink, Github, Star, GitFork, Clock } from "lucide-react";
 import { motion } from "framer-motion";
 import { projects, type Project } from "./data";
 import { useItemVariant, useMotionPolicy } from "@/lib/motion";
+import LetterReveal from "@/components/LetterReveal";
 
 const desktopStagger = {
   hidden: {},
@@ -96,15 +97,13 @@ const ProjectsList = () => {
     <div className="min-h-screen pt-24 pb-16 px-4">
       <div className="container mx-auto max-w-5xl">
         <div className="mb-12">
-          <p className="text-muted-foreground text-xs tracking-[0.3em] mb-2">{">"} ls ~/projects</p>
+          <LetterReveal text="> ls ~/projects" tag="p" className="text-muted-foreground text-xs tracking-[0.3em] mb-2" delayPerLetter={40} skipAnimation={animationsDisabled} />
           <h1 className="font-display text-4xl font-bold text-foreground text-glow">PROJECTS</h1>
         </div>
 
         {projects.length === 0 ? (
           <div className="text-center py-20 border border-border/50">
-            <p className="text-muted-foreground text-sm tracking-wider">
-              {">"} NO PROJECTS FOUND. INITIALIZING...
-            </p>
+            <LetterReveal text="> NO PROJECTS FOUND. INITIALIZING..." tag="p" className="text-muted-foreground text-sm tracking-wider" delayPerLetter={40} skipAnimation={animationsDisabled} />
           </div>
         ) : animationsDisabled ? (
           <div className="grid gap-6">

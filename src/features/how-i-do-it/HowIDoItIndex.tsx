@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { FileText } from "lucide-react";
 import { howIDoItPages } from "./data";
 import { useItemVariant, useMotionPolicy } from "@/lib/motion";
+import LetterReveal from "@/components/LetterReveal";
 
 const desktopStagger = {
   hidden: {},
@@ -34,9 +35,7 @@ const HowIDoItIndex = () => {
     <div className="min-h-screen pt-24 pb-16 px-4">
       <div className="container mx-auto max-w-5xl">
         <div className="mb-12">
-          <p className="text-muted-foreground text-xs tracking-[0.3em] mb-2">
-            {">"} ls ~/methodology/
-          </p>
+          <LetterReveal text="> ls ~/methodology/" tag="p" className="text-muted-foreground text-xs tracking-[0.3em] mb-2" delayPerLetter={40} skipAnimation={animationsDisabled} />
           <h1 className="font-display text-4xl font-bold text-foreground text-glow">
             HOW I DO IT
           </h1>
