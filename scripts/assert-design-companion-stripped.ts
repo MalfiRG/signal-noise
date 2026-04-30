@@ -106,13 +106,60 @@ export const layer4SourcemapPolicy = async (dir: string): Promise<void> => {
   }
 };
 
-// Layer 1 orchestration deferred — see Session 8 handoff §E (spec compliance gap).
+// Layer 1 wired via vite-manifest chunk attribution (Session 9 §E remediation).
+// Requires `build.manifest = true` in vite.config.ts.
+type ManifestEntry = {
+  file: string;
+  src?: string;
+  isEntry?: boolean;
+  imports?: string[];
+  css?: string[];
+};
+type Manifest = Record<string, ManifestEntry>;
+
+const DESIGN_COMPANION_PREFIX = 'src/design-companion/';
+
+export const sumDesignCompanionBytesFromManifest = async (
+  dist: string,
+): Promise<number> => {
+  const manifestPath = path.join(dist, '.vite', 'manifest.json');
+  const raw = await readFile(manifestPath, 'utf8').catch(() => null);
+  if (raw === null) {
+    throw new Error(
+      `FAIL: ${manifestPath} not found — ensure vite.config.ts has build.manifest=true`,
+    );
+  }
+  const manifest = JSON.parse(raw) as Manifest;
+  let total = 0;
+  for (const [key, entry] of Object.entries(manifest)) {
+    const isDesignCompanion =
+      key.startsWith(DESIGN_COMPANION_PREFIX) ||
+      (entry.src !== undefined && entry.src.startsWith(DESIGN_COMPANION_PREFIX));
+    if (!isDesignCompanion) continue;
+    const distFile = path.join(dist, entry.file);
+    const s = await stat(distFile).catch(() => null);
+    if (s) total += s.size;
+    for (const cssFile of entry.css ?? []) {
+      const cs = await stat(path.join(dist, cssFile)).catch(() => null);
+      if (cs) total += cs.size;
+    }
+  }
+  return total;
+};
+
 const main = async (): Promise<void> => {
+  console.log('[assert-stripped] running layer 1 (manifest chunk attribution)…');
+  const designCompanionBytes = await sumDesignCompanionBytesFromManifest(DIST);
+  await layer1BundleSizeDiff(designCompanionBytes, 0);
+
   console.log('[assert-stripped] running layers 2-4 against current dist…');
   await layer2AstWalk(DIST);
   await layer3SentinelSweep(DIST);
   await layer4SourcemapPolicy(DIST);
-  console.log('PASS: layers 2-4 — AST-clean, sentinel-clean, no source maps');
+  console.log(
+    `PASS: all four layers — design-companion-bytes=${designCompanionBytes}B ` +
+    `(threshold=${DEFAULT_SIZE_THRESHOLD}B), AST-clean, sentinel-clean, no source maps`,
+  );
 };
 
 const isMain = (() => {
