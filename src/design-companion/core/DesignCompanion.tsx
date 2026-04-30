@@ -5,6 +5,8 @@ import { Outlet } from 'react-router-dom';
 import { SelectionOverlay } from './SelectionOverlay';
 import { DesignOverridesContext, applyInlineStyle, applyLayerOverrides } from './LivePreviewLayer';
 import { RightSidebar } from '../layout/RightSidebar';
+import { BottomDrawer } from '../layout/BottomDrawer';
+import { PanelLayoutToggle, useLayoutChoice } from '../layout/PanelLayoutToggle';
 import { SpacingControls } from '../controls/SpacingControls';
 import { ColorControls } from '../controls/ColorControls';
 import { TypographyControls } from '../controls/TypographyControls';
@@ -23,6 +25,7 @@ const DesignCompanionInner: React.FC = () => {
   const deferredOverrides = React.useDeferredValue(overridesNow);
   const handlesRef = React.useRef<Array<{ revert(): void }>>([]);
   const token = useToken();
+  const [layout, setLayout] = useLayoutChoice();
   const [, startTransition] = React.useTransition();
   const onSelectId = (id: string | null) => {
     startTransition(() => { setSelectedId(id); setEdits({}); });
@@ -53,7 +56,7 @@ const DesignCompanionInner: React.FC = () => {
       session_id: `${new Date().toISOString().replace(/[-:]/g, '').slice(0,15)}-${Math.random().toString(16).slice(2,10)}`,
       project: 'blog', page: window.location.pathname,
       timestamp: new Date().toISOString(),
-      panel_layout: 'right-sidebar' as const, status: 'pending' as const,
+      panel_layout: layout, status: 'pending' as const,
       edits: [{ type: 'css' as const, component: '?', file: '?', instance_id: selectedId,
                 source_hash: '00000000', selector: `[data-design-id="${selectedId}"]`, changes: edits }],
     };
@@ -69,13 +72,15 @@ const DesignCompanionInner: React.FC = () => {
     }
   };
 
+  const Shell = layout === 'right-sidebar' ? RightSidebar : BottomDrawer;
+
   return (
     <DesignOverridesContext.Provider value={deferredOverrides}>
       <div className="design-companion-shell">
         <SelectionOverlay onSelect={onSelectId}>
           <Outlet />
         </SelectionOverlay>
-        <RightSidebar
+        <Shell
           header={<ElementHeader componentName="?" instanceId={selectedId ?? '(none)'} file="?" />}
           content={<>
             <SpacingControls value={edits} onChange={onChange} />
@@ -90,6 +95,7 @@ const DesignCompanionInner: React.FC = () => {
               {token ? 'Save' : 'Save (loading token…)'}
             </button>
             <button type="button" onClick={onReset}>Reset</button>
+            <PanelLayoutToggle value={layout} onChange={setLayout} />
           </>}
         />
       </div>
