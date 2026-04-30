@@ -76,7 +76,7 @@ const DesignCompanionInner: React.FC = () => {
 
   return (
     <DesignOverridesContext.Provider value={deferredOverrides}>
-      <div className="design-companion-shell">
+      <div className="design-companion-shell" data-layout={layout}>
         <SelectionOverlay onSelect={onSelectId}>
           <Outlet />
         </SelectionOverlay>
