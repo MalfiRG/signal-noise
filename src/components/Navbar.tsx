@@ -32,9 +32,27 @@ const Navbar = () => {
     { to: "/blog", label: "BLOG" },
   ];
 
+  // Editor-aware navigation: when viewing a route under /__design (dev-only
+  // editor mode, see src/design-companion/), prefix Link/navigate targets so
+  // intra-app navigation stays in editor mode instead of dumping back to
+  // production routes. The `import.meta.env.DEV` gate ensures Vite's DCE
+  // eliminates the entire branch in production builds — design-companion
+  // strip discipline preserved.
+  const inEditor = import.meta.env.DEV
+    ? location.pathname.startsWith("/__design")
+    : false;
+  const editorPrefix = (path: string): string => {
+    if (!inEditor) return path;
+    if (path === "/") return "/__design";
+    return `/__design${path}`;
+  };
+  const normalizedPath = inEditor
+    ? location.pathname.replace(/^\/__design/, "") || "/"
+    : location.pathname;
+
   const isActive = (path: string) => {
-    if (path === "/") return location.pathname === "/";
-    return location.pathname.startsWith(path);
+    if (path === "/") return normalizedPath === "/";
+    return normalizedPath.startsWith(path);
   };
 
   const navLinkClass = (path: string) =>
@@ -45,7 +63,7 @@ const Navbar = () => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/90 backdrop-blur-sm pt-[env(safe-area-inset-top)]">
       <div className="w-full flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link to="/" className="font-display text-lg font-bold text-foreground text-glow tracking-wider">
+        <Link to={editorPrefix("/")} className="font-display text-lg font-bold text-foreground text-glow tracking-wider">
           <Terminal className="inline-block mr-2 h-5 w-5" />
           SIGNAL_NOISE
         </Link>
@@ -54,7 +72,7 @@ const Navbar = () => {
           {links.map((link) => (
             <Link
               key={link.to}
-              to={link.to}
+              to={editorPrefix(link.to)}
               className={navLinkClass(link.to)}
               data-text={link.label}
               {...(isActive(link.to) ? { "aria-current": "page" as const } : {})}
@@ -76,7 +94,7 @@ const Navbar = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-card border-border">
               <DropdownMenuItem
-                onClick={() => navigate("/how-i-do-it")}
+                onClick={() => navigate(editorPrefix("/how-i-do-it"))}
                 className="text-foreground hover:text-primary cursor-pointer text-xs tracking-wider"
               >
                 Overview
@@ -84,7 +102,7 @@ const Navbar = () => {
               {howIDoItPages.map((page) => (
                 <DropdownMenuItem
                   key={page.slug}
-                  onClick={() => navigate(`/how-i-do-it/${page.slug}`)}
+                  onClick={() => navigate(editorPrefix(`/how-i-do-it/${page.slug}`))}
                   className="text-foreground hover:text-primary cursor-pointer text-xs tracking-wider"
                 >
                   {page.title}
@@ -132,7 +150,7 @@ const Navbar = () => {
                 {links.map((link) => (
                   <Link
                     key={link.to}
-                    to={link.to}
+                    to={editorPrefix(link.to)}
                     onClick={() => setMobileOpen(false)}
                     className={navLinkClass(link.to)}
                   >
@@ -144,7 +162,7 @@ const Navbar = () => {
                   <p className="text-xs tracking-[0.2em] text-muted-foreground mb-3">HOW I DO IT</p>
                   <div className="flex flex-col gap-2 pl-2">
                     <Link
-                      to="/how-i-do-it"
+                      to={editorPrefix("/how-i-do-it")}
                       onClick={() => setMobileOpen(false)}
                       className={navLinkClass("/how-i-do-it")}
                     >
@@ -153,7 +171,7 @@ const Navbar = () => {
                     {howIDoItPages.map((page) => (
                       <Link
                         key={page.slug}
-                        to={`/how-i-do-it/${page.slug}`}
+                        to={editorPrefix(`/how-i-do-it/${page.slug}`)}
                         onClick={() => setMobileOpen(false)}
                         className="text-sm tracking-wider text-muted-foreground hover:text-primary transition-colors"
                       >

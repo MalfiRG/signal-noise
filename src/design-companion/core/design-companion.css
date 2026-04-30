@@ -6,7 +6,11 @@
   --dc-accent: #a78bfa;
   display: grid;
   grid-template-columns: 1fr 320px;
-  height: 100vh;
+  /* min-height (not height) so the page content inside the Outlet can grow
+     beyond the viewport — pages like / have AboutSection + more below the
+     hero. Session 9 §M: was `height: 100vh` which clipped everything below
+     the fold. */
+  min-height: 100vh;
   background: var(--dc-bg);
   color: var(--dc-text);
   font-family: ui-sans-serif, system-ui;
@@ -20,6 +24,13 @@
   padding: 16px;
   overflow-y: auto;
   border-left: 1px solid #2a2a3a;
+  /* Sticky so the panel stays visible as the page content scrolls (§M
+     companion fix — without this, the sidebar scrolls out of view on
+     long pages and the user loses access to controls). */
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
 }
 .design-companion-bottom-drawer {
   position: fixed;
