@@ -16,7 +16,7 @@ const BlogIndex = () => {
   return (
     <div className="max-w-3xl mx-auto">
       <div className="mb-6">
-        <LetterReveal text="> cat ~/blog/posts.md" tag="p" className="text-muted-foreground text-xs tracking-[0.3em] mb-2" delayPerLetter={40} skipAnimation={animationsDisabled} />
+        <LetterReveal text="> cat ~/blog/posts.md" tag="p" className="text-muted-foreground text-xs tracking-[0.3em] mb-2" delayPerLetter={20} skipAnimation={animationsDisabled} />
         <h1 className="font-display text-4xl font-bold text-foreground text-glow">BLOG</h1>
       </div>
 
@@ -25,7 +25,7 @@ const BlogIndex = () => {
       </div>
 
       {filteredPosts.length > 0 ? (
-        <ScrollReveal key={activeTags.join(",") || "all"} className="space-y-8">
+        <ScrollReveal key={activeTags.join(",") || "all"} className="space-y-8" delay={0.4}>
           {filteredPosts.map((post) => (
             <ScrollRevealItem key={post.slug}>
               <Link
@@ -81,11 +81,11 @@ const BlogIndex = () => {
         </ScrollReveal>
       ) : activeTags.length > 0 ? (
         <div className="text-center py-20 border border-border/50">
-          <LetterReveal text="> NO MATCHES. REFINE SEARCH PARAMETERS." tag="p" className="text-muted-foreground text-sm tracking-wider" delayPerLetter={40} skipAnimation={animationsDisabled} />
+          <LetterReveal text="> NO MATCHES. REFINE SEARCH PARAMETERS." tag="p" className="text-muted-foreground text-sm tracking-wider" delayPerLetter={20} skipAnimation={animationsDisabled} />
         </div>
       ) : (
         <div className="text-center py-20 border border-border/50">
-          <LetterReveal text="> NO POSTS FOUND. BUFFER EMPTY." tag="p" className="text-muted-foreground text-sm tracking-wider" delayPerLetter={40} skipAnimation={animationsDisabled} />
+          <LetterReveal text="> NO POSTS FOUND. BUFFER EMPTY." tag="p" className="text-muted-foreground text-sm tracking-wider" delayPerLetter={20} skipAnimation={animationsDisabled} />
         </div>
       )}
     </div>

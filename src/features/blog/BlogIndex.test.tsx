@@ -21,22 +21,33 @@ const ContextProvider = ({ context }: { context: BlogOutletContext }) => (
   <Outlet context={context} />
 );
 
-const renderBlogIndex = (context: BlogOutletContext) =>
-  render(
+const renderBlogIndex = (context: Omit<BlogOutletContext, "sidebarProps"> & { sidebarProps?: BlogOutletContext["sidebarProps"] }) => {
+  const fullContext: BlogOutletContext = {
+    ...context,
+    sidebarProps: context.sidebarProps ?? {
+      posts: context.filteredPosts,
+      filteredSlugs: context.filteredPosts.map((p) => p.slug),
+      allTags: context.allTags,
+      activeTags: context.activeTags,
+      onToggleTag: () => {},
+    },
+  };
+  return render(
     <MemoryRouter initialEntries={["/blog"]}>
       <Routes>
-        <Route path="/blog" element={<ContextProvider context={context} />}>
+        <Route path="/blog" element={<ContextProvider context={fullContext} />}>
           <Route index element={<BlogIndex />} />
         </Route>
       </Routes>
     </MemoryRouter>
   );
+};
 
 describe("BlogIndex", () => {
   it("renders filtered posts from outlet context", () => {
     renderBlogIndex({ filteredPosts: mockPosts, activeTags: [], allTags: ["testing", "automation"] });
-    expect(screen.getByText("Alpha Post")).toBeInTheDocument();
-    expect(screen.getByText("Beta Post")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Alpha Post" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Beta Post" })).toBeInTheDocument();
   });
 
   it("shows empty state when no filtered posts with active filters", () => {
