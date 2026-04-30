@@ -55,7 +55,7 @@ const HowIDoItPage = () => {
 
         {pageInfo && (
           <div className="mb-8">
-            <LetterReveal key={slug} text={`> cat ~/methodology/${slug}.md`} tag="p" className="text-muted-foreground text-xs tracking-[0.3em] mb-2 hidden-in-reading" delayPerLetter={40} skipAnimation={animationsDisabled} />
+            <LetterReveal key={slug} text={`> cat ~/methodology/${slug}.md`} tag="p" className="text-muted-foreground text-xs tracking-[0.3em] mb-2 hidden-in-reading" delayPerLetter={20} skipAnimation={animationsDisabled} />
             <h1 className="font-display text-3xl font-bold text-foreground text-glow">
               {pageInfo.title}
             </h1>
