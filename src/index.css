@@ -1169,13 +1169,10 @@ code[class*="language-"] span::selection {
   letter-spacing: 0.22em;
   color: hsl(var(--muted-foreground));
   margin: 0 0 14px 0;
-  display: flex;
-  gap: 10px;
-  align-items: center;
 }
 .cat-block .cat-head .pmt  { color: hsl(var(--primary)); }
 .cat-block .cat-head .file { color: hsl(var(--accent)); }
-.cat-block .cat-head .meta { margin-left: auto; color: hsl(var(--foreground) / 0.4); font-size: 10px; }
+.cat-block .cat-head .meta { margin-left: 12px; color: hsl(var(--foreground) / 0.4); font-size: 10px; }
 
 .cat-block .row {
   display: flex;

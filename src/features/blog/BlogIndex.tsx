@@ -1,19 +1,22 @@
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { ScrollReveal, ScrollRevealItem } from "@/components/ScrollReveal";
+import LetterReveal from "@/components/LetterReveal";
+import { useMotionPolicy } from "@/lib/motion";
 import BlogSidebar from "./BlogSidebar";
 import type { BlogOutletContext } from "./data";
 
 const BlogIndex = () => {
   const { filteredPosts, activeTags, sidebarProps } = useOutletContext<BlogOutletContext>();
   const navigate = useNavigate();
+  const { animationsDisabled } = useMotionPolicy();
 
   const tagParams = activeTags.length > 0 ? `?tags=${activeTags.join(",")}` : "";
 
   return (
     <div className="max-w-3xl mx-auto">
       <div className="mb-6">
-        <p className="text-muted-foreground text-xs tracking-[0.3em] mb-2">{">"} cat ~/blog/posts.md</p>
+        <LetterReveal text="> cat ~/blog/posts.md" tag="p" className="text-muted-foreground text-xs tracking-[0.3em] mb-2" delayPerLetter={20} skipAnimation={animationsDisabled} />
         <h1 className="font-display text-4xl font-bold text-foreground text-glow">BLOG</h1>
       </div>
 
@@ -22,7 +25,7 @@ const BlogIndex = () => {
       </div>
 
       {filteredPosts.length > 0 ? (
-        <ScrollReveal key={activeTags.join(",") || "all"} className="space-y-8">
+        <ScrollReveal key={activeTags.join(",") || "all"} className="space-y-8" delay={0.4}>
           {filteredPosts.map((post) => (
             <ScrollRevealItem key={post.slug}>
               <Link
@@ -78,15 +81,11 @@ const BlogIndex = () => {
         </ScrollReveal>
       ) : activeTags.length > 0 ? (
         <div className="text-center py-20 border border-border/50">
-          <p className="text-muted-foreground text-sm tracking-wider">
-            {">"} NO MATCHES. REFINE SEARCH PARAMETERS.
-          </p>
+          <LetterReveal text="> NO MATCHES. REFINE SEARCH PARAMETERS." tag="p" className="text-muted-foreground text-sm tracking-wider" delayPerLetter={20} skipAnimation={animationsDisabled} />
         </div>
       ) : (
         <div className="text-center py-20 border border-border/50">
-          <p className="text-muted-foreground text-sm tracking-wider">
-            {">"} NO POSTS FOUND. BUFFER EMPTY.
-          </p>
+          <LetterReveal text="> NO POSTS FOUND. BUFFER EMPTY." tag="p" className="text-muted-foreground text-sm tracking-wider" delayPerLetter={20} skipAnimation={animationsDisabled} />
         </div>
       )}
     </div>

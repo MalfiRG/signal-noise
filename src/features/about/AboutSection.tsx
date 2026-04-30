@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import ToolBadges from "./ToolBadges";
 import { introText, socialLinks } from "./data";
 import { useItemVariant, useMotionPolicy } from "@/lib/motion";
+import LetterReveal from "@/components/LetterReveal";
 
 const desktopStagger = {
   hidden: {},
@@ -21,10 +22,10 @@ const AboutSection = () => {
     <div className={PANEL_CLASS}>
       <div className={`cat-block space-y-3${animationsDisabled ? " motion-disabled" : ""}`}>
         <p className="cat-head">
-          <span className="pmt">$</span>
-          <span>cat</span>
-          <span className="file">~/profile.txt</span>
-          <span className="meta">— 1.2k // utf-8</span>
+          <LetterReveal tag="span" text="$ " className="pmt" delayPerLetter={40} startDelay={0} skipAnimation={animationsDisabled} />
+          <LetterReveal tag="span" text="cat " delayPerLetter={40} startDelay={80} skipAnimation={animationsDisabled} />
+          <LetterReveal tag="span" text="~/profile.txt" className="file" delayPerLetter={40} startDelay={240} skipAnimation={animationsDisabled} />
+          <LetterReveal tag="span" text="— 1.2k // utf-8" className="meta" delayPerLetter={40} startDelay={760} skipAnimation={animationsDisabled} />
         </p>
 
         {introText.bio.map((paragraph, i) => (
@@ -60,13 +61,15 @@ const AboutSection = () => {
 
   const toolkitPanel = (
     <div className={PANEL_CLASS}>
-      <p className="cat-head mb-4">
-        <span className="pmt">$</span>
-        <span>ls</span>
-        <span className="file">~/toolkit/</span>
-        <span className="meta">— versioned</span>
-      </p>
-      <ToolBadges />
+      <div className={`cat-block space-y-3${animationsDisabled ? " motion-disabled" : ""}`}>
+        <p className="cat-head">
+          <LetterReveal tag="span" text="$ " className="pmt" delayPerLetter={40} startDelay={0} skipAnimation={animationsDisabled} />
+          <LetterReveal tag="span" text="ls " delayPerLetter={40} startDelay={80} skipAnimation={animationsDisabled} />
+          <LetterReveal tag="span" text="~/toolkit/" className="file" delayPerLetter={40} startDelay={200} skipAnimation={animationsDisabled} />
+          <LetterReveal tag="span" text="— versioned" className="meta" delayPerLetter={40} startDelay={600} skipAnimation={animationsDisabled} />
+        </p>
+        <ToolBadges />
+      </div>
     </div>
   );
 
@@ -74,9 +77,13 @@ const AboutSection = () => {
     <section className="flex items-center pt-8 pb-16 px-4">
       <div className="container mx-auto max-w-5xl">
         <div className="mb-12">
-          <p className="text-muted-foreground text-xs tracking-[0.3em] mb-2">
-            {introText.terminal}
-          </p>
+          <LetterReveal
+            text={introText.terminal}
+            tag="p"
+            className="text-muted-foreground text-xs tracking-[0.3em] mb-2"
+            delayPerLetter={40}
+            skipAnimation={animationsDisabled}
+          />
           <h2 className="font-display text-4xl font-bold text-foreground text-glow">
             {introText.headline}
           </h2>

@@ -3,15 +3,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AnimatedProgressBar from "./AnimatedProgressBar";
 import { skills, learning } from "./data";
 import { ScrollReveal, ScrollRevealItem } from "@/components/ScrollReveal";
+import LetterReveal from "@/components/LetterReveal";
+import { useMotionPolicy } from "@/lib/motion";
 
 const Skills = () => {
+  const { animationsDisabled } = useMotionPolicy();
+
   return (
     <div className="min-h-screen pt-24 pb-16 px-4">
       <div className="container mx-auto max-w-4xl">
         <div className="mb-12">
-          <p className="text-muted-foreground text-xs tracking-[0.3em] mb-2">
-            {">"} cat ~/skills.json
-          </p>
+          <LetterReveal text="> cat ~/skills.json" tag="p" className="text-muted-foreground text-xs tracking-[0.3em] mb-2" delayPerLetter={20} skipAnimation={animationsDisabled} />
           <h1 className="font-display text-4xl font-bold text-foreground text-glow">SKILLS</h1>
         </div>
 
@@ -40,7 +42,7 @@ const Skills = () => {
             </TabsList>
 
             <TabsContent value="skills" className="mt-8">
-              <ScrollReveal className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <ScrollReveal className="grid grid-cols-1 md:grid-cols-2 gap-6" delay={0.4}>
                 {skills.map((skill, index) => (
                   <ScrollRevealItem key={skill.name} className="space-y-2">
                     <div className="flex justify-between items-center">
@@ -66,7 +68,7 @@ const Skills = () => {
               <p className="text-muted-foreground text-sm mb-6">
                 Growth is a key part of my career. Currently expanding into these areas:
               </p>
-              <ScrollReveal className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <ScrollReveal className="grid grid-cols-1 md:grid-cols-2 gap-6" delay={0.4}>
                 {learning.map((item, index) => (
                   <ScrollRevealItem key={item.name} className="space-y-2">
                     <div className="flex justify-between items-center">

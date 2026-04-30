@@ -20,7 +20,7 @@ test.describe("Index — About below fold", () => {
 
     await page.waitForSelector("h1.hero-h");
 
-    const whoami = page.locator("text=whoami").first();
+    const whoami = page.locator('[aria-label="> whoami"]').first();
     const box = await whoami.boundingBox();
     if (box) {
       expect(box.y).toBeGreaterThan(720);
@@ -32,7 +32,7 @@ test.describe("Index — About below fold", () => {
     await page.goto("/");
     await page.waitForSelector("h1.hero-h");
 
-    const whoami = page.locator("text=whoami").first();
+    const whoami = page.locator('[aria-label="> whoami"]').first();
     const box = await whoami.boundingBox();
     if (box) {
       expect(box.y).toBeGreaterThan(812);
@@ -46,7 +46,7 @@ test.describe("Index — About below fold", () => {
     await page.evaluate(() => window.scrollBy(0, window.innerHeight + 200));
     await page.waitForTimeout(500);
 
-    const whoami = page.locator("text=whoami").first();
+    const whoami = page.locator('[aria-label="> whoami"]').first();
     await expect(whoami).toBeVisible();
   });
 });

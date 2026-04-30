@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { ChevronRight, Folder, FileText } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { BlogPost } from "./data";
+import LetterReveal from "@/components/LetterReveal";
+import { useMotionPolicy } from "@/lib/motion";
 
 interface CategoryTreeProps {
   posts: BlogPost[];
@@ -11,6 +13,7 @@ interface CategoryTreeProps {
 }
 
 const CategoryTree = ({ posts, filteredSlugs, activeTags }: CategoryTreeProps) => {
+  const { animationsDisabled } = useMotionPolicy();
   const postsByCategory = useMemo(() => {
     const map: Record<string, BlogPost[]> = {};
     for (const post of posts) {
@@ -44,9 +47,7 @@ const CategoryTree = ({ posts, filteredSlugs, activeTags }: CategoryTreeProps) =
   if (posts.length === 0) {
     return (
       <div className="px-3 py-4">
-        <p className="text-muted-foreground text-xs tracking-wider">
-          {">"} NO ENTRIES IN INDEX
-        </p>
+        <LetterReveal text="> NO ENTRIES IN INDEX" tag="p" className="text-muted-foreground text-xs tracking-wider" delayPerLetter={40} skipAnimation={animationsDisabled} />
       </div>
     );
   }
