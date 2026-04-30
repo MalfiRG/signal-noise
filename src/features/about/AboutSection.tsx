@@ -22,10 +22,10 @@ const AboutSection = () => {
     <div className={PANEL_CLASS}>
       <div className={`cat-block space-y-3${animationsDisabled ? " motion-disabled" : ""}`}>
         <p className="cat-head">
-          <span className="pmt">$ </span>
-          <span>cat </span>
-          <span className="file">~/profile.txt</span>
-          <span className="meta">— 1.2k // utf-8</span>
+          <LetterReveal tag="span" text="$ " className="pmt" delayPerLetter={40} startDelay={0} skipAnimation={animationsDisabled} />
+          <LetterReveal tag="span" text="cat " delayPerLetter={40} startDelay={80} skipAnimation={animationsDisabled} />
+          <LetterReveal tag="span" text="~/profile.txt" className="file" delayPerLetter={40} startDelay={240} skipAnimation={animationsDisabled} />
+          <LetterReveal tag="span" text="— 1.2k // utf-8" className="meta" delayPerLetter={40} startDelay={760} skipAnimation={animationsDisabled} />
         </p>
 
         {introText.bio.map((paragraph, i) => (
@@ -61,13 +61,15 @@ const AboutSection = () => {
 
   const toolkitPanel = (
     <div className={PANEL_CLASS}>
-      <p className="cat-head mb-4">
-        <span className="pmt">$ </span>
-        <span>ls </span>
-        <span className="file">~/toolkit/</span>
-        <span className="meta">— versioned</span>
-      </p>
-      <ToolBadges />
+      <div className={`cat-block space-y-3${animationsDisabled ? " motion-disabled" : ""}`}>
+        <p className="cat-head">
+          <LetterReveal tag="span" text="$ " className="pmt" delayPerLetter={40} startDelay={0} skipAnimation={animationsDisabled} />
+          <LetterReveal tag="span" text="ls " delayPerLetter={40} startDelay={80} skipAnimation={animationsDisabled} />
+          <LetterReveal tag="span" text="~/toolkit/" className="file" delayPerLetter={40} startDelay={200} skipAnimation={animationsDisabled} />
+          <LetterReveal tag="span" text="— versioned" className="meta" delayPerLetter={40} startDelay={600} skipAnimation={animationsDisabled} />
+        </p>
+        <ToolBadges />
+      </div>
     </div>
   );
 
