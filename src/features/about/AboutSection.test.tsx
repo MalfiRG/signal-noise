@@ -4,11 +4,11 @@ import AboutSection from "./AboutSection";
 
 describe("AboutSection", () => {
   it("renders the cat-block frame with terminal header", () => {
-    const { container, getByText } = render(<AboutSection />);
+    const { container, getByLabelText } = render(<AboutSection />);
     expect(container.querySelector(".cat-block")).not.toBeNull();
     expect(container.querySelector(".cat-head")).not.toBeNull();
-    expect(getByText("cat")).toBeTruthy();
-    expect(getByText("~/profile.txt")).toBeTruthy();
+    expect(getByLabelText(/^cat\s*$/)).toBeTruthy();
+    expect(getByLabelText(/^~\/profile\.txt$/)).toBeTruthy();
   });
 
   it("renders all 5 tool categories", () => {
