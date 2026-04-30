@@ -7,11 +7,33 @@ export interface LoopbackHandlerSet {
   handleSaveRoute(req: http.IncomingMessage, res: http.ServerResponse): Promise<void>;
 }
 
+const ALLOWED_ORIGINS = new Set([
+  'http://localhost:8080',
+  'http://127.0.0.1:8080',
+  'http://[::1]:8080',
+]);
+
+const setCorsHeaders = (req: http.IncomingMessage, res: http.ServerResponse): void => {
+  const origin = req.headers.origin;
+  if (origin && ALLOWED_ORIGINS.has(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Design-Token');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  }
+};
+
 export const startLoopbackListener = (
   port: number,
   handlers: LoopbackHandlerSet,
 ): http.Server => {
   const server = http.createServer((req, res) => {
+    setCorsHeaders(req, res);
+    if (req.method === 'OPTIONS') {
+      res.statusCode = 204;
+      res.end();
+      return;
+    }
     const url = req.url ?? '/';
     if (url === '/__design' || url === '/__design/' || url.startsWith('/__design/?')) {
       handlers.handleDesignRoute(req, res); return;
