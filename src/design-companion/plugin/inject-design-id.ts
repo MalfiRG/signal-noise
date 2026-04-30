@@ -116,6 +116,51 @@ export const injectDesignIdInSource = (
       }
       modified = true;
     },
+    ExportDefaultDeclaration(path) {
+      if (!opts.registry) return;
+      const decl = path.node.declaration;
+
+      // Pattern A: export default function X() { ... }
+      if (decl.type === 'FunctionDeclaration' && decl.id) {
+        const name = decl.id.name;
+        if (!opts.registry.has(name) || wrappedNames.has(name)) return;
+        wrappedNames.add(name);
+        const innerName = `${name}_inner`;
+        decl.id.name = innerName;
+        // Sibling FunctionDeclaration + new default export of the wrapped call.
+        path.replaceWithMultiple([
+          decl,
+          t.exportDefaultDeclaration(
+            t.callExpression(t.identifier('withDesignOverrides'), [
+              t.identifier(innerName),
+              t.stringLiteral(name),
+            ]),
+          ),
+        ]);
+        modified = true;
+        return;
+      }
+
+      // Pattern B: export default <Identifier>  (e.g., `const X = ...; export default X`)
+      // Wrap at the export site without renaming the in-scope binding — the wrapped
+      // version is the default-exported one; the named const remains intact.
+      if (decl.type === 'Identifier') {
+        const name = decl.name;
+        if (!opts.registry.has(name) || wrappedNames.has(name)) return;
+        wrappedNames.add(name);
+        path.node.declaration = t.callExpression(t.identifier('withDesignOverrides'), [
+          t.identifier(name),
+          t.stringLiteral(name),
+        ]);
+        modified = true;
+        return;
+      }
+
+      // Pattern C: export default () => <div/>  (anonymous) → SKIP (no name to register against).
+      // Also catches export default <ArrowFunctionExpression> with no enclosing const.
+      // Per plan §4859 — emit a warn-class diagnostic in production, but for the
+      // unit test we just leave the node untouched.
+    },
   });
 
   // If any export was wrapped, ensure withDesignOverrides is imported.

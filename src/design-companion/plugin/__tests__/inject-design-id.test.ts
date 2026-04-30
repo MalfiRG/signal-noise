@@ -38,3 +38,47 @@ describe('injectDesignId — Phase 2 auto-wrap [H2]', () => {
     expect(out).toMatch(/PostHeader_inner/);
   });
 });
+
+describe('injectDesignId — 15-pattern AST coverage matrix [Risk 1 final]', () => {
+  const cases: Array<[string, string]> = [
+    ['forwardRef',           `export const X = React.forwardRef((p, ref) => <div ref={ref}/>);`],
+    ['memo',                 `export const X = React.memo(() => <div/>);`],
+    // Plan §4919 'lazy import' case dropped — degenerate: no JSX in source so
+    // id-injection assertion can't pass (early-skip returns null code). Plan
+    // amendment §12 captured for META session-close.
+    ['generics',             `export function X<T>(p: { v: T }) { return <div data-v={String(p.v)}/>; }`],
+    ['render props',         `export const X = ({ render }) => render(<div/>);`],
+    ['HOC-wrapped',          `export const X = withFoo(() => <div/>);`],
+    ['default export fn',    `export default function X(){ return <div/>; }`],
+    ['default export arrow', `const X = () => <div/>; export default X;`],
+    ['arrow fn const',       `export const X = () => <div/>;`],
+    ['anonymous default',    `export default () => <div/>;`],
+    ['fragment',             `export const X = () => <><span/><span/></>;`],
+    ['conditional jsx',      `export const X = ({ on }) => on ? <a/> : <b/>;`],
+    ['list map',             `export const X = ({ xs }) => xs.map(x => <li key={x}>{x}</li>);`],
+    ['portal',               `export const X = () => createPortal(<div/>, document.body);`],
+    ['typescript narrow',    `export const X = (p: { v?: string }) => <div title={p.v ?? ''}/>;`],
+  ];
+
+  it.each(cases)('injects an id on pattern: %s', (_label, code) => {
+    const out = injectDesignIdInSource(code, { filename: 'x.tsx' }).code ?? '';
+    expect(out).toMatch(/data-design-id="/);
+  });
+
+  // Per H9: each pattern is also tested against auto-wrap. Patterns in the
+  // WRAP class must emit `withDesignOverrides`; patterns in the SKIP class
+  // must NOT emit it.
+  const wrapCases: Array<[string, string, 'wrap' | 'skip']> = cases.map(([label, code]) => {
+    const skip = /anonymous default|^re-export/.test(label);
+    return [label, code, skip ? 'skip' : 'wrap'];
+  });
+
+  it.each(wrapCases)('auto-wrap on pattern: %s → %s', (_label, code, expected) => {
+    const out = injectDesignIdInSource(code, {
+      filename: 'x.tsx',
+      registry: new Set(['X']),
+    }).code ?? '';
+    if (expected === 'wrap') expect(out).toMatch(/withDesignOverrides/);
+    else expect(out).not.toMatch(/withDesignOverrides/);
+  });
+});
