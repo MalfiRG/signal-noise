@@ -10,6 +10,7 @@ vi.mock("framer-motion", () => ({
     div: ({ children, ...props }: Record<string, unknown>) => <div {...props}>{children}</div>,
   },
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  useReducedMotion: () => false,
 }));
 
 const mockPosts: BlogPost[] = [
@@ -72,7 +73,7 @@ describe("CategoryTree", () => {
 
   it("shows empty state when no posts", () => {
     renderTree({ posts: [] });
-    expect(screen.getByText(/NO ENTRIES IN INDEX/)).toBeInTheDocument();
+    expect(screen.getByLabelText(/NO ENTRIES IN INDEX/)).toBeInTheDocument();
   });
 
   it("groups posts without category under Uncategorized", () => {

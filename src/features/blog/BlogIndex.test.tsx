@@ -9,6 +9,7 @@ vi.mock("framer-motion", () => ({
     div: ({ children, ...props }: Record<string, unknown>) => <div {...props}>{children}</div>,
   },
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  useReducedMotion: () => false,
 }));
 
 const mockPosts: BlogPost[] = [
@@ -40,11 +41,11 @@ describe("BlogIndex", () => {
 
   it("shows empty state when no filtered posts with active filters", () => {
     renderBlogIndex({ filteredPosts: [], activeTags: ["nonexistent"], allTags: ["testing"] });
-    expect(screen.getByText(/NO MATCHES/)).toBeInTheDocument();
+    expect(screen.getByLabelText(/NO MATCHES/)).toBeInTheDocument();
   });
 
   it("shows buffer empty when no posts and no active tags", () => {
     renderBlogIndex({ filteredPosts: [], activeTags: [], allTags: [] });
-    expect(screen.getByText(/BUFFER EMPTY/)).toBeInTheDocument();
+    expect(screen.getByLabelText(/BUFFER EMPTY/)).toBeInTheDocument();
   });
 });
