@@ -43,6 +43,7 @@ export const injectDesignIdInSource = (
   });
 
   let modified = false;
+  const wrappedNames = new Set<string>();
   traverse(ast, {
     JSXElement(path) {
       const opening = path.node.openingElement;
@@ -61,7 +62,86 @@ export const injectDesignIdInSource = (
       );
       modified = true;
     },
+    ExportNamedDeclaration(path) {
+      if (!opts.registry) return;
+      const decl = path.node.declaration;
+      if (!decl) return;
+
+      // Resolve the exported name from FunctionDeclaration or VariableDeclaration.
+      let name: string | null = null;
+      let isFunctionDecl = false;
+      if (decl.type === 'FunctionDeclaration' && decl.id) {
+        name = decl.id.name;
+        isFunctionDecl = true;
+      } else if (decl.type === 'VariableDeclaration' && decl.declarations.length === 1) {
+        const declarator = decl.declarations[0];
+        if (declarator.id.type === 'Identifier') {
+          // Idempotency: skip if init is already withDesignOverrides(...) call.
+          if (
+            declarator.init?.type === 'CallExpression' &&
+            declarator.init.callee.type === 'Identifier' &&
+            declarator.init.callee.name === 'withDesignOverrides'
+          ) {
+            return;
+          }
+          name = declarator.id.name;
+        }
+      }
+
+      if (!name || !opts.registry.has(name) || wrappedNames.has(name)) return;
+      wrappedNames.add(name);
+
+      const innerName = `${name}_inner`;
+      const wrappedExport = t.exportNamedDeclaration(
+        t.variableDeclaration('const', [
+          t.variableDeclarator(
+            t.identifier(name),
+            t.callExpression(t.identifier('withDesignOverrides'), [
+              t.identifier(innerName),
+              t.stringLiteral(name),
+            ]),
+          ),
+        ]),
+      );
+
+      if (isFunctionDecl) {
+        const fn = decl as t.FunctionDeclaration;
+        if (fn.id) fn.id.name = innerName;
+        path.replaceWithMultiple([fn, wrappedExport]);
+      } else {
+        const vd = decl as t.VariableDeclaration;
+        const declarator = vd.declarations[0];
+        (declarator.id as t.Identifier).name = innerName;
+        path.replaceWithMultiple([vd, wrappedExport]);
+      }
+      modified = true;
+    },
   });
+
+  // If any export was wrapped, ensure withDesignOverrides is imported.
+  if (wrappedNames.size > 0) {
+    const programBody = ast.program.body;
+    const HOC_SOURCE = '@/design-companion/core/LivePreviewLayer';
+    const hasImport = programBody.some(
+      n =>
+        n.type === 'ImportDeclaration' &&
+        n.source.value === HOC_SOURCE &&
+        n.specifiers.some(
+          s =>
+            s.type === 'ImportSpecifier' &&
+            s.imported.type === 'Identifier' &&
+            s.imported.name === 'withDesignOverrides',
+        ),
+    );
+    if (!hasImport) {
+      programBody.unshift(
+        t.importDeclaration(
+          [t.importSpecifier(t.identifier('withDesignOverrides'), t.identifier('withDesignOverrides'))],
+          t.stringLiteral(HOC_SOURCE),
+        ),
+      );
+    }
+  }
 
   if (!modified) return { code: null };
   const output = generate(ast, { retainLines: true, jsescOption: { minimal: true } });

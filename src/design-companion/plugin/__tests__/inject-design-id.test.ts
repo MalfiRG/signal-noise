@@ -27,3 +27,14 @@ describe('injectDesignId — Phase 0 functional-component pattern', () => {
     expect(out.code).toBe(null);
   });
 });
+
+describe('injectDesignId — Phase 2 auto-wrap [H2]', () => {
+  it('auto-wraps a registered function declaration in withDesignOverrides', () => {
+    const out = injectDesignIdInSource(
+      `export function PostHeader(){return <h1/>;}`,
+      { filename: 'src/components/PostHeader.tsx', registry: new Set(['PostHeader']) },
+    ).code ?? '';
+    expect(out).toMatch(/withDesignOverrides/);
+    expect(out).toMatch(/PostHeader_inner/);
+  });
+});
