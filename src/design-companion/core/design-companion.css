@@ -11,6 +11,10 @@
   color: var(--dc-text);
   font-family: ui-sans-serif, system-ui;
 }
+.design-companion-shell[data-layout="bottom-drawer"] {
+  grid-template-columns: 1fr;
+  padding-bottom: 180px;
+}
 .design-companion-right-sidebar {
   background: var(--dc-bg-elev);
   padding: 16px;
