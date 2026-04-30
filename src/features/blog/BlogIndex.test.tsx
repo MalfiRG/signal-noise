@@ -9,6 +9,7 @@ vi.mock("framer-motion", () => ({
     div: ({ children, ...props }: Record<string, unknown>) => <div {...props}>{children}</div>,
   },
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  useReducedMotion: () => false,
 }));
 
 const mockPosts: BlogPost[] = [
@@ -20,31 +21,42 @@ const ContextProvider = ({ context }: { context: BlogOutletContext }) => (
   <Outlet context={context} />
 );
 
-const renderBlogIndex = (context: BlogOutletContext) =>
-  render(
+const renderBlogIndex = (context: Omit<BlogOutletContext, "sidebarProps"> & { sidebarProps?: BlogOutletContext["sidebarProps"] }) => {
+  const fullContext: BlogOutletContext = {
+    ...context,
+    sidebarProps: context.sidebarProps ?? {
+      posts: context.filteredPosts,
+      filteredSlugs: context.filteredPosts.map((p) => p.slug),
+      allTags: context.allTags,
+      activeTags: context.activeTags,
+      onToggleTag: () => {},
+    },
+  };
+  return render(
     <MemoryRouter initialEntries={["/blog"]}>
       <Routes>
-        <Route path="/blog" element={<ContextProvider context={context} />}>
+        <Route path="/blog" element={<ContextProvider context={fullContext} />}>
           <Route index element={<BlogIndex />} />
         </Route>
       </Routes>
     </MemoryRouter>
   );
+};
 
 describe("BlogIndex", () => {
   it("renders filtered posts from outlet context", () => {
     renderBlogIndex({ filteredPosts: mockPosts, activeTags: [], allTags: ["testing", "automation"] });
-    expect(screen.getByText("Alpha Post")).toBeInTheDocument();
-    expect(screen.getByText("Beta Post")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Alpha Post" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Beta Post" })).toBeInTheDocument();
   });
 
   it("shows empty state when no filtered posts with active filters", () => {
     renderBlogIndex({ filteredPosts: [], activeTags: ["nonexistent"], allTags: ["testing"] });
-    expect(screen.getByText(/NO MATCHES/)).toBeInTheDocument();
+    expect(screen.getByLabelText(/NO MATCHES/)).toBeInTheDocument();
   });
 
   it("shows buffer empty when no posts and no active tags", () => {
     renderBlogIndex({ filteredPosts: [], activeTags: [], allTags: [] });
-    expect(screen.getByText(/BUFFER EMPTY/)).toBeInTheDocument();
+    expect(screen.getByLabelText(/BUFFER EMPTY/)).toBeInTheDocument();
   });
 });
