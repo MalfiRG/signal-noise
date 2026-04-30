@@ -38,6 +38,20 @@ export const applyLayerOverrides = (selector: string, changes: Record<string, st
   };
 };
 
+export const applyDataOverride = (el: HTMLElement, changes: Record<string, string>): CssApplyHandle => {
+  const before = el.getAttribute('data-design-override');
+  el.setAttribute('data-design-override', JSON.stringify(changes));
+  return {
+    selectorId: el.getAttribute('data-design-id') ?? '',
+    changes,
+    mechanism: 'data-override',
+    revert() {
+      if (before === null) el.removeAttribute('data-design-override');
+      else el.setAttribute('data-design-override', before);
+    },
+  };
+};
+
 export const DesignOverridesContext = React.createContext<Map<string, Record<string, unknown>>>(new Map());
 
 export function withDesignOverrides<P extends object>(
@@ -56,6 +70,16 @@ export function withDesignOverrides<P extends object>(
     const overrides = React.useContext(DesignOverridesContext);
     const instanceId = useInstanceId(internalRef);
     const overrideProps = (instanceId && overrides.get(instanceId)) || {};
-    return <Component {...props} {...(overrideProps as P)} ref={mergedRef as never} />;
+    const styleFromAttr = React.useMemo(() => {
+      if (!instanceId) return undefined;
+      const node = document.querySelector(`[data-design-id="${instanceId}"]`);
+      const raw = node?.getAttribute('data-design-override');
+      if (!raw) return undefined;
+      try { return JSON.parse(raw) as React.CSSProperties; } catch { return undefined; }
+    }, [instanceId]);
+    const baseStyle = (props as { style?: React.CSSProperties }).style;
+    const mergedStyle = styleFromAttr ? { ...baseStyle, ...styleFromAttr } : baseStyle;
+    const mergedProps = { ...props, ...overrideProps, ...(mergedStyle ? { style: mergedStyle } : {}) };
+    return <Component {...(mergedProps as P)} ref={mergedRef as never} />;
   });
 }
