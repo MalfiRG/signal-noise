@@ -1,4 +1,4 @@
-import { ExternalLink, Github, Star, GitFork, Clock } from "lucide-react";
+import { ExternalLink, Github, Star, GitFork, Clock, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 import { projects, type Project } from "./data";
 import { useItemVariant, useMotionPolicy } from "@/lib/motion";
@@ -73,7 +73,12 @@ const ProjectCard = ({ project }: { project: Project }) => (
     )}
 
     <div className="flex items-center gap-3 mt-4 pt-3 border-t border-border/50 text-xs text-muted-foreground">
-      {project.stars !== "0" ? (
+      {project.private ? (
+        <span className="flex items-center gap-1.5 tracking-wider uppercase text-muted-foreground/80">
+          <Lock className="h-3 w-3" />
+          Proprietary
+        </span>
+      ) : project.stars !== "0" ? (
         <>
           <span className="flex items-center gap-1">
             <Star className="h-3 w-3" />
@@ -144,6 +149,19 @@ const ProjectsList = () => {
             ))}
           </motion.div>
         )}
+
+        <p className="mt-10 text-xs text-muted-foreground/70 tracking-wider">
+          + ~20 other repos used internally and not shown here. Public surface:{" "}
+          <a
+            href="https://github.com/MalfiRG"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary/80 hover:text-primary underline-offset-4 hover:underline"
+          >
+            github.com/MalfiRG
+          </a>
+          .
+        </p>
       </div>
     </div>
   );
