@@ -21,7 +21,7 @@ export const projects: Project[] = [
   {
     title: "MetaOrchestrator",
     description:
-      "The fully agentic workspace. A multi-project monorepo with a routing layer that decides which project a query belongs to, a three-tier memory architecture (lazy file-tier, eager session-tier, semantic mem-palace tier with tens of thousands of indexed drawers), and a regression test harness that keeps routing accuracy above 97%. Built by hardening an existing folder structure into a research instrument.",
+      "The fully agentic workspace. A multi-project monorepo with a routing layer that decides which project a query belongs to, a three-tier memory architecture (lazy file-tier, eager session-tier, semantic mem-palace tier with ~20,000 indexed drawers), and a regression test harness that keeps routing accuracy above 97%. Built by hardening an existing folder structure into a research instrument.",
     tech_stack: ["Python", "Claude Code", "MCP", "pytest", "YAML", "Bash"],
     stars: "0",
     forks: "0",
@@ -31,7 +31,13 @@ export const projects: Project[] = [
     title: "VMware Orchestrator",
     description:
       "PowerShell class-based PSM1 module for orchestrating dozens of VMs at once. Snapshot rotation, programmatic revert/create cycles, remote script execution, and system-agnostic update routing across Debian, RHEL, and Windows hosts (package-manager-as-strategy). Built end-to-end with Builder, Strategy, and Factory patterns. Runs daily on demand and via Windows Task Scheduler.",
-    tech_stack: ["PowerShell", "PSM1 modules", "VMware PowerCLI", "OOP", "Design Patterns"],
+    tech_stack: [
+      "PowerShell",
+      "PSM1 modules",
+      "VMware PowerCLI",
+      "OOP",
+      "Design Patterns",
+    ],
     stars: "0",
     forks: "0",
     private: true,
@@ -39,7 +45,7 @@ export const projects: Project[] = [
   {
     title: "PowerShell Testing Framework",
     description:
-      "Pester-based regression suite with bootstrap scripts that stand up the test environment from zero. Cut the manual regression cycle by ~50% in steady-state use. Built from scratch — environment provisioning, test orchestration, and reporting all in PowerShell.",
+      "Pester-based regression suite with bootstrap scripts that stand up the test environment from zero. Cut the manual regression cycle by ~50% in steady-state use. Built from scratch - environment provisioning, test orchestration, and reporting all in PowerShell.",
     tech_stack: ["PowerShell", "Pester", "VMware", "CI/CD"],
     stars: "0",
     forks: "0",
@@ -49,7 +55,15 @@ export const projects: Project[] = [
     title: "ScoutQL",
     description:
       "Full-stack job aggregator built end-to-end. Scrapes career pages, stores listings in a centralized DB, scores postings against my CV with an LLM worker, reviewed through a React dashboard. Self-hosted on a hardened VPS. Sits on top of an in-house observability bus, an AIOps self-healing layer, and the DevOps pipeline that runs the box. Engineered as a platform, not a script.",
-    tech_stack: ["React", "TypeScript", "FastAPI", "SQLAlchemy", "Crawlee", "Docker", "Tailwind"],
+    tech_stack: [
+      "React",
+      "TypeScript",
+      "FastAPI",
+      "SQLAlchemy",
+      "Crawlee",
+      "Docker",
+      "Tailwind",
+    ],
     stars: "0",
     forks: "0",
     private: true,
@@ -58,7 +72,14 @@ export const projects: Project[] = [
     title: "SIGNAL_NOISE",
     description:
       "This blog and portfolio. React SPA with a responsive Night City visual identity, Mermaid rendering, and an e-ink reader aesthetic for long-form posts: monochrome, paper-like, distraction-free. Regression-proofed with a Playwright E2E suite that asserts every visual element renders as envisioned.",
-    tech_stack: ["React", "TypeScript", "Vite", "Tailwind", "Framer Motion", "Playwright"],
+    tech_stack: [
+      "React",
+      "TypeScript",
+      "Vite",
+      "Tailwind",
+      "Framer Motion",
+      "Playwright",
+    ],
     github_url: "https://github.com/MalfiRG/the-digital-matrix",
     live_url: "https://the-digital-matrix.vercel.app",
     github_owner_repo: "MalfiRG/the-digital-matrix",
@@ -67,8 +88,19 @@ export const projects: Project[] = [
     language: "TypeScript",
     ciBadge: {
       label: "Playwright E2E Tests",
-      imageUrl: "https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/MalfiRG/58e37ead5baa74b10aaca477f228b7ae/raw/digital-matrix-e2e-status.json",
-      linkUrl: "https://github.com/MalfiRG/the-digital-matrix/actions/workflows/e2e.yml",
+      imageUrl:
+        "https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/MalfiRG/58e37ead5baa74b10aaca477f228b7ae/raw/digital-matrix-e2e-status.json",
+      linkUrl:
+        "https://github.com/MalfiRG/the-digital-matrix/actions/workflows/e2e.yml",
     },
+  },
+  {
+    title: "Mr. Robot",
+    description:
+      "Established a persistent meshnet VPN across multiple devices using NordVPN's Meshnet. SSH hardening, port proxying, and custom routing rules to access home lab services from anywhere. I can literally access my infrastructure from my phone from almost anywhere. Looks quite cool and a bit scary for bystanders, I suppose.",
+    tech_stack: ["Bash", "NordVPN Meshnet", "SSH"],
+    stars: "0",
+    forks: "0",
+    private: true,
   },
 ];
