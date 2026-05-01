@@ -15,25 +15,37 @@ export const skills: Skill[] = [
     name: "Agentic Coding (Claude Code, Multi-Agent Orchestration)",
     level: 85,
     description:
-      "Daily driver since the GPT-3 era. Build, debug, refactor, and orchestrate multi-agent workflows. Authored MetaOrchestrator - a workspace harness with routing logic, three-tier memory (lazy file-tier, eager session-tier, semantic palace-tier), and a regression test suite for the routing layer itself.",
+      "Daily driver since the GPT-3 era. Build, debug, refactor, and orchestrate multi-agent workflows.",
   },
   {
-    name: "DevOps from Zero (BIOS → OS → Harden → CI/CD → App)",
-    level: 80,
+    name: "REST API Testing & Automation",
+    level: 85,
     description:
-      "Bootstrap full environments end-to-end: BIOS, OS install, hardening, networking, observability, CI/CD wiring, application deploy. Recently migrated a Windows-bound workspace to Linux-native by mounting the VHD and porting the entire infrastructure through Claude Code.",
+      "Bread and butter. Designing and executing comprehensive test suites for RESTful APIs. Utilizing tools like Postman, Newman, Pytest to automate what can and should be automated.",
   },
   {
-    name: "PowerShell Module Authoring (OOP + Design Patterns)",
+    name: "DevOps from Zero to Hero",
     level: 80,
     description:
-      "Class-based PSM1 modules using Builder, Strategy, and Factory patterns. Built a VMware orchestrator that snapshot-rotates dozens of VMs, executes remote scripts, and routes system-agnostic updates across Debian, RHEL, and Windows hosts. PowerShell as a real language, not glue.",
+      "Bootstrap full environments end-to-end: BIOS, OS install, hardening, networking, observability, CI/CD wiring, application deploy.",
+  },
+  {
+    name: "PowerShell Module Authoring",
+    level: 80,
+    description:
+      "Class-based PSM1 modules using Builder, Strategy, and Factory patterns.",
   },
   {
     name: "Linux/Windows Infrastructure & Networking",
     level: 80,
     description:
-      "SSH hardening, NordVPN Meshnet tunneling, port-proxy plumbing, sshd drop-in ordering, UFW, fail2ban, Let's Encrypt. Run a hardened Hetzner VPS end-to-end - bootstrap, certs, firewall, observability, deploy.",
+      "SSH hardening, NordVPN Meshnet tunneling, port-proxy plumbing, sshd drop-in ordering, UFW, fail2ban, Let's Encrypt.",
+  },
+  {
+    name: "Cross-Team Collaboration & Technical Writing",
+    level: 80,
+    description:
+      "Translate between developers, product, and DevOps. Mentor junior testers. Write the blog you're reading.",
   },
   {
     name: "VMware Virtualization",
@@ -54,22 +66,22 @@ export const skills: Skill[] = [
       "Pipeline integration for test suites and deploys. Comfortable across all three; choice is project-shape-dependent, not religious.",
   },
   {
-    name: "Python (Intermediate-Strong, AI-Augmented)",
+    name: "Python",
     level: 75,
     description:
-      "Test automation, scripting, REST API testing, data processing. Comfortable building from scratch with AI assistance; reading and modifying unfamiliar Python codebases still benefits from doc-lookup loops - the honest version of this skill.",
+      "Test automation, scripting, REST API testing, data processing. Comfortable architecting whole programs from scratch with AI assistance. No worries, I am taking care to gitignore .venv and .env ;)",
   },
   {
     name: "PowerShell / Pester",
     level: 75,
     description:
-      "Primary scripting language for Windows test automation. Authored a Pester-based regression suite that cut the manual regression cycle by ~50% in steady-state use.",
+      "My primary scripting language for Windows test automation. Authored a Pester-based regression suite that cut the manual testing time by ~50% in everyday use.",
   },
   {
     name: "Pytest",
     level: 70,
     description:
-      "Confident on parametrize, fixtures, and custom plugins from scratch. Existing legacy scaffolding still warrants a docs cycle - same as anyone honest about their stack.",
+      "Confident on parametrize, fixtures, and custom plugins from scratch.",
   },
   {
     name: "Observability (Grafana, Structured Logging)",
@@ -82,12 +94,6 @@ export const skills: Skill[] = [
     level: 65,
     description:
       "Web UI automation, Page Object Model, cross-browser. Used in this blog's E2E suite and in ScoutQL.",
-  },
-  {
-    name: "Cross-Team Collaboration & Technical Writing",
-    level: 80,
-    description:
-      "Translate between developers, product, and DevOps. Mentor junior testers. Write the blog you're reading.",
   },
 ];
 
@@ -119,7 +125,6 @@ export const learning: LearningItem[] = [
   {
     name: ".NET / C#",
     level: 40,
-    description:
-      "Backend understanding for ASP.NET Core. Less active than the others; kept here for honesty.",
+    description: "Backend understanding for ASP.NET Core.",
   },
 ];
