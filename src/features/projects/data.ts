@@ -70,7 +70,7 @@ export const projects: Project[] = [
     private: true,
     ciBadge: {
       label: "Playwright E2E Tests",
-      imageUrl: "https://github.com/MalfiRG/the-digital-matrix/actions/workflows/e2e.yml/badge.svg",
+      imageUrl: "https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/MalfiRG/58e37ead5baa74b10aaca477f228b7ae/raw/digital-matrix-e2e-status.json",
       linkUrl: "https://github.com/MalfiRG/the-digital-matrix/actions/workflows/e2e.yml",
     },
   },
