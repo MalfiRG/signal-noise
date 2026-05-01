@@ -18,15 +18,13 @@ export const introText = {
   headline: "ABOUT ME",
   terminal: "> whoami",
   bio: [
-    "QA engineer who started in molecular biology — I don't remember 95% of the science and the lab training didn't stick, but the mental model and methodology did: research, execute, certify.",
-    "Now it runs on Pytest, Playwright, and CI/CD, with a pinch of DevOps and Agent-Driven development.",
-    "Speaking of the Wolf — testing systems that think for themselves and writing about what I find on this blog.",
+    "AI builder and DevOps practitioner who started in molecular biology — most of the science didn't stick, but the methodology did: research, execute, certify. Same axiom now runs on Claude Code agents, Pytest, and infrastructure I can rebuild from BIOS up.",
+    "What I actually ~did: build a PowerShell orchestrator that rotates dozens of VMs through snapshot, update, and remote-script cycles — runs daily. Build a Pester regression suite that cuts the manual testing cycle by ~50%. Build MetaOrchestrator, a fully agentic, self-autonomous workspace with three-tier memory and a routing harness that has its own regression tests. Build ScoutQL on the side — full-stack scrape → LLM-score → review.",
+    "QA is the lens, not the ceiling. I test systems that think for themselves, harden the infrastructure they run on, and write about what breaks here.",
   ],
 };
 
-// TODO(piotr): refresh tool versions quarterly — see spec §11.2 for rationale.
-// Tools without an explicit minor version (e.g. Pytest "v8.x") are intentional;
-// bump quarterly during feature retrospectives.
+
 export const toolCategories: ToolCategory[] = [
   {
     name: "Test Automation",
@@ -60,17 +58,15 @@ export const toolCategories: ToolCategory[] = [
     tools: [
       { name: "JIRA", version: null },
       { name: "TestRail", version: null },
-      { name: "Confluence", version: null },
-      { name: "ClickUp", version: null },
+      { name: "Confluence", version: null }
     ],
   },
   {
     name: "AI & Tooling",
     tools: [
-      { name: "Claude", version: "sonnet-4.6" },
+      { name: "Claude", version: null },
       { name: "GitHub Copilot", version: null },
-      { name: "n8n", version: null },
-      { name: "Qdrant", version: null },
+      { name: "n8n", version: null }
     ],
   },
 ];
