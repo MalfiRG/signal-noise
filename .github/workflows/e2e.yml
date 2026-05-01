@@ -160,3 +160,39 @@ jobs:
           name: visual-playwright-report
           path: playwright-report/
           retention-days: 14
+
+  report-status:
+    needs: [e2e-smoke, e2e-functional]
+    if: always() && github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Aggregate status and PATCH shields.io endpoint Gist
+        env:
+          SMOKE_RESULT: ${{ needs.e2e-smoke.result }}
+          FUNCTIONAL_RESULT: ${{ needs.e2e-functional.result }}
+          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+          GIST_ID: 58e37ead5baa74b10aaca477f228b7ae
+          GIST_FILE: digital-matrix-e2e-status.json
+        run: |
+          if [ -z "$GIST_TOKEN" ]; then
+            echo "::warning::GIST_TOKEN secret not set - skipping badge update"
+            exit 0
+          fi
+          if [ "$SMOKE_RESULT" = "success" ] && [ "$FUNCTIONAL_RESULT" = "success" ]; then
+            MESSAGE="passing"
+            COLOR="brightgreen"
+          else
+            MESSAGE="failing"
+            COLOR="red"
+          fi
+          PAYLOAD=$(jq -nc \
+            --arg file "$GIST_FILE" \
+            --arg content "{\"schemaVersion\":1,\"label\":\"e2e\",\"message\":\"$MESSAGE\",\"color\":\"$COLOR\"}" \
+            '{files: {($file): {content: $content}}}')
+          curl -fsS -X PATCH \
+            -H "Authorization: token $GIST_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -d "$PAYLOAD" \
+            "https://api.github.com/gists/$GIST_ID" > /dev/null
+          echo "Badge updated: message=$MESSAGE, color=$COLOR"
