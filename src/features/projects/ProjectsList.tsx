@@ -56,6 +56,22 @@ const ProjectCard = ({ project }: { project: Project }) => (
       )}
     </div>
 
+    {project.ciBadge && (
+      <a
+        href={project.ciBadge.linkUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-block mt-4"
+        aria-label={`${project.ciBadge.label} - view CI runs on GitHub Actions`}
+      >
+        <img
+          src={project.ciBadge.imageUrl}
+          alt={`${project.ciBadge.label} status`}
+          className="h-5"
+        />
+      </a>
+    )}
+
     <div className="flex items-center gap-3 mt-4 pt-3 border-t border-border/50 text-xs text-muted-foreground">
       {project.stars !== "0" ? (
         <>
