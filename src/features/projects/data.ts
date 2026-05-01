@@ -55,15 +55,7 @@ export const projects: Project[] = [
     title: "ScoutQL",
     description:
       "Full-stack job aggregator built end-to-end. Scrapes career pages, stores listings in a centralized DB, scores postings against my CV with an LLM worker, reviewed through a React dashboard. Self-hosted on a hardened VPS. Sits on top of an in-house observability bus, an AIOps self-healing layer, and the DevOps pipeline that runs the box. Engineered as a platform, not a script.",
-    tech_stack: [
-      "React",
-      "TypeScript",
-      "FastAPI",
-      "SQLAlchemy",
-      "Crawlee",
-      "Docker",
-      "Tailwind",
-    ],
+    tech_stack: ["React", "TypeScript", "FastAPI", "SQLAlchemy", "Crawlee", "Docker", "Tailwind"],
     stars: "0",
     forks: "0",
     private: true,
@@ -72,14 +64,7 @@ export const projects: Project[] = [
     title: "SIGNAL_NOISE",
     description:
       "This blog and portfolio. React SPA with a responsive Night City visual identity, Mermaid rendering, and an e-ink reader aesthetic for long-form posts: monochrome, paper-like, distraction-free. Regression-proofed with a Playwright E2E suite that asserts every visual element renders as envisioned.",
-    tech_stack: [
-      "React",
-      "TypeScript",
-      "Vite",
-      "Tailwind",
-      "Framer Motion",
-      "Playwright",
-    ],
+    tech_stack: ["React", "TypeScript", "Vite", "Tailwind", "Framer Motion", "Playwright"],
     github_url: "https://github.com/MalfiRG/the-digital-matrix",
     live_url: "https://the-digital-matrix.vercel.app",
     github_owner_repo: "MalfiRG/the-digital-matrix",
