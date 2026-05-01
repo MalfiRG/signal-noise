@@ -92,7 +92,7 @@ export const blogPosts: BlogPost[] = [
     category: "AI & Automation",
     excerpt:
       "Parsed 30 days of my Claude Code JSONL transcripts and ran an ANCOVA. Two factors independently drive prompt-cache TTL drift: session length and whether the session ran inside a git worktree. +39 percentage points at any session size, p = 2×10⁻⁵, partial η² = 0.156 — with graphs, hypotheses, and a primer on Analysis of Covariance because it somehow didn't come up in my biotech PhD.",
-    draft: false,
+    draft: true,
   },
   {
     slug: "rag-retrieval-harness",
