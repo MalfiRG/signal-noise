@@ -21,7 +21,7 @@ export const projects: Project[] = [
   {
     title: "MetaOrchestrator",
     description:
-      "The fully agentic workspace. A multi-project monorepo with a routing layer that decides which project a query belongs to, a three-tier memory architecture (lazy file-tier, eager session-tier, semantic mem-palace tier with tens of thousands of indexed drawers), and a regression test harness that keeps routing accuracy above 97%. Built by hardening an existing folder structure into a research instrument.",
+      "The fully agentic workspace. A multi-project monorepo with a routing layer that decides which project a query belongs to, a three-tier memory architecture (lazy file-tier, eager session-tier, semantic mem-palace tier with ~20,000 indexed drawers), and a regression test harness that keeps routing accuracy above 97%. Built by hardening an existing folder structure into a research instrument.",
     tech_stack: ["Python", "Claude Code", "MCP", "pytest", "YAML", "Bash"],
     stars: "0",
     forks: "0",
@@ -39,7 +39,7 @@ export const projects: Project[] = [
   {
     title: "PowerShell Testing Framework",
     description:
-      "Pester-based regression suite with bootstrap scripts that stand up the test environment from zero. Cut the manual regression cycle by ~50% in steady-state use. Built from scratch — environment provisioning, test orchestration, and reporting all in PowerShell.",
+      "Pester-based regression suite with bootstrap scripts that stand up the test environment from zero. Cut the manual regression cycle by ~50% in steady-state use. Built from scratch - environment provisioning, test orchestration, and reporting all in PowerShell.",
     tech_stack: ["PowerShell", "Pester", "VMware", "CI/CD"],
     stars: "0",
     forks: "0",

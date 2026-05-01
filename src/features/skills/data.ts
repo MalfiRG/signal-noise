@@ -15,7 +15,7 @@ export const skills: Skill[] = [
     name: "Agentic Coding (Claude Code, Multi-Agent Orchestration)",
     level: 85,
     description:
-      "Daily driver since the GPT-3 era. Build, debug, refactor, and orchestrate multi-agent workflows. Authored MetaOrchestrator — a workspace harness with routing logic, three-tier memory (lazy file-tier, eager session-tier, semantic palace-tier), and a regression test suite for the routing layer itself.",
+      "Daily driver since the GPT-3 era. Build, debug, refactor, and orchestrate multi-agent workflows. Authored MetaOrchestrator - a workspace harness with routing logic, three-tier memory (lazy file-tier, eager session-tier, semantic palace-tier), and a regression test suite for the routing layer itself.",
   },
   {
     name: "DevOps from Zero (BIOS → OS → Harden → CI/CD → App)",
@@ -33,7 +33,7 @@ export const skills: Skill[] = [
     name: "Linux/Windows Infrastructure & Networking",
     level: 80,
     description:
-      "SSH hardening, NordVPN Meshnet tunneling, port-proxy plumbing, sshd drop-in ordering, UFW, fail2ban, Let's Encrypt. Run a hardened Hetzner VPS end-to-end — bootstrap, certs, firewall, observability, deploy.",
+      "SSH hardening, NordVPN Meshnet tunneling, port-proxy plumbing, sshd drop-in ordering, UFW, fail2ban, Let's Encrypt. Run a hardened Hetzner VPS end-to-end - bootstrap, certs, firewall, observability, deploy.",
   },
   {
     name: "VMware Virtualization",
@@ -57,7 +57,7 @@ export const skills: Skill[] = [
     name: "Python (Intermediate-Strong, AI-Augmented)",
     level: 75,
     description:
-      "Test automation, scripting, REST API testing, data processing. Build from scratch with AI assistance comfortably; reading and modifying unfamiliar Python codebases benefits from doc-lookup loops — the honest version of this skill.",
+      "Test automation, scripting, REST API testing, data processing. Comfortable building from scratch with AI assistance; reading and modifying unfamiliar Python codebases still benefits from doc-lookup loops - the honest version of this skill.",
   },
   {
     name: "PowerShell / Pester",
@@ -69,7 +69,7 @@ export const skills: Skill[] = [
     name: "Pytest",
     level: 70,
     description:
-      "Confident on parametrize, fixtures, and custom plugins from scratch. Existing legacy scaffolding still warrants a docs cycle — same as anyone honest about their stack.",
+      "Confident on parametrize, fixtures, and custom plugins from scratch. Existing legacy scaffolding still warrants a docs cycle - same as anyone honest about their stack.",
   },
   {
     name: "Observability (Grafana, Structured Logging)",
@@ -96,7 +96,7 @@ export const learning: LearningItem[] = [
     name: "TypeScript",
     level: 35,
     description:
-      "Type-safe applications and test utilities. Daily exposure via this blog and ScoutQL — closing the gap by shipping, not studying.",
+      "Type-safe applications and test utilities. Daily exposure via this blog and ScoutQL - closing the gap by shipping, not studying.",
   },
   {
     name: "React + Tailwind + Vite",
