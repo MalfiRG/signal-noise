@@ -9,6 +9,11 @@ export interface Project {
   forks: string;
   language?: string;
   pushedAt?: string;
+  ciBadge?: {
+    label: string;
+    imageUrl: string;
+    linkUrl: string;
+  };
 }
 
 export const projects: Project[] = [
@@ -27,7 +32,7 @@ export const projects: Project[] = [
   {
     title: "The Digital Matrix",
     description:
-      "This blog. A personal portfolio and technical blog built as a React SPA with a voice-first content pipeline. Features multiple theme profiles, dark/reading mode toggle, Mermaid diagram rendering, and file-explorer-style navigation.",
+      "This blog. A personal portfolio and technical blog built as a React SPA with a voice-first content pipeline. Features multiple theme profiles, dark/reading mode toggle, Mermaid diagram rendering, and file-explorer-style navigation. Regression-proofed with a Playwright E2E suite that runs on every push - the CI badge below is live proof, not a promise.",
     tech_stack: ["React", "TypeScript", "Vite", "Tailwind CSS", "Framer Motion", "Markdown"],
     github_url: "https://github.com/MalfiRG/the-digital-matrix",
     live_url: "https://the-digital-matrix.vercel.app",
@@ -36,6 +41,11 @@ export const projects: Project[] = [
     forks: "0",
     language: "TypeScript",
     pushedAt: "",
+    ciBadge: {
+      label: "Playwright E2E Tests",
+      imageUrl: "https://github.com/MalfiRG/the-digital-matrix/actions/workflows/e2e.yml/badge.svg",
+      linkUrl: "https://github.com/MalfiRG/the-digital-matrix/actions/workflows/e2e.yml",
+    },
   },
   {
     title: "Whispr Local",
