@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:design": "DESIGN_COMPANION=1 vite",
+    "dev:design": "VITE_DESIGN_COMPANION=1 vite",
     "build": "tsx scripts/update-github-stats.ts && VITE_VERCEL_ENV=\"${VERCEL_ENV:-}\" vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
