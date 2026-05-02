@@ -19,6 +19,21 @@ import HowIDoItSlugPage from "./pages/HowIDoItSlugPage";
 import NotFound from "./pages/NotFound";
 import { useScrollRestoration } from "@/hooks/useScrollRestoration";
 
+// [§Task 1.0c — C10/C11/H2] Design-companion is dev-only. The ternary collapses to
+// `null` at build time (Vite substitutes `import.meta.env.DEV` → `false`), and Rollup's
+// DCE removes the dynamic-import branch entirely — no design-companion chunk lands in
+// dist/, satisfying the sentinel sweep. Top-level await is permitted because
+// tsconfig.app.json sets module:ESNext + target:ES2020.
+// Gate on DEV AND opt-in flag — VITE_DESIGN_COMPANION=1 enables the editor in dev.
+// Routine `npm run dev` runs without the editor; `npm run dev:design` enables it.
+const DESIGN_ENABLED = import.meta.env.DEV && import.meta.env.VITE_DESIGN_COMPANION === '1';
+const DesignCompanion = DESIGN_ENABLED
+  ? (await import("./design-companion/core/DesignCompanion")).DesignCompanion
+  : null;
+const DesignToggle = DESIGN_ENABLED
+  ? (await import("./design-companion/core/DesignToggle")).DesignToggle
+  : null;
+
 const queryClient = new QueryClient();
 
 export const AppContent = () => {
@@ -49,11 +64,25 @@ export const AppContent = () => {
                 <Route index element={<BlogIndexPage />} />
                 <Route path=":slug" element={<BlogSlugPage />} />
               </Route>
+              {DesignCompanion && (
+                <Route path="/__design" element={<DesignCompanion />}>
+                  <Route index element={<Index />} />
+                  <Route path="projects" element={<ProjectsPage />} />
+                  <Route path="skills" element={<SkillsPage />} />
+                  <Route path="how-i-do-it" element={<HowIDoItIndexPage />} />
+                  <Route path="how-i-do-it/:slug" element={<HowIDoItSlugPage />} />
+                  <Route path="blog" element={<BlogLayoutPage />}>
+                    <Route index element={<BlogIndexPage />} />
+                    <Route path=":slug" element={<BlogSlugPage />} />
+                  </Route>
+                </Route>
+              )}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </PageTransition>
         </main>
       </div>
+      {DesignToggle && <DesignToggle />}
     </>
   );
 };

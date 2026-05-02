@@ -85,7 +85,7 @@ const HeroSignalNoise = ({
           inner motion.div owns the stagger-children animation. */}
       <div
         data-cta-wrap=""
-        {...(phase < 3 ? { inert: "true" } as Record<string, string> : {})}
+        {...(phase < 3 ? { inert: true } : {})}
       >
         <motion.div
           variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.5, delayChildren: 0.05 } } }}

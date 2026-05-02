@@ -1,0 +1,47 @@
+name: design-companion-strip-check
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/design-companion/**'
+      - 'scripts/assert-design-companion-stripped.ts'
+      - 'scripts/__tests__/**'
+      - 'src/main.tsx'
+      - 'src/App.tsx'
+      - 'vite.config.ts'
+      - 'vitest.config.ts'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/design-companion.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  strip-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Build (production check, hermetic)
+        run: npm run build:check
+
+      - name: Assert design-companion stripped (layers 2-4)
+        run: npm run design:assert-stripped
+
+      - name: Per-layer isolation tests
+        run: npx vitest run scripts/__tests__/assert-design-companion-stripped.test.ts

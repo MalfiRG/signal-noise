@@ -24,8 +24,12 @@
 
     "baseUrl": ".",
     "paths": {
+      "@/design-companion/*": ["./src/design-companion/*"],
       "@/*": ["./src/*"]
-    }
+    },
+
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": ["src"]
 }
