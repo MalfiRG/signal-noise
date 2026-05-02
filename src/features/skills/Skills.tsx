@@ -29,13 +29,13 @@ const Skills = () => {
                   active = themed accent color, inactive = bright neutral. */}
               <TabsTrigger
                 value="skills"
-                className="flex-1 tracking-wider text-sm md:text-lg text-foreground/70 data-[state=active]:text-primary data-[state=active]:text-glow"
+                className="tab-trigger-skills flex-1 tracking-wider text-sm md:text-lg text-foreground/70 data-[state=active]:text-primary data-[state=active]:text-glow"
               >
                 SKILLS
               </TabsTrigger>
               <TabsTrigger
                 value="learning"
-                className="flex-1 tracking-wider text-sm md:text-lg text-foreground/70 data-[state=active]:text-learning"
+                className="tab-trigger-learning flex-1 tracking-wider text-sm md:text-lg text-foreground/70 data-[state=active]:text-learning"
               >
                 LEARNING
               </TabsTrigger>

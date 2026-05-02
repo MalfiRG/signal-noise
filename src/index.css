@@ -136,6 +136,7 @@
 
     --matrix-glow: 0 0 20px hsl(var(--primary) / 0.5), 0 0 40px hsl(var(--primary) / 0.2);
     --matrix-text-glow: 0 0 10px hsl(var(--primary) / 0.8);
+    --learning-glow: 0 0 20px hsl(var(--learning) / 0.5), 0 0 40px hsl(var(--learning) / 0.2);
 
     --matrix-rain-color: 57 100% 48%;
     --scrollbar-thumb: 222 30% 22%;
@@ -154,6 +155,7 @@
     :root {
       --matrix-text-glow: 0 0 6px hsl(var(--primary) / 0.4);
       --matrix-glow: 0 0 12px hsl(var(--primary) / 0.3);
+      --learning-glow: 0 0 12px hsl(var(--learning) / 0.3);
     }
   }
 
@@ -195,6 +197,7 @@
 
     --matrix-glow: none;
     --matrix-text-glow: none;
+    --learning-glow: none;
     --hero-orb-primary: 0 0% 0% / 0;
     --hero-orb-accent: 0 0% 0% / 0;
 
@@ -343,6 +346,18 @@
     box-shadow: var(--matrix-glow);
   }
 
+  .tab-glow-learning {
+    box-shadow: var(--learning-glow);
+  }
+
+  .tab-trigger-skills[data-state="active"] {
+    box-shadow: var(--matrix-glow) !important;
+  }
+
+  .tab-trigger-learning[data-state="active"] {
+    box-shadow: var(--learning-glow) !important;
+  }
+
   .scanline {
     background: repeating-linear-gradient(
       0deg,
@@ -359,6 +374,12 @@
   }
 
   .theme-reading .box-glow {
+    box-shadow: none;
+  }
+
+  .theme-reading .tab-glow-learning,
+  .theme-reading .tab-trigger-skills[data-state="active"],
+  .theme-reading .tab-trigger-learning[data-state="active"] {
     box-shadow: none;
   }
 

@@ -4,7 +4,7 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  workers: process.env.CI ? 1 : 4,
   // dual reporter — wall-clock guard requires results.json (html alone omits it)
   reporter: process.env.CI
     ? [["html"], ["json", { outputFile: "playwright-report/results.json" }]]
@@ -25,6 +25,11 @@ export default defineConfig({
     {
       name: "functional",
       testDir: "./e2e/functional",
+      use: { ...devices["Desktop Chrome"] },
+    },
+    {
+      name: "design",
+      testDir: "./e2e/design",
       use: { ...devices["Desktop Chrome"] },
     },
   ],
