@@ -57,7 +57,7 @@ export const toolCategories: ToolCategory[] = [
   {
     name: "Cloud & Virtualization",
     tools: [
-      { name: "Docker", version: "27.x" },
+      { name: "Docker", version: null },
       { name: "Vmware vSphere", version: null },
       { name: "Hyper-V", version: null },
       { name: "AWS", version: null },
