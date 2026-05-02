@@ -13,7 +13,12 @@ export default defineConfig(({ command }) => ({
   },
   plugins: [
     react(),
-    ...(command !== 'build' ? [designCompanion()] : []),
+    // Design companion is opt-IN (DESIGN_COMPANION=1) — Babel transform on every .tsx +
+    // loopback listener add measurable startup + per-request overhead, only worth paying
+    // when actively iterating on design. Routine blog dev runs without it.
+    //   Enable:  DESIGN_COMPANION=1 npm run dev    (or `npm run dev:design`)
+    //   Disable: npm run dev                       (default)
+    ...(command !== 'build' && process.env.DESIGN_COMPANION === '1' ? [designCompanion()] : []),
   ],
   resolve: {
     alias: {

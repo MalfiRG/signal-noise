@@ -1,4 +1,91 @@
 /* __DESIGN_COMPANION_DEV_ONLY__ */
+.design-companion-color-target {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+  padding: 2px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.design-companion-color-target label {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 5px 8px;
+  font-size: 11px;
+  cursor: pointer;
+  border-radius: 4px;
+  text-transform: lowercase;
+  user-select: none;
+  transition: background 100ms ease-out;
+}
+.design-companion-color-target label:hover { background: rgba(255, 255, 255, 0.08); }
+.design-companion-color-target label.is-active {
+  background: rgba(82, 227, 200, 0.18);
+  outline: 1px solid rgba(82, 227, 200, 0.5);
+}
+.design-companion-color-target input { accent-color: #52e3c8; }
+.design-companion-replay {
+  margin-top: 8px;
+  width: 100%;
+  padding: 6px 10px;
+  background: rgba(82, 227, 200, 0.12);
+  border: 1px solid rgba(82, 227, 200, 0.4);
+  color: #52e3c8;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: ui-monospace, monospace;
+  transition: background 100ms ease-out;
+}
+.design-companion-replay:hover { background: rgba(82, 227, 200, 0.22); }
+.design-companion-replay:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.design-companion-swatch-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin: 6px 0 10px;
+}
+.design-companion-swatch {
+  position: relative;
+  height: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 0;
+  overflow: hidden;
+  transition: transform 80ms ease-out, border-color 120ms ease-out;
+}
+.design-companion-swatch:hover {
+  transform: scale(1.04);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+.design-companion-swatch-label {
+  position: absolute;
+  inset: auto 2px 2px 2px;
+  font-size: 9px;
+  line-height: 10px;
+  font-family: ui-monospace, monospace;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.55);
+  padding: 1px 3px;
+  border-radius: 2px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+[data-design-selected] {
+  outline: 2px dashed #52e3c8 !important;
+  outline-offset: 3px !important;
+}
 .design-companion-shell {
   --dc-bg: #14141c;
   --dc-bg-elev: #1c1c28;

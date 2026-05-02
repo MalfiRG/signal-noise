@@ -13,13 +13,14 @@ describe('SelectionOverlay', () => {
         </SelectionOverlay>
       </div>,
     );
-    fireEvent.click(container.querySelector('[data-design-id]')!);
-    expect(onSelect).toHaveBeenCalledWith('Foo::App::0::abc12345');
+    const target = container.querySelector('[data-design-id]')!;
+    fireEvent.click(target);
+    expect(onSelect).toHaveBeenCalledWith('Foo::App::0::abc12345', target);
   });
   it('clears selection on ESC', () => {
     const onSelect = vi.fn();
     render(<SelectionOverlay onSelect={onSelect}><span/></SelectionOverlay>);
     fireEvent.keyDown(document, { key: 'Escape' });
-    expect(onSelect).toHaveBeenCalledWith(null);
+    expect(onSelect).toHaveBeenCalledWith(null, null);
   });
 });

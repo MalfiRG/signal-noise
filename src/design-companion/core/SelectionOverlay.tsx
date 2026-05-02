@@ -3,12 +3,12 @@ import * as React from 'react';
 
 export interface SelectionOverlayProps {
   children: React.ReactNode;
-  onSelect: (id: string | null) => void;
+  onSelect: (id: string | null, el: HTMLElement | null) => void;
 }
 
 export const SelectionOverlay: React.FC<SelectionOverlayProps> = ({ children, onSelect }) => {
   React.useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onSelect(null); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onSelect(null, null); };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [onSelect]);
@@ -16,7 +16,7 @@ export const SelectionOverlay: React.FC<SelectionOverlayProps> = ({ children, on
     const target = (e.target as HTMLElement).closest('[data-design-id]') as HTMLElement | null;
     if (!target) return;
     e.preventDefault();
-    onSelect(target.getAttribute('data-design-id'));
+    onSelect(target.getAttribute('data-design-id'), target);
   };
   return <div className="design-companion-overlay" onClick={handle}>{children}</div>;
 };
