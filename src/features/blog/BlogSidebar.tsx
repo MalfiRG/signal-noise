@@ -65,10 +65,10 @@ const BlogSidebar = (props: BlogSidebarProps) => {
     const aside = asideRef.current;
     if (!aside) return;
 
-    const parent = aside.parentElement;
-    if (!parent) return;
+    const flexParent = aside.closest(".flex");
+    if (!flexParent) return;
 
-    const parentWidth = parent.getBoundingClientRect().width;
+    const parentWidth = flexParent.getBoundingClientRect().width;
     maxRef.current = Math.min(parentWidth * 0.5, MAX_WIDTH_CAP);
 
     setIsDragging(true);
