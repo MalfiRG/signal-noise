@@ -6,7 +6,7 @@ import type { ProjectAdapter } from './types';
 // per spec §6.4: (a) the color picker menu, (b) the deterministic-translator
 // allowlist. Tokens omitted here fall through to the LLM gap path on translate.
 export const adapter: ProjectAdapter = {
-  projectName: 'the-digital-matrix',
+  projectName: 'signal-noise',
   cssVarPalette: [
     // Brand triad + their foreground pairs
     '--primary',

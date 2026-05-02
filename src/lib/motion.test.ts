@@ -14,7 +14,7 @@ describe("useMotionPolicy", () => {
   beforeEach(() => {
     setMockViewportWidth(1440);
     (useReducedMotion as unknown as ReturnType<typeof vi.fn>).mockReturnValue(false);
-    localStorage.removeItem("digital-matrix-motion-override");
+    localStorage.removeItem("signal-noise-motion-override");
   });
 
   it("returns animationsDisabled=false on desktop with no reduced-motion", () => {
@@ -53,7 +53,7 @@ describe("useMotionPolicy", () => {
 
   it("localStorage override forces animationsDisabled=false on mobile (but not over reduced-motion)", () => {
     setMockViewportWidth(375);
-    localStorage.setItem("digital-matrix-motion-override", "on");
+    localStorage.setItem("signal-noise-motion-override", "on");
     const { result: a } = renderHook(() => useMotionPolicy());
     expect(a.current.animationsDisabled).toBe(false);
 
@@ -69,7 +69,7 @@ describe("useItemVariant (delegated)", () => {
   beforeEach(() => {
     setMockViewportWidth(1440);
     (useReducedMotion as unknown as ReturnType<typeof vi.fn>).mockReturnValue(false);
-    localStorage.removeItem("digital-matrix-motion-override");
+    localStorage.removeItem("signal-noise-motion-override");
   });
 
   it("returns staggerItemCyber on desktop with animations enabled", () => {

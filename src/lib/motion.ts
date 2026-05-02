@@ -106,7 +106,7 @@ function readAuthorOverride(): boolean {
         if (!authorOverrideWarned) {
           authorOverrideWarned = true;
           console.info(
-            `[digital-matrix] motion override active (localStorage): ${motionConfig.storageKey} = 'on'`,
+            `[signal-noise] motion override active (localStorage): ${motionConfig.storageKey} = 'on'`,
           );
         }
         return true;

@@ -1,9 +1,9 @@
-# The Digital Matrix
+# SIGNAL_NOISE
 
 Personal technical blog and portfolio for **Piotr Tarach**, QA engineer based in Prague. Voice-first content pipeline + React SPA with cyberpunk-gold (Night City) visual identity. Reading-mode toggle for blog posts.
 
-**Hosting:** Vercel — auto-deploys from `main`.
-**Repo:** https://github.com/MalfiRG/the-digital-matrix
+**Live:** https://piotrtarach.dev
+**Repo:** https://github.com/MalfiRG/signal-noise
 
 ## Tech Stack
 
@@ -32,23 +32,14 @@ npm run lint
 npm run test
 ```
 
-**WSL2 caveat:** Vite HMR over NTFS cross-mounts is unreliable. Hard-restart vite after any file change. See `.claude/rules/hard-reload-dev-servers.md` for the canonical command pattern.
-
 ## Documentation Map
 
 | Doc | Role |
 |---|---|
-| [`DESIGN.md`](DESIGN.md) | Visual identity (Google Stitch spec format) — palette, typography, motion, components, do's/don'ts. Read for ANY UI/styling work. |
-| [`ARCHITECTURE.md`](ARCHITECTURE.md) | Engineering architecture — routing, content pipeline, motion system internals, hero cascade state machine, testing layers, implementation notes (the WHY-host per workspace-global rule). |
+| [`docs/DESIGN.md`](docs/DESIGN.md) | Visual identity (Google Stitch spec format) — palette, typography, motion, components, do's/don'ts. Read for ANY UI/styling work. |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Engineering architecture — routing, content pipeline, motion system internals, hero cascade state machine, testing layers, implementation notes (the WHY-host per workspace-global rule). |
 | [`CLAUDE.md`](CLAUDE.md) | Agent instructions — authoritative-doc routing manifest, ambiguity-resolution rule, env vars, known gotchas. |
 | [`docs/superpowers/specs/`](docs/superpowers/specs/) | Pre-implementation design specs (HARD SPEC tier). |
 | [`docs/superpowers/plans/`](docs/superpowers/plans/) | Implementation plans (TDD-style, per-task). |
 | [`e2e/`](e2e/) | Playwright suite — smoke / functional / visual tiers (see `ARCHITECTURE.md §9`). |
 
-## Repo Conventions
-
-- **Single source of truth per concern:** visual identity → `DESIGN.md`; engineering architecture → `ARCHITECTURE.md` (with `§12 Implementation Notes` as the WHY-host per workspace rule). Do not duplicate rationale across docs.
-- **Code comments narrow whitelist:** see `~/.claude/rules/docs-over-code-comments.md` — narrative WHY belongs in `ARCHITECTURE.md §12`, not inline.
-.
-- **Commits:** conventional prefix (`docs(scope): ...`, `feat(scope): ...`); never include `Co-Authored-By` lines.
-- **Hard-reload dev server** after file changes — Vite HMR over WSL2 NTFS cross-mounts is unreliable. Runbook in `~/.claude/rules/hard-reload-dev-servers.md`.

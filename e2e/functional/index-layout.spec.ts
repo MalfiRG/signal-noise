@@ -88,11 +88,11 @@ test.describe("Projects — tile cascade", () => {
     expect(count).toBeGreaterThanOrEqual(3);
   });
 
-  test("The Digital Matrix has a live site link", async ({ page }) => {
+  test("SIGNAL_NOISE has a live site link", async ({ page }) => {
     await page.goto("/projects");
     await page.waitForSelector(".grid");
 
-    const liveLink = page.locator('a[href*="the-digital-matrix.vercel.app"]');
+    const liveLink = page.locator('a[href*="piotrtarach.dev"]');
     await expect(liveLink).toBeVisible();
   });
 });

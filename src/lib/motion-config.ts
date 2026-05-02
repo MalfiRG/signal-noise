@@ -7,6 +7,6 @@ function readBuildTimeOverride(): OverrideValue {
 }
 
 export const motionConfig = {
-  storageKey: "digital-matrix-motion-override",
+  storageKey: "signal-noise-motion-override",
   buildTimeOverride: readBuildTimeOverride(),
 } as const;

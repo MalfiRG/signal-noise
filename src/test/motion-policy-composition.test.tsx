@@ -23,38 +23,38 @@ describe("useMotionPolicy — localStorage author override edge cases", () => {
   beforeEach(() => {
     setMockViewportWidth(375);
     mockUseReducedMotion.mockReturnValue(false);
-    localStorage.removeItem("digital-matrix-motion-override");
+    localStorage.removeItem("signal-noise-motion-override");
   });
 
   it("treats missing localStorage key as 'override off' (animations disabled on mobile)", () => {
-    localStorage.removeItem("digital-matrix-motion-override");
+    localStorage.removeItem("signal-noise-motion-override");
     const { result } = renderHook(() => useMotionPolicy());
     expect(result.current.animationsDisabled).toBe(true);
   });
 
   it("treats arbitrary non-'on' value as 'override off'", () => {
-    localStorage.setItem("digital-matrix-motion-override", "true");
+    localStorage.setItem("signal-noise-motion-override", "true");
     const { result: a } = renderHook(() => useMotionPolicy());
     expect(a.current.animationsDisabled).toBe(true);
 
-    localStorage.setItem("digital-matrix-motion-override", "1");
+    localStorage.setItem("signal-noise-motion-override", "1");
     const { result: b } = renderHook(() => useMotionPolicy());
     expect(b.current.animationsDisabled).toBe(true);
 
-    localStorage.setItem("digital-matrix-motion-override", "ON");
+    localStorage.setItem("signal-noise-motion-override", "ON");
     const { result: c } = renderHook(() => useMotionPolicy());
     // spec §4 point 4 — exact "on" only, case-sensitive
     expect(c.current.animationsDisabled).toBe(true);
   });
 
   it("activates on exact string 'on'", () => {
-    localStorage.setItem("digital-matrix-motion-override", "on");
+    localStorage.setItem("signal-noise-motion-override", "on");
     const { result } = renderHook(() => useMotionPolicy());
     expect(result.current.animationsDisabled).toBe(false);
   });
 
   it("override is ignored when prefers-reduced-motion is set (OS wins)", () => {
-    localStorage.setItem("digital-matrix-motion-override", "on");
+    localStorage.setItem("signal-noise-motion-override", "on");
     mockUseReducedMotion.mockReturnValue(true);
     const { result } = renderHook(() => useMotionPolicy());
     expect(result.current.animationsDisabled).toBe(true);
@@ -62,7 +62,7 @@ describe("useMotionPolicy — localStorage author override edge cases", () => {
 
   it("override is ignored when heroReplaySkip is true (replay-skip wins per spec §4 H7)", () => {
     setMockViewportWidth(1440);
-    localStorage.setItem("digital-matrix-motion-override", "on");
+    localStorage.setItem("signal-noise-motion-override", "on");
     const { result } = renderHook(() => useMotionPolicy({ heroReplaySkip: true }));
     // spec §4 H7 — heroReplaySkip wins over authorOverride
     expect(result.current.animationsDisabled).toBe(true);
@@ -97,7 +97,7 @@ describe("useMotionPolicy — localStorage read failure (private mode simulation
 describe("useMotionPolicy — cross-consumer coherence", () => {
   beforeEach(() => {
     mockUseReducedMotion.mockReturnValue(false);
-    localStorage.removeItem("digital-matrix-motion-override");
+    localStorage.removeItem("signal-noise-motion-override");
   });
 
   it("desktop + animations-on: all three consumers render cinematic variants", () => {
@@ -139,7 +139,7 @@ describe("useMotionPolicy — cross-consumer coherence", () => {
 
   it("mobile + author-override=on: all three consumers render cinematic variants", () => {
     setMockViewportWidth(375);
-    localStorage.setItem("digital-matrix-motion-override", "on");
+    localStorage.setItem("signal-noise-motion-override", "on");
 
     const { result: policy } = renderHook(() => useMotionPolicy());
     const { result: heroVariant } = renderHook(() => useHeroStaggerVariant());

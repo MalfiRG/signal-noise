@@ -1,4 +1,4 @@
-# ARCHITECTURE.md — The Digital Matrix
+# ARCHITECTURE.md — SIGNAL_NOISE
 
 > Engineering architecture for the blog. Companion to `DESIGN.md` (visual identity) — this doc covers the structural and runtime concerns: how the SPA is wired, how content flows, how motion is timed, how tests are layered.
 
@@ -534,7 +534,7 @@ Forgetting `data-text` produces silent failure: animation runs, but the overlay 
 
 The motion-policy author override forces animations on regardless of device tier. It is a three-layer config evaluated top-down, first match wins:
 
-1. **`localStorage["digital-matrix-motion-override"]`** — per-browser, per-origin. Values `"on"` or `"off"` win over the env var. Set from DevTools console for personal preview without redeploying. Case-sensitive — `"ON"` / `"true"` / `"1"` do NOT activate (spec §4 point 4 mandates exact `"on"`).
+1. **`localStorage["signal-noise-motion-override"]`** — per-browser, per-origin. Values `"on"` or `"off"` win over the env var. Set from DevTools console for personal preview without redeploying. Case-sensitive — `"ON"` / `"true"` / `"1"` do NOT activate (spec §4 point 4 mandates exact `"on"`).
 2. **`VITE_MOTION_OVERRIDE`** (env var) — build-time substitution; requires Vite restart or Vercel redeploy. Use to force animations on for ALL visitors (demo, A/B test). Read once in `motion-config.ts`.
 3. **Tier default** — desktop = on, tablet/mobile = off (`useMotionPolicy` in `src/lib/motion.ts`).
 
@@ -686,7 +686,7 @@ Scroll trigger: `useEffect` listens for `window.scrollY > 40`, sets a `scrolled`
 - **Voice & content guide:** `skills/voice-to-blog/references/voice-style-guide.md`
 - **WSL2 dev rules:** `.claude/rules/hard-reload-dev-servers.md`
 - **Operator profile:** repo's `CLAUDE.md` + workspace `CLAUDE.md`
-- **Repo:** https://github.com/MalfiRG/the-digital-matrix
+- **Repo:** https://github.com/MalfiRG/signal-noise
 - **Hosting:** Vercel (auto from `main`)
 - **Doc deduplication migration spec:** `docs/superpowers/specs/2026-04-28-blog-doc-deduplication-design.md` (HARD SPEC for the architecture-tier doc dedup; see also the Stitch lint command `npx --yes @google/design.md lint DESIGN.md` for ongoing DESIGN.md format validation)
 

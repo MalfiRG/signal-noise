@@ -115,7 +115,7 @@ components:
     rounded: "{rounded.sm}"
 ---
 
-# DESIGN.md — The Digital Matrix
+# DESIGN.md — SIGNAL_NOISE
 
 > AI-agent-readable design system spec for Piotr Tarach's personal blog and portfolio. Optimized for coding agents (Claude, Stitch, etc.) to generate UI consistent with the established visual identity.
 
@@ -519,7 +519,7 @@ Reduced-motion (`prefers-reduced-motion: reduce`) compresses to 100/600/1200ms w
 
 ## References
 
-- **Codebase:** `https://github.com/MalfiRG/the-digital-matrix`
+- **Codebase:** `https://github.com/MalfiRG/signal-noise`
 - **Architecture:** see `ARCHITECTURE.md` (component tree, routing, motion system internals)
 - **Tone & voice (for blog content):** see `skills/voice-to-blog/references/voice-style-guide.md`
 - **DESIGN.md convention:** Google Stitch / VoltAgent collection (https://github.com/VoltAgent/awesome-design-md)

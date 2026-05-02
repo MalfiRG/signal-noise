@@ -1,10 +1,10 @@
-# The Digital Matrix — Agent Instructions
+# SIGNAL_NOISE — Agent Instructions
 
 ## Project Overview
 
 Personal technical blog by **Piotr Tarach**, QA engineer based in Prague. Single visual identity: **Night City** (cyberpunk-gold). React + TypeScript SPA on Vercel.
 
-**Repo:** `https://github.com/MalfiRG/the-digital-matrix.git` | **Hosting:** Vercel (auto from `main`).
+**Repo:** `https://github.com/MalfiRG/signal-noise.git` | **Hosting:** Vercel (auto from `main`). | **Live:** https://piotrtarach.dev
 
 ---
 
@@ -13,8 +13,8 @@ Personal technical blog by **Piotr Tarach**, QA engineer based in Prague. Single
 The architecture-tier docs are the canonical source of truth for their respective domains. Read them on demand for the kind of work you're doing.
 
 - **`README.md`** — project pitch, **canonical Tech Stack table**, Quick Start, doc map. Read FIRST when discovering the repo.
-- **`DESIGN.md`** — visual identity (Google Stitch DESIGN.md format, alpha). Read for ANY UI/styling work BEFORE generating code. Sections: Overview, Colors, Typography, Layout, Elevation & Depth, Shapes, Components, Do's and Don'ts (+ extensions: Motion, References).
-- **`ARCHITECTURE.md`** — engineering architecture (13 sections, numbering frozen):
+- **`docs/DESIGN.md`** — visual identity (Google Stitch DESIGN.md format, alpha). Read for ANY UI/styling work BEFORE generating code. Sections: Overview, Colors, Typography, Layout, Elevation & Depth, Shapes, Components, Do's and Don'ts (+ extensions: Motion, References).
+- **`docs/ARCHITECTURE.md`** — engineering architecture (13 sections, numbering frozen):
   - **§1** System Overview · **§2** Directory Structure · **§3** Routing · **§4** Content Pipeline
   - **§5** Styling Architecture · **§6** Motion Design System · **§7** Hero Cascade Architecture
   - **§8** Build & Deploy · **§9** Testing Architecture · **§10** Key Abstractions
@@ -40,7 +40,7 @@ This rule is the consumer side of the workspace-global policy `~/.claude/rules/d
 
 ## Git Conventions
 
-`→ ARCHITECTURE.md §11`. Highlight: **never** include `Co-Authored-By` lines in commits.
+`→ docs/ARCHITECTURE.md §11`. Highlight: **never** include `Co-Authored-By` lines in commits.
 
 ---
 
@@ -48,7 +48,7 @@ This rule is the consumer side of the workspace-global policy `~/.claude/rules/d
 
 | Variable | Purpose | Required |
 |----------|---------|----------|
-| `VITE_MOTION_OVERRIDE` | Forces motion policy `on`/`off` for every visitor (build-time default). Per-browser `localStorage["digital-matrix-motion-override"]` wins over this. See `src/lib/motion-config.ts`. | No |
+| `VITE_MOTION_OVERRIDE` | Forces motion policy `on`/`off` for every visitor (build-time default). Per-browser `localStorage["signal-noise-motion-override"]` wins over this. See `src/lib/motion-config.ts`. | No |
 | `VITE_VERCEL_ENV` | Bridged from Vercel's `VERCEL_ENV` by the build script. Drives blog visibility tiers (`production` hides drafts; `preview`/`development` show them). Do not set manually. | No (auto) |
 
 ### Blog post visibility tiers
@@ -69,10 +69,10 @@ Implementation: `detectVisibilityMode` in `src/features/blog/data.ts`.
 To preview animations on mobile/tablet from your own browser without changing config or redeploying:
 
 1. Open the site (any environment), F12 → Console
-2. `localStorage.setItem("digital-matrix-motion-override", "on")` then reload
-3. To revert: `localStorage.removeItem("digital-matrix-motion-override")` then reload
+2. `localStorage.setItem("signal-noise-motion-override", "on")` then reload
+3. To revert: `localStorage.removeItem("signal-noise-motion-override")` then reload
 
-Per-browser, per-origin tool — never affects other visitors. Full control-plane explanation: `→ ARCHITECTURE.md §12 / Motion override precedence`.
+Per-browser, per-origin tool — never affects other visitors. Full control-plane explanation: `→ docs/ARCHITECTURE.md §12 / Motion override precedence`.
 
 ---
 
@@ -95,7 +95,7 @@ Night City palette:
 ### Ready-to-use prompts
 
 **For new component generation:**
-> Generate a [component] for The Digital Matrix blog. Use Night City palette: primary=yellow `text-primary`, accent=cyan `text-accent`, never amber-500 (use `text-learning` if in-progress). Wrap interactive elements in `btn-interactive glitch-hover` (set `data-text` attr). Use Tailwind utilities exclusively — no hardcoded colors. Body font defaults to Chakra Petch; headings use `font-display` (Orbitron) for h1, `font-heading` (Rajdhani) for h2/h3/h4.
+> Generate a [component] for the SIGNAL_NOISE blog. Use Night City palette: primary=yellow `text-primary`, accent=cyan `text-accent`, never amber-500 (use `text-learning` if in-progress). Wrap interactive elements in `btn-interactive glitch-hover` (set `data-text` attr). Use Tailwind utilities exclusively — no hardcoded colors. Body font defaults to Chakra Petch; headings use `font-display` (Orbitron) for h1, `font-heading` (Rajdhani) for h2/h3/h4.
 
 **For new page entrance:**
 > Use `useItemVariant()` from `@/lib/motion` for stagger items (NOT `staggerItem` directly — bypasses mobile/reduced-motion guards). Wrap stagger children in a `motion.div` with `staggerContainer` variants. For hero pages with their own entrance theater, use `useHeroStaggerVariant()` instead.

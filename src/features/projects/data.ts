@@ -65,18 +65,18 @@ export const projects: Project[] = [
     description:
       "This blog and portfolio. React SPA with a responsive Night City visual identity, Mermaid rendering, and an e-ink reader aesthetic for long-form posts: monochrome, paper-like, distraction-free. Regression-proofed with a Playwright E2E suite that asserts every visual element renders as envisioned.",
     tech_stack: ["React", "TypeScript", "Vite", "Tailwind", "Framer Motion", "Playwright"],
-    github_url: "https://github.com/MalfiRG/the-digital-matrix",
+    github_url: "https://github.com/MalfiRG/signal-noise",
     live_url: "https://piotrtarach.dev",
-    github_owner_repo: "MalfiRG/the-digital-matrix",
+    github_owner_repo: "MalfiRG/signal-noise",
     stars: "0",
     forks: "0",
     language: "TypeScript",
     ciBadge: {
       label: "Playwright E2E Tests",
       imageUrl:
-        "https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/MalfiRG/58e37ead5baa74b10aaca477f228b7ae/raw/digital-matrix-e2e-status.json",
+        "https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/MalfiRG/58e37ead5baa74b10aaca477f228b7ae/raw/signal-noise-e2e-status.json",
       linkUrl:
-        "https://github.com/MalfiRG/the-digital-matrix/actions/workflows/e2e.yml",
+        "https://github.com/MalfiRG/signal-noise/actions/workflows/e2e.yml",
     },
   },
   {
