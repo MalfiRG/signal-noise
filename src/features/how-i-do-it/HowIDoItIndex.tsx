@@ -21,7 +21,7 @@ const MethodologyCard = ({ slug, title, description }: { slug: string; title: st
         {title}
       </h3>
     </div>
-    <p className="text-muted-foreground text-sm leading-relaxed">
+    <p className="text-muted-foreground text-lg leading-relaxed">
       {description}
     </p>
   </Link>
@@ -33,13 +33,13 @@ const HowIDoItIndex = () => {
 
   return (
     <div className="min-h-screen pt-24 pb-16 px-4">
-      <div className="container mx-auto max-w-5xl">
+      <div className="container mx-auto max-w-6xl">
         <div className="mb-12">
           <LetterReveal text="> ls ~/methodology/" tag="p" className="text-muted-foreground text-xs tracking-[0.3em] mb-2" delayPerLetter={20} skipAnimation={animationsDisabled} />
           <h1 className="font-display text-4xl font-bold text-foreground text-glow">
             HOW I DO IT
           </h1>
-          <p className="text-muted-foreground text-sm mt-4 max-w-2xl">
+          <p className="text-muted-foreground text-base mt-4 max-w-2xl">
             A look into my QA methodology — how I plan tests, design cases, build frameworks, and
             report bugs.
           </p>

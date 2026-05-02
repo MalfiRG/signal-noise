@@ -31,7 +31,7 @@ const AboutSection = () => {
         {introText.bio.map((paragraph, i) => (
           <p
             key={i}
-            className={`text-foreground/80 text-sm leading-relaxed${i === lastBioIndex ? " cursor-blink" : ""}`}
+            className={`text-foreground/80 text-lg leading-relaxed${i === lastBioIndex ? " cursor-blink" : ""}`}
           >
             {paragraph}
           </p>
@@ -75,7 +75,7 @@ const AboutSection = () => {
 
   return (
     <section className="flex items-center pt-8 pb-16 px-4">
-      <div className="container mx-auto max-w-5xl">
+      <div className="container mx-auto max-w-6xl">
         <div className="mb-12">
           <LetterReveal
             text={introText.terminal}

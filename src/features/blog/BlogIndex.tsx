@@ -14,7 +14,7 @@ const BlogIndex = () => {
   const tagParams = activeTags.length > 0 ? `?tags=${activeTags.join(",")}` : "";
 
   return (
-    <div className="max-w-3xl mx-auto">
+    <div className="max-w-5xl mx-auto">
       <div className="mb-6">
         <LetterReveal text="> cat ~/blog/posts.md" tag="p" className="text-muted-foreground text-xs tracking-[0.3em] mb-2" delayPerLetter={20} skipAnimation={animationsDisabled} />
         <h1 className="font-display text-4xl font-bold text-foreground text-glow">BLOG</h1>
@@ -71,7 +71,7 @@ const BlogIndex = () => {
                   {post.title}
                 </h2>
                 {post.excerpt && (
-                  <p className="text-muted-foreground text-sm leading-relaxed break-words">
+                  <p className="text-muted-foreground text-lg leading-relaxed break-words">
                     {post.excerpt}
                   </p>
                 )}

@@ -14,7 +14,7 @@ const ProjectCard = ({ project }: { project: Project }) => (
     <h3 className="font-display text-xl font-bold text-foreground group-hover:text-glow mb-3">
       {project.title}
     </h3>
-    <p className="text-muted-foreground text-sm mb-4 leading-relaxed">
+    <p className="text-muted-foreground text-lg mb-4 leading-relaxed">
       {project.description}
     </p>
 
@@ -116,7 +116,7 @@ const ProjectsList = () => {
 
   return (
     <div className="min-h-screen pt-24 pb-16 px-4">
-      <div className="container mx-auto max-w-5xl">
+      <div className="container mx-auto max-w-6xl">
         <div className="mb-12">
           <LetterReveal text="> ls ~/projects" tag="p" className="text-muted-foreground text-xs tracking-[0.3em] mb-2" delayPerLetter={20} skipAnimation={animationsDisabled} />
           <h1 className="font-display text-4xl font-bold text-foreground text-glow">PROJECTS</h1>

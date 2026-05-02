@@ -44,7 +44,7 @@ const HowIDoItPage = () => {
 
   return (
     <div className="min-h-screen pt-24 pb-16 px-4">
-      <div className="container mx-auto max-w-4xl">
+      <div className="container mx-auto max-w-6xl">
         <Link
           to="/how-i-do-it"
           className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors text-sm tracking-wider mb-8"

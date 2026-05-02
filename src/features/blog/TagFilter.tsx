@@ -9,7 +9,7 @@ const TagFilter = ({ allTags, activeTags, onToggleTag }: TagFilterProps) => {
 
   return (
     <div className="px-3 py-4 border-t border-border max-h-48 overflow-y-auto flex-shrink-0">
-      <p className="text-xs tracking-[0.2em] text-muted-foreground mb-3">TAGS</p>
+      <p className="text-base tracking-[0.2em] text-muted-foreground mb-3">TAGS</p>
       <div className="flex flex-wrap gap-1.5">
         {allTags.map((tag) => {
           const isActive = activeTags.includes(tag);
@@ -18,7 +18,7 @@ const TagFilter = ({ allTags, activeTags, onToggleTag }: TagFilterProps) => {
               key={tag}
               onClick={() => onToggleTag(tag)}
               aria-pressed={isActive}
-              className={`text-xs px-2 py-1 border rounded transition-colors tracking-wider ${
+              className={`text-base px-2.5 py-1.5 border rounded transition-colors tracking-wider ${
                 isActive
                   ? "bg-primary text-primary-foreground border-primary"
                   : "border-border text-muted-foreground hover:border-primary/50 hover:text-primary"
