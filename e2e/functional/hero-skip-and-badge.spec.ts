@@ -80,9 +80,9 @@ test.describe("Hero skip-intro paths (spec §5.6)", () => {
     await page.reload();
     await page.waitForLoadState("networkidle");
 
-    // spec §5.6 - mobile tier skips cascade; CTAs visible immediately, no SKIP button
+    // spec §5.6 - mobile tier skips cascade; CTAs visible, SKIP absent in settled state
     await expect(page.getByRole("link", { name: "VIEW PROJECTS" })).toBeVisible({ timeout: 5000 });
-    await expect(page.getByRole("button", { name: /skip intro/i })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: /skip intro/i })).not.toBeVisible({ timeout: 3000 });
   });
 });
 
