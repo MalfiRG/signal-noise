@@ -1,9 +1,9 @@
 # SIGNAL_NOISE
 
-Personal technical blog and portfolio for **Piotr Tarach**, QA engineer based in Prague. Voice-first content pipeline + React SPA with cyberpunk-gold (Night City) visual identity. Reading-mode toggle for blog posts.
+Personal technical blog and portfolio for **Piotr Tarach**, QA engineer based in Prague. React SPA with cyberpunk-gold (Night City) visual identity. Reading-mode toggle for blog posts.
 
-**Live:** https://piotrtarach.dev
-**Repo:** https://github.com/MalfiRG/signal-noise
+**Live:** <https://piotrtarach.dev>
+**Repo:** <https://github.com/MalfiRG/signal-noise>
 
 ## Tech Stack
 
@@ -18,8 +18,8 @@ Personal technical blog and portfolio for **Piotr Tarach**, QA engineer based in
 | Icons        | Lucide React                        | UI iconography                                 |
 | UI Components| shadcn/ui (Radix primitives)        | Sheets, dropdowns, tabs                        |
 | Styling      | Tailwind CSS 3 + CSS custom properties | All colors via `:root` tokens                |
-| Theme        | next-themes (single theme: cyberpunk-gold) | `attribute="class"` on `<html>`         |
-| Deployment   | Vercel                              | Includes Analytics + Speed Insights            |
+| Theme        | next-themes (single theme: cyberpunk-gold) |   |
+| Deployment   | Vercel                                        |
 
 ## Quick Start
 
@@ -37,9 +37,6 @@ npm run test
 | Doc | Role |
 |---|---|
 | [`docs/DESIGN.md`](docs/DESIGN.md) | Visual identity (Google Stitch spec format) — palette, typography, motion, components, do's/don'ts. Read for ANY UI/styling work. |
-| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Engineering architecture — routing, content pipeline, motion system internals, hero cascade state machine, testing layers, implementation notes (the WHY-host per workspace-global rule). |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Engineering architecture — routing, content pipeline, motion system internals, hero cascade state machine, testing layers, implementation notes. |
 | [`CLAUDE.md`](CLAUDE.md) | Agent instructions — authoritative-doc routing manifest, ambiguity-resolution rule, env vars, known gotchas. |
-| [`docs/superpowers/specs/`](docs/superpowers/specs/) | Pre-implementation design specs (HARD SPEC tier). |
-| [`docs/superpowers/plans/`](docs/superpowers/plans/) | Implementation plans (TDD-style, per-task). |
 | [`e2e/`](e2e/) | Playwright suite — smoke / functional / visual tiers (see `ARCHITECTURE.md §9`). |
-
