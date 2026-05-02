@@ -131,6 +131,23 @@ test.describe("Mobile no-overflow contract", () => {
       ).toHaveLength(0);
     });
 
+    test(`/ (homepage) has no horizontal scroll at ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 844 });
+      await prepareContext(page);
+      await page.goto("/");
+      await stabilizeForLayout(page);
+
+      const { scrollWidth, clientWidth } = await page.evaluate(() => ({
+        scrollWidth: document.documentElement.scrollWidth,
+        clientWidth: document.documentElement.clientWidth,
+      }));
+
+      expect(
+        scrollWidth,
+        `Page scrollWidth (${scrollWidth}) exceeds clientWidth (${clientWidth}) at ${width}px`
+      ).toBeLessThanOrEqual(clientWidth);
+    });
+
     test(`/blog tag list height is bounded at ${width}px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 844 });
       await prepareContext(page);

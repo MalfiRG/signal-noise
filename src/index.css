@@ -266,6 +266,7 @@
   body {
     @apply bg-background text-foreground;
     font-family: 'Chakra Petch', system-ui, sans-serif;
+    overflow-x: hidden;
   }
 
   h1, h5, h6 {
@@ -1177,8 +1178,8 @@ code[class*="language-"] span::selection {
 .cat-block .row {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
-  margin-bottom: 6px;
+  gap: 6px;
+  margin-bottom: 8px;
 }
 
 .cursor-blink::after {
@@ -1193,20 +1194,20 @@ code[class*="language-"] span::selection {
 
 .tools-grid h4 {
   font-family: 'Rajdhani', sans-serif;
-  font-size: 10px;
+  font-size: 14px;
   letter-spacing: 0.2em;
   color: hsl(var(--accent));
-  margin: 12px 0 4px;
+  margin: 12px 0 6px;
   text-transform: uppercase;
 }
 
 .badge {
   border: 1px solid hsl(var(--border));
   background: hsl(var(--card) / 0.4);
-  padding: 2px 7px;
+  padding: 4px 10px;
   border-radius: 2px;
   font-family: 'Share Tech Mono', monospace;
-  font-size: 10px;
+  font-size: 14px;
   color: hsl(var(--foreground) / 0.85);
   display: inline-flex;
   gap: 4px;
