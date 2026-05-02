@@ -110,7 +110,7 @@ const HeroSignalNoise = ({
             </Link>
             <Link
               to="/blog"
-              className="border border-border px-8 py-3 text-base tracking-widest text-muted-foreground hover:border-primary/50 hover:text-foreground transition-all btn-interactive glitch-hover"
+              className="border border-muted-foreground/50 px-8 py-3 text-base tracking-widest text-muted-foreground hover:border-primary/50 hover:text-foreground transition-all btn-interactive glitch-hover"
               data-text="READ BLOG"
             >
               READ BLOG

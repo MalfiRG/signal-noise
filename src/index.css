@@ -136,7 +136,6 @@
 
     --matrix-glow: 0 0 20px hsl(var(--primary) / 0.5), 0 0 40px hsl(var(--primary) / 0.2);
     --matrix-text-glow: 0 0 10px hsl(var(--primary) / 0.8);
-    --learning-glow: 0 0 20px hsl(var(--learning) / 0.5), 0 0 40px hsl(var(--learning) / 0.2);
 
     --matrix-rain-color: 57 100% 48%;
     --scrollbar-thumb: 222 30% 22%;
@@ -155,7 +154,6 @@
     :root {
       --matrix-text-glow: 0 0 6px hsl(var(--primary) / 0.4);
       --matrix-glow: 0 0 12px hsl(var(--primary) / 0.3);
-      --learning-glow: 0 0 12px hsl(var(--learning) / 0.3);
     }
   }
 
@@ -197,7 +195,6 @@
 
     --matrix-glow: none;
     --matrix-text-glow: none;
-    --learning-glow: none;
     --hero-orb-primary: 0 0% 0% / 0;
     --hero-orb-accent: 0 0% 0% / 0;
 
@@ -346,16 +343,24 @@
     box-shadow: var(--matrix-glow);
   }
 
-  .tab-glow-learning {
-    box-shadow: var(--learning-glow);
+  .skill-glow-expert:hover,
+  .skill-glow-expert:active {
+    box-shadow: 0 0 8px hsl(var(--primary) / 0.5), 0 0 20px hsl(var(--primary) / 0.2);
   }
 
-  .tab-trigger-skills[data-state="active"] {
-    box-shadow: var(--matrix-glow) !important;
+  .skill-glow-strong:hover,
+  .skill-glow-strong:active {
+    box-shadow: 0 0 8px hsl(var(--accent) / 0.5), 0 0 20px hsl(var(--accent) / 0.2);
   }
 
-  .tab-trigger-learning[data-state="active"] {
-    box-shadow: var(--learning-glow) !important;
+  .skill-glow-growing:hover,
+  .skill-glow-growing:active {
+    box-shadow: 0 0 8px hsl(var(--learning) / 0.5), 0 0 20px hsl(var(--learning) / 0.2);
+  }
+
+  .skill-glow-exploring:hover,
+  .skill-glow-exploring:active {
+    box-shadow: 0 0 6px hsl(var(--muted-foreground) / 0.3);
   }
 
   .scanline {
@@ -377,9 +382,8 @@
     box-shadow: none;
   }
 
-  .theme-reading .tab-glow-learning,
-  .theme-reading .tab-trigger-skills[data-state="active"],
-  .theme-reading .tab-trigger-learning[data-state="active"] {
+  .theme-reading [class*="skill-glow-"]:hover,
+  .theme-reading [class*="skill-glow-"]:active {
     box-shadow: none;
   }
 
@@ -857,7 +861,8 @@ code[class*="language-"] span::selection {
   transition: border-color var(--motion-normal);
 }
 
-.neon-border-trace:hover {
+.neon-border-trace:hover,
+.neon-border-trace:active {
   border-color: hsl(var(--primary));
 }
 
@@ -882,7 +887,8 @@ code[class*="language-"] span::selection {
   pointer-events: none;
 }
 
-.neon-border-trace:hover::before {
+.neon-border-trace:hover::before,
+.neon-border-trace:active::before {
   opacity: 1;
   animation: border-rotate 2s linear infinite;
 }

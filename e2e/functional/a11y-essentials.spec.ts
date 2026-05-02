@@ -162,17 +162,17 @@ test.describe("A11y — landmarks and aria-hidden hygiene", () => {
 });
 
 test.describe("A11y — color contrast", () => {
-  test("/skills tab triggers meet WCAG AA 4.5:1 normal-text contrast", async ({
+  test("/skills tech radar badges meet WCAG AA 4.5:1 normal-text contrast", async ({
     page,
   }) => {
     await page.goto("/skills");
     await page.waitForLoadState("networkidle");
 
     const samples = await page.evaluate(() => {
-      const triggers = Array.from(
-        document.querySelectorAll<HTMLElement>('[role="tab"]'),
+      const badges = Array.from(
+        document.querySelectorAll<HTMLElement>("span.rounded-full.border"),
       );
-      return triggers.map((el) => {
+      return badges.map((el) => {
         const computed = getComputedStyle(el);
         let bg = "";
         let parent: HTMLElement | null = el;
@@ -185,7 +185,6 @@ test.describe("A11y — color contrast", () => {
           parent = parent.parentElement;
         }
         return {
-          id: el.id,
           text: el.textContent?.trim().slice(0, 40) ?? "",
           fg: computed.color,
           bg: bg || "rgb(0,0,0)",
@@ -195,14 +194,14 @@ test.describe("A11y — color contrast", () => {
 
     expect(
       samples.length,
-      "skills page should render at least 2 tab triggers",
-    ).toBeGreaterThanOrEqual(2);
+      "skills page should render tech radar badges",
+    ).toBeGreaterThanOrEqual(10);
 
     for (const s of samples) {
       const ratio = contrastRatio(s.fg, s.bg);
       expect(
         ratio,
-        `Tab "${s.text}" contrast ${ratio.toFixed(2)} fails WCAG AA 4.5:1 (fg=${s.fg} bg=${s.bg})`,
+        `Badge "${s.text}" contrast ${ratio.toFixed(2)} fails WCAG AA 4.5:1 (fg=${s.fg} bg=${s.bg})`,
       ).toBeGreaterThanOrEqual(4.5);
     }
   });

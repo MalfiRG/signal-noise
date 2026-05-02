@@ -7,7 +7,7 @@ const ROUTES: Array<{
 }> = [
   { path: "/", check: (p) => p.getByRole("heading", { level: 1 }).first() },
   { path: "/projects", check: (p) => p.getByRole("heading", { level: 1, name: /projects/i }).first() },
-  { path: "/skills", check: (p) => p.getByRole("heading", { level: 1, name: /skills/i }).first() },
+  { path: "/skills", check: (p) => p.getByRole("heading", { level: 1, name: /tech radar/i }).first() },
   { path: "/blog", check: (p) => p.getByRole("heading", { level: 1, name: /blog/i }).first() },
   { path: "/blog/style-test", check: (p) => p.locator(".markdown-body") },
   { path: "/how-i-do-it", check: (p) => p.getByRole("heading", { level: 1, name: /how/i }).first() },

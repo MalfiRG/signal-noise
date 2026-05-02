@@ -1,22 +1,39 @@
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { ScrollReveal, ScrollRevealItem } from "@/components/ScrollReveal";
+import { motion } from "framer-motion";
 import LetterReveal from "@/components/LetterReveal";
-import { useMotionPolicy } from "@/lib/motion";
+import { useMotionPolicy, useItemVariant } from "@/lib/motion";
 import BlogSidebar from "./BlogSidebar";
 import type { BlogOutletContext } from "./data";
+
+const TERMINAL_TEXT = "> cat ~/blog/posts.md";
+const DELAY_PER_LETTER_MS = 20;
+const TERMINAL_DURATION_S = (TERMINAL_TEXT.length * DELAY_PER_LETTER_MS) / 1000;
 
 const BlogIndex = () => {
   const { filteredPosts, activeTags, sidebarProps } = useOutletContext<BlogOutletContext>();
   const navigate = useNavigate();
   const { animationsDisabled } = useMotionPolicy();
+  const itemVariant = useItemVariant();
 
   const tagParams = activeTags.length > 0 ? `?tags=${activeTags.join(",")}` : "";
+
+  const containerVariants = animationsDisabled
+    ? {}
+    : {
+        hidden: {},
+        visible: {
+          transition: {
+            delayChildren: TERMINAL_DURATION_S + 0.3,
+            staggerChildren: 0.1,
+          },
+        },
+      };
 
   return (
     <div className="max-w-5xl mx-auto">
       <div className="mb-6">
-        <LetterReveal text="> cat ~/blog/posts.md" tag="p" className="text-muted-foreground text-xs tracking-[0.3em] mb-2" delayPerLetter={20} skipAnimation={animationsDisabled} />
+        <LetterReveal text={TERMINAL_TEXT} tag="p" className="text-muted-foreground text-xs tracking-[0.3em] mb-2" delayPerLetter={DELAY_PER_LETTER_MS} skipAnimation={animationsDisabled} />
         <h1 className="font-display text-4xl font-bold text-foreground text-glow">BLOG</h1>
       </div>
 
@@ -25,9 +42,15 @@ const BlogIndex = () => {
       </div>
 
       {filteredPosts.length > 0 ? (
-        <ScrollReveal key={activeTags.join(",") || "all"} className="space-y-8" delay={0.4}>
+        <motion.div
+          key={activeTags.join(",") || "all"}
+          className="space-y-8"
+          initial={animationsDisabled ? undefined : "hidden"}
+          animate="visible"
+          variants={containerVariants}
+        >
           {filteredPosts.map((post) => (
-            <ScrollRevealItem key={post.slug}>
+            <motion.div key={post.slug} variants={itemVariant}>
               <Link
                 to={`/blog/${post.slug}${tagParams}`}
                 data-testid="blog-post-tile"
@@ -76,9 +99,9 @@ const BlogIndex = () => {
                   </p>
                 )}
               </Link>
-            </ScrollRevealItem>
+            </motion.div>
           ))}
-        </ScrollReveal>
+        </motion.div>
       ) : activeTags.length > 0 ? (
         <div className="text-center py-20 border border-border/50">
           <LetterReveal text="> NO MATCHES. REFINE SEARCH PARAMETERS." tag="p" className="text-muted-foreground text-sm tracking-wider" delayPerLetter={20} skipAnimation={animationsDisabled} />
