@@ -56,7 +56,7 @@ const Navbar = () => {
   };
 
   const navLinkClass = (path: string) =>
-    `text-sm tracking-widest transition-colors hover:text-primary nav-link-motion glitch-hover ${
+    `text-base md:text-lg tracking-widest transition-colors hover:text-primary nav-link-motion glitch-hover ${
       isActive(path) ? "text-primary text-glow" : "text-muted-foreground"
     }`;
 
@@ -83,7 +83,7 @@ const Navbar = () => {
 
           <DropdownMenu>
             <DropdownMenuTrigger
-              className={`inline-flex items-center gap-1 text-sm tracking-widest transition-colors hover:text-primary nav-link-motion glitch-hover ${
+              className={`inline-flex items-center gap-1 text-base md:text-lg tracking-widest transition-colors hover:text-primary nav-link-motion glitch-hover ${
                 isActive("/how-i-do-it") ? "text-primary text-glow" : "text-muted-foreground"
               }`}
               data-text="HOW I DO IT"
@@ -95,7 +95,7 @@ const Navbar = () => {
             <DropdownMenuContent align="end" className="bg-card border-border">
               <DropdownMenuItem
                 onClick={() => navigate(editorPrefix("/how-i-do-it"))}
-                className="text-foreground hover:text-primary cursor-pointer text-xs tracking-wider"
+                className="text-foreground hover:text-primary cursor-pointer text-base tracking-wider"
               >
                 Overview
               </DropdownMenuItem>
@@ -103,7 +103,7 @@ const Navbar = () => {
                 <DropdownMenuItem
                   key={page.slug}
                   onClick={() => navigate(editorPrefix(`/how-i-do-it/${page.slug}`))}
-                  className="text-foreground hover:text-primary cursor-pointer text-xs tracking-wider"
+                  className="text-foreground hover:text-primary cursor-pointer text-base tracking-wider"
                 >
                   {page.title}
                 </DropdownMenuItem>
@@ -159,7 +159,7 @@ const Navbar = () => {
                 ))}
 
                 <div className="border-t border-border pt-4">
-                  <p className="text-xs tracking-[0.2em] text-muted-foreground mb-3">HOW I DO IT</p>
+                  <p className="text-sm tracking-[0.2em] text-muted-foreground mb-3">HOW I DO IT</p>
                   <div className="flex flex-col gap-2 pl-2">
                     <Link
                       to={editorPrefix("/how-i-do-it")}
@@ -173,7 +173,7 @@ const Navbar = () => {
                         key={page.slug}
                         to={editorPrefix(`/how-i-do-it/${page.slug}`)}
                         onClick={() => setMobileOpen(false)}
-                        className="text-sm tracking-wider text-muted-foreground hover:text-primary transition-colors"
+                        className="text-base tracking-wider text-muted-foreground hover:text-primary transition-colors"
                       >
                         {page.title}
                       </Link>
@@ -182,14 +182,14 @@ const Navbar = () => {
                 </div>
 
                 <div className="border-t border-border pt-4">
-                  <p className="text-xs tracking-[0.2em] text-muted-foreground mb-3">CONNECT</p>
+                  <p className="text-sm tracking-[0.2em] text-muted-foreground mb-3">CONNECT</p>
                   <div className="flex flex-col gap-2 pl-2">
                     <a
                       href="https://github.com/MalfiRG"
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => setMobileOpen(false)}
-                      className="flex items-center gap-3 text-sm tracking-wider text-muted-foreground hover:text-primary transition-colors"
+                      className="flex items-center gap-3 text-base tracking-wider text-muted-foreground hover:text-primary transition-colors"
                     >
                       <Github className="w-4 h-4" />
                       GitHub
@@ -199,7 +199,7 @@ const Navbar = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => setMobileOpen(false)}
-                      className="flex items-center gap-3 text-sm tracking-wider text-muted-foreground hover:text-primary transition-colors"
+                      className="flex items-center gap-3 text-base tracking-wider text-muted-foreground hover:text-primary transition-colors"
                     >
                       <Linkedin className="w-4 h-4" />
                       LinkedIn

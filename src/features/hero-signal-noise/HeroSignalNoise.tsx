@@ -103,14 +103,14 @@ const HeroSignalNoise = ({
             <Link
               ref={viewProjectsRef}
               to="/projects"
-              className="border border-primary/50 bg-primary/10 px-8 py-3 text-sm tracking-widest text-primary hover:bg-primary/20 hover:border-primary transition-all box-glow btn-interactive glitch-hover"
+              className="border border-primary/50 bg-primary/10 px-8 py-3 text-base tracking-widest text-primary hover:bg-primary/20 hover:border-primary transition-all box-glow btn-interactive glitch-hover"
               data-text="VIEW PROJECTS"
             >
               VIEW PROJECTS
             </Link>
             <Link
               to="/blog"
-              className="border border-border px-8 py-3 text-sm tracking-widest text-muted-foreground hover:border-primary/50 hover:text-foreground transition-all btn-interactive glitch-hover"
+              className="border border-border px-8 py-3 text-base tracking-widest text-muted-foreground hover:border-primary/50 hover:text-foreground transition-all btn-interactive glitch-hover"
               data-text="READ BLOG"
             >
               READ BLOG
@@ -122,7 +122,7 @@ const HeroSignalNoise = ({
             aria-hidden={scrolled ? "true" : undefined}
           >
             <motion.div variants={heroItem} className="mt-8">
-              <p className="text-muted-foreground text-xs tracking-[0.2em] animate-glow-pulse">
+              <p className="text-muted-foreground text-sm tracking-[0.2em] animate-glow-pulse">
                 ▼ SCROLL TO EXPLORE ▼
               </p>
             </motion.div>
