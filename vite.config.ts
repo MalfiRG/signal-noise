@@ -13,12 +13,14 @@ export default defineConfig(({ command }) => ({
   },
   plugins: [
     react(),
-    // Design companion is opt-IN (DESIGN_COMPANION=1) — Babel transform on every .tsx +
+    // Design companion is opt-IN (VITE_DESIGN_COMPANION=1) — Babel transform on every .tsx +
     // loopback listener add measurable startup + per-request overhead, only worth paying
     // when actively iterating on design. Routine blog dev runs without it.
-    //   Enable:  DESIGN_COMPANION=1 npm run dev    (or `npm run dev:design`)
-    //   Disable: npm run dev                       (default)
-    ...(command !== 'build' && process.env.DESIGN_COMPANION === '1' ? [designCompanion()] : []),
+    // The VITE_ prefix is load-bearing: client-side code in src/App.tsx reads the same
+    // flag via import.meta.env to gate the DesignToggle button + /__design routes.
+    //   Enable:  npm run dev:design   (sets VITE_DESIGN_COMPANION=1)
+    //   Disable: npm run dev          (default)
+    ...(command !== 'build' && process.env.VITE_DESIGN_COMPANION === '1' ? [designCompanion()] : []),
   ],
   resolve: {
     alias: {

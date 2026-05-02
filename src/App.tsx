@@ -24,10 +24,13 @@ import { useScrollRestoration } from "@/hooks/useScrollRestoration";
 // DCE removes the dynamic-import branch entirely — no design-companion chunk lands in
 // dist/, satisfying the sentinel sweep. Top-level await is permitted because
 // tsconfig.app.json sets module:ESNext + target:ES2020.
-const DesignCompanion = import.meta.env.DEV
+// Gate on DEV AND opt-in flag — VITE_DESIGN_COMPANION=1 enables the editor in dev.
+// Routine `npm run dev` runs without the editor; `npm run dev:design` enables it.
+const DESIGN_ENABLED = import.meta.env.DEV && import.meta.env.VITE_DESIGN_COMPANION === '1';
+const DesignCompanion = DESIGN_ENABLED
   ? (await import("./design-companion/core/DesignCompanion")).DesignCompanion
   : null;
-const DesignToggle = import.meta.env.DEV
+const DesignToggle = DESIGN_ENABLED
   ? (await import("./design-companion/core/DesignToggle")).DesignToggle
   : null;
 
