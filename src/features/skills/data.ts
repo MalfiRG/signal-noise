@@ -57,7 +57,7 @@ export const skills: Skill[] = [
     name: "Python (Intermediate-Strong, AI-Augmented)",
     level: 75,
     description:
-      "Test automation, scripting, REST API testing, data processing. Build from scratch with AI assistance comfortably; reading and modifying unfamiliar Python codebases benefits from doc-lookup loops - the honest version of this skill.",
+      "Test automation, scripting, REST API testing, data processing. Build from scratch with AI assistance comfortably.",
   },
   {
     name: "PowerShell / Pester",
@@ -69,7 +69,7 @@ export const skills: Skill[] = [
     name: "Pytest",
     level: 70,
     description:
-      "Confident on parametrize, fixtures, and custom plugins from scratch. Existing legacy scaffolding still warrants a docs cycle - same as anyone honest about their stack.",
+      "Confident on parametrize, fixtures, and custom plugins from scratch.",
   },
   {
     name: "Observability (Grafana, Structured Logging)",
@@ -84,6 +84,30 @@ export const skills: Skill[] = [
       "Web UI automation, Page Object Model, cross-browser. Used in this blog's E2E suite and in ScoutQL.",
   },
   {
+    name: "FastAPI / REST API Development",
+    level: 70,
+    description:
+      "Full backend builds: routers, auth (JWT + refresh), Pydantic v2 schemas, SQLAlchemy 2.0, rate limiting, SSRF prevention. Built ScoutQL's entire API layer from scratch.",
+  },
+  {
+    name: "Web Scraping / Data Engineering",
+    level: 70,
+    description:
+      "Crawlee actors on Apify, Playwright-based pagination, structured extraction, error classification (transient vs deterministic).",
+  },
+  {
+    name: "Linux Server Administration",
+    level: 70,
+    description:
+      "Production VPS on Hetzner end-to-end: systemd services, UFW firewall, Let's Encrypt SSL, Docker deploy, fail2ban, SSH hardening.",
+  },
+  {
+    name: "Research & Technical Writing",
+    level: 75,
+    description:
+      "Multi-source research pipelines with adversarial review gates.",
+  },
+  {
     name: "Cross-Team Collaboration & Technical Writing",
     level: 80,
     description:
@@ -94,15 +118,27 @@ export const skills: Skill[] = [
 export const learning: LearningItem[] = [
   {
     name: "TypeScript",
-    level: 35,
+    level: 50,
     description:
-      "Type-safe applications and test utilities. Daily exposure via this blog and ScoutQL - closing the gap by shipping, not studying.",
+      "Shipped a full portfolio site and ScoutQL dashboard in TS. Comfortable with generics, utility types, and strict mode.",
   },
   {
     name: "React + Tailwind + Vite",
-    level: 35,
+    level: 50,
     description:
-      "Modern frontend stack. Built this blog and ScoutQL's dashboard on it; still learning the idiomatic patterns.",
+      "Built two production apps (this blog + ScoutQL). 4-theme system, Framer Motion cascades, responsive layouts.",
+  },
+  {
+    name: "Security Testing",
+    level: 40,
+    description:
+      "Purple-team exercises, OWASP Top 10, JWT attack vectors, SSRF prevention, prompt injection defense.",
+  },
+  {
+    name: "Terraform / IaC",
+    level: 25,
+    description:
+      "Natural next step from Docker + Hetzner VPS. On the roadmap for reproducible multi-environment infrastructure.",
   },
   {
     name: "Robot Framework",
@@ -114,12 +150,12 @@ export const learning: LearningItem[] = [
     name: "Mobile Testing",
     level: 25,
     description:
-      "Appium and platform-specific tooling. Adjacent to the day job but not yet a core skill.",
+      "Appium and platform-specific tooling.",
   },
   {
     name: ".NET / C#",
     level: 40,
     description:
-      "Backend understanding for ASP.NET Core. Less active than the others; kept here for honesty.",
+      "Backend understanding for ASP.NET Core.",
   },
 ];

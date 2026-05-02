@@ -16,9 +16,9 @@ This pipeline is sequential but not waterfall. Each stage can trigger revisiting
 
 ## Group by Feature Area, Not Methodology
 
-This is the single most important structural decision. Most QA engineers organize their plans by test type — positive tests, negative tests, boundary tests, error handling. That's wrong. Group by feature area instead.
+This is the single most important structural decision in my test plans. I group by feature area, not by test type (positive, negative, boundary, error handling).
 
-The wrong way looks like "Section 1: Positive tests (all endpoints), Section 2: Negative tests (all endpoints)." The right way groups by what the product actually does:
+A type-based structure looks like "Section 1: Positive tests (all endpoints), Section 2: Negative tests (all endpoints)." I organize by what the product actually does:
 
 - **Regression Tests** (known bugs, linked to bug IDs)
 - **CRUD & Lifecycle** (create, read, update, delete)
