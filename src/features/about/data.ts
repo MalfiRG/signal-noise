@@ -63,7 +63,7 @@ export const toolCategories: ToolCategory[] = [
       { name: "AWS", version: null },
       { name: "Azure", version: null },
       { name: "GCP", version: null },
-      { name: "On-prem virualization", version: null },
+      { name: "On-prem virtualization", version: null },
     ],
   },
   {
