@@ -20,6 +20,7 @@ const ALLOWED_HOSTNAMES = new Set(['localhost', '127.0.0.1', '[::1]']);
 
 const DesignCompanionInner: React.FC = () => {
   const [selectedId, setSelectedId] = React.useState<string | null>(null);
+  const [selectedEl, setSelectedEl] = React.useState<HTMLElement | null>(null);
   const [edits, setEdits] = React.useState<Record<string, string>>({});
   const overridesNow = React.useMemo(() => new Map<string, Record<string, unknown>>(), []);
   const deferredOverrides = React.useDeferredValue(overridesNow);
@@ -27,11 +28,18 @@ const DesignCompanionInner: React.FC = () => {
   const token = useToken();
   const [layout, setLayout] = useLayoutChoice();
   const [, startTransition] = React.useTransition();
-  const onSelectId = (id: string | null) => {
-    startTransition(() => { setSelectedId(id); setEdits({}); });
+  const onSelectId = (id: string | null, el: HTMLElement | null) => {
+    startTransition(() => { setSelectedId(id); setSelectedEl(el); setEdits({}); });
   };
 
   React.useEffect(() => installBeforeUnload(() => Object.keys(edits).length > 0), [edits]);
+
+  React.useEffect(() => {
+    document.querySelectorAll('[data-design-selected]').forEach(el => el.removeAttribute('data-design-selected'));
+    if (!selectedEl) return;
+    selectedEl.setAttribute('data-design-selected', 'true');
+    return () => { selectedEl.removeAttribute('data-design-selected'); };
+  }, [selectedEl]);
 
   const onChange = (next: Record<string, string>) => {
     setEdits(next);
@@ -39,8 +47,7 @@ const DesignCompanionInner: React.FC = () => {
     handlesRef.current.forEach(h => h.revert());
     handlesRef.current = [];
     if (!selectedId) return;
-    const el = document.querySelector(`[data-design-id="${selectedId}"]`) as HTMLElement | null;
-    if (el) handlesRef.current.push(applyInlineStyle(el, next));
+    if (selectedEl) handlesRef.current.push(applyInlineStyle(selectedEl, next));
     else handlesRef.current.push(applyLayerOverrides(`[data-design-id="${selectedId}"]`, next));
   };
 
