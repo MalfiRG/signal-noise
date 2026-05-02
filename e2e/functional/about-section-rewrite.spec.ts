@@ -16,23 +16,23 @@ test.describe("AboutSection rewrite", () => {
     await expect(head).toContainText("utf-8");
   });
 
-  test("renders versioned badges (Pytest, Playwright)", async ({ page }) => {
+  test("renders tool badges (Pytest, Playwright)", async ({ page }) => {
     const pytest = page.locator(".badge", { hasText: "Pytest" }).first();
     await expect(pytest).toBeVisible();
-    await expect(pytest.locator(".ver")).toContainText("v8.x");
 
     const playwrightBadge = page.locator(".badge", { hasText: "Playwright" }).first();
-    await expect(playwrightBadge.locator(".ver")).toContainText("v1.58");
+    await expect(playwrightBadge).toBeVisible();
   });
 
-  test("renders all 5 categories in expected order", async ({ page }) => {
+  test("renders all 6 categories in expected order", async ({ page }) => {
     const headings = page.locator(".tools-grid h4");
-    await expect(headings).toHaveCount(5);
+    await expect(headings).toHaveCount(6);
     await expect(headings.nth(0)).toHaveText("Test Automation");
     await expect(headings.nth(1)).toHaveText("Languages");
     await expect(headings.nth(2)).toHaveText("CI/CD & DevOps");
-    await expect(headings.nth(3)).toHaveText("Test Management");
-    await expect(headings.nth(4)).toHaveText("AI & Tooling");
+    await expect(headings.nth(3)).toHaveText("Cloud & Virtualization");
+    await expect(headings.nth(4)).toHaveText("Test Management");
+    await expect(headings.nth(5)).toHaveText("AI & Tooling");
   });
 
   test("ascii-div separator is aria-hidden", async ({ page }) => {

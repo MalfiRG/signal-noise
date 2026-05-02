@@ -35,14 +35,12 @@ test.describe("HeroSignalNoise mobile reflow", () => {
       );
 
       if (vp.asymmetric) {
-        // At >=768px, .h-row.left/.right pick up clamp(0px, 6vw, 48px) padding.
-        // At 768 viewport, 6vw = 46.08px. At 1280, capped at 48px.
+        // At >=768px, .h-row.left gets padding-left via clamp(0px, 4vw, 48px).
+        // .h-row.right uses justify-content: flex-end (no padding).
         expect(leftPadding).toBeGreaterThan(0);
-        expect(rightPadding).toBeGreaterThan(0);
       } else {
-        // Below 768px, no asymmetric padding — rows are flex-centered.
+        // Below 768px, no asymmetric padding - rows are flex-centered.
         expect(leftPadding).toBe(0);
-        expect(rightPadding).toBe(0);
       }
     });
   }

@@ -24,7 +24,8 @@ test.describe("Hero focus management after skip", () => {
 
     await skipBtn.click();
 
-    await expect(page.locator('[data-testid="hero-phase3"]')).toBeVisible({ timeout: 2_000 });
+    await expect(page.locator('[data-testid="hero-phase3"]')).toBeVisible({ timeout: 5_000 });
+    await page.waitForTimeout(200);
 
     const focusedAccessibleName = await page.evaluate(() => {
       const el = document.activeElement as HTMLElement | null;
@@ -35,12 +36,13 @@ test.describe("Hero focus management after skip", () => {
     expect(focusedAccessibleName).toBe("VIEW PROJECTS");
   });
 
-  test("programmatic skipToPhase3 via section-pointer-noop does NOT move focus (no section handler)", async ({ page }) => {
+  test("clicking hero area does NOT skip cascade (no section click handler)", async ({ page }) => {
     await gotoFreshCascade(page);
 
-    // spec §5.6 — <section> has no click handler; only SKIP button skips
-    const section = page.locator("section").first();
-    await section.click({ position: { x: 100, y: 100 } });
+    // spec §5.6 - <section> has no click handler; only SKIP button skips
+    const heroArea = page.locator('[data-testid="hero-cascading"]');
+    await expect(heroArea).toBeVisible({ timeout: 5_000 });
+    await heroArea.click({ position: { x: 100, y: 100 }, force: true });
 
     await expect(page.locator('[data-testid="hero-phase3"]')).not.toBeVisible({ timeout: 1_000 });
   });

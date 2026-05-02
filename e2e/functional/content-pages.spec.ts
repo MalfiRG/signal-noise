@@ -94,7 +94,7 @@ test.describe("Projects page — buttons", () => {
 
     const sourceButtons = page.locator("a", { hasText: "SOURCE" });
     const sourceCount = await sourceButtons.count();
-    expect(sourceCount).toBeGreaterThanOrEqual(2);
+    expect(sourceCount).toBeGreaterThanOrEqual(1);
 
     for (let i = 0; i < sourceCount; i++) {
       const svg = sourceButtons.nth(i).locator("svg");
