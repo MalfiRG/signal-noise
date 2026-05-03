@@ -12,7 +12,6 @@ test.describe("Blog draft filter — production build", () => {
     const draftSlugs = [
       "claude-code-cache-ttl-worktree-trap",
       "rag-retrieval-harness",
-      "autonomous-qa-loop",
       "style-test",
     ];
 

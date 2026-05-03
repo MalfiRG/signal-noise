@@ -5,7 +5,7 @@ async function main() {
   const page = await browser.newPage();
   await page.setViewportSize({ width: 1280, height: 900 });
 
-  await page.goto("http://localhost:8080/blog/autonomous-qa-loop", { waitUntil: "domcontentloaded" });
+  await page.goto("http://localhost:8080/blog/rag-retrieval-harness", { waitUntil: "domcontentloaded" });
   await page.waitForTimeout(2000);
 
   await page.locator("code[class*='language']").first().scrollIntoViewIfNeeded();

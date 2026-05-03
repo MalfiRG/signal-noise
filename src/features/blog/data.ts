@@ -105,16 +105,6 @@ export const blogPosts: BlogPost[] = [
     draft: true,
   },
   {
-    slug: "autonomous-qa-loop",
-    title: "I Built an Autonomous QA Agent That Develops Its Own Fixes",
-    date: "2026-04-01",
-    tags: ["AI", "QA", "automation", "Claude", "Playwright"],
-    category: "AI & Automation",
-    excerpt:
-      "How a 30-minute autonomous loop screenshotted my frontends, found bugs, fixed them, built 8 new pages, wired up an Apify scraper, and scraped 254 real jobs — all in one session.",
-    draft: true,
-  },
-  {
     slug: "style-test",
     title: "Style Test Kitchen Sink",
     date: "2026-03-15",
