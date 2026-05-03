@@ -36,3 +36,7 @@ blob-report/
 .vercel/
 sessions/
 unsubscribe.js
+
+# Internal docs (local-only, never push)
+docs/superpowers/
+docs/test-plans/
