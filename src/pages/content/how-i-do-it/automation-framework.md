@@ -63,7 +63,7 @@ resource = resp.json()
 # Verify what was actually persisted
 get_resp = api.resource.get(resource["id"])
 stored = get_resp.json()
-assert stored["mode"] == "Incremental", f"Mode not persisted: {stored['mode']}"
+assert stored["mode"] == "Advanced", f"Mode not persisted: {stored['mode']}"
 ```
 
 This catches silent corrections, echo-without-persist bugs, and any transformation the server applies between receiving and storing data.
@@ -117,7 +117,7 @@ Standard JUnit XML goes to CI — pass/fail/skip/error. But JUnit can't express 
 
 ## CI Integration
 
-Integration tests run against dedicated test environments. The CI workflow uses `workflow_dispatch` is the primary trigger — not push events.
+Integration tests run against dedicated test environments. The CI workflow uses `workflow_dispatch` as the primary trigger — not push events.
 
 Why manual trigger? Integration tests depend on environment state. A maintenance window would cause all tests to fail and block the entire pipeline. Manual trigger puts the engineer in control of when tests run. Auto-trigger on merge to main serves as a secondary check, but the engineer should know the environment is available before pushing.
 

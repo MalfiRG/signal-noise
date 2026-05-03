@@ -20,7 +20,7 @@ That's it. If a bug report needs more than this, you're either explaining too mu
 
 **Description is optional — and it's a preface, not a substitute.** Title + steps + expected + actual usually tells the whole story. Reach for a description only when the bug is complex enough that the reader needs framing first, and keep it short. Don't let it secretly carry the reproduction — that belongs in steps.
 
-**Steps are reproducible, not a narrative.** "I was testing the schedule configuration and noticed that when I changed the mode..." — that's a story, not reproduction steps. Write: "1. Create resource with `config.mode=Active`. 2. PUT to change `mode`. 3. GET the resource." The developer should be able to copy your steps and hit the same bug.
+**Steps are reproducible, not a narrative.** "I was testing the schedule configuration and noticed that when I changed the mode..." — that's a story, not reproduction steps. Write: "1. Create resource with `config.mode=Active`. 2. PUT to change `priority`. 3. GET the resource." The developer should be able to copy your steps and hit the same bug.
 
 **Let logs speak.** Don't re-explain what a stack trace already shows. If the error says `NullReferenceException at <Module>.<Method>()`, include the stack trace verbatim and move on. The developer reads stack traces faster than your prose description of one.
 

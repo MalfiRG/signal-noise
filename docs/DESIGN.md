@@ -459,7 +459,6 @@ text-foreground border border-border/60
 - ❌ Use Title Case for headlines — choose all-caps + wide tracking, OR sentence case
 - ❌ Use the cyan accent for primary text color (poor contrast on dark bg)
 - ❌ Stack heavy entrance animations (cyber stagger + glitch + stamp simultaneously) — pick subtle stagger if the page already has theater
-- ❌ Use branded company names in published content (workspace-global rule per CLAUDE.md §2)
 - ❌ Use `Co-Authored-By` lines, callout boxes (`> **Key Insight:**`), or "delve" / "landscape" / "it's worth noting" / "let's dive in" AI-isms in blog posts
 - ❌ Use scan-sweep on mobile (re-enabled = distracting at small viewports)
 - ❌ Use `font-mono` on body — body is `Chakra Petch` (sans), `font-mono` is for code/badges only

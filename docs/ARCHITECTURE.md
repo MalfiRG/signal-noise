@@ -434,7 +434,6 @@ See §6 above. The hook indirection (instead of importing variants directly) is 
 - Tone dial: 4-5/10 polish. No AI-isms (`delve`, `landscape`, `it's worth noting`)
 - No labeled callout boxes — weave insights into prose
 
-
 ### Polish character handling
 
 `MarkdownRenderer.tsx:customSlugify` transliterates `ą→a`, `ć→c`, `ę→e`, `ł→l`, `ń→n`, `ó→o`, `ś→s`, `ź→z`, `ż→z` for slugifying.
