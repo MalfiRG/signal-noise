@@ -26,7 +26,7 @@ The hierarchical naming convention makes filtering trivial. The prefix tells you
 | W.SCHED | Schedule and timing |
 | W.OPS | Operations (start, stop, disable, enable) |
 | W.OPS.EDGE | Operations edge cases |
-| W.QP.TASKS | Query parameters for the jobs endpoint |
+| W.QP.TASKS | Query parameters for the tasks endpoint |
 | W.QP.STATES | Query parameters for the states endpoint |
 | W.SC | Silent corrections (API quietly fixes invalid input) |
 | W.REG | Regression tests linked to known bugs |
