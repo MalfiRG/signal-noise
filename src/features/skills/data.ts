@@ -24,7 +24,7 @@ export const categories: SkillCategory[] = [
       { name: "Pytest", tier: "strong" },
       { name: "Pester", tier: "expert" },
       { name: "Playwright", tier: "growing" },
-      { name: "Selenium", tier: "strong" },
+      { name: "Selenium", tier: "growing" },
       { name: "Postman / REST Testing", tier: "expert" },
       { name: "Robot Framework", tier: "exploring" },
       { name: "Appium", tier: "exploring" },
