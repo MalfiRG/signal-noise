@@ -349,6 +349,10 @@ transition-all btn-interactive glitch-hover
 
 State variant — border tints to `border-primary/50`; text brightens from `text-muted-foreground` to `text-foreground`. No fill applied; the rest state has none.
 
+### navbar-wordmark
+
+Home link in the top navbar. Displays `PIOTR_TARACH` with a Lucide `Terminal` icon prefix. Uses `font-display` (Orbitron), `text-foreground`, `text-glow`, `tracking-wider`. Links to `/`.
+
 ### nav-link
 
 Top navbar links. Always on `glitch-hover` (single-theme reality — no conditional). Active state is yellow with a text-glow.

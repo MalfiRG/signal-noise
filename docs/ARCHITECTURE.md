@@ -59,7 +59,7 @@ src/
 ├── main.tsx                               # ReactDOM.render entry
 ├── index.css                              # Global styles, theme tokens, motion CSS
 ├── components/
-│   ├── Navbar.tsx                          # Fixed top nav (desktop + mobile sheet)
+│   ├── Navbar.tsx                          # Fixed top nav — PIOTR_TARACH wordmark + terminal icon
 │   ├── LetterReveal.tsx                    # Per-letter cascade reveal primitive
 │   ├── ScrollReveal.tsx                    # Container + item for scroll-triggered stagger
 │   ├── PageTransition.tsx                  # AnimatePresence wrapper
@@ -345,6 +345,12 @@ npm run dev                       # vite on port 8080 (NOT 5173)
 npm run build      # vite build → dist/
 npm run preview    # serve dist/ locally for verification
 ```
+
+### Static assets (`public/`)
+
+- `favicon.svg` — SVG terminal `>_` icon in Night City gold (#f3e600) on dark background (#0b0d12). Linked via `<link rel="icon" type="image/svg+xml">` in `index.html`.
+- `fonts/` — self-hosted woff2s (see §5).
+- `images/` — static images.
 
 ### Deploy
 

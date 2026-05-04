@@ -88,7 +88,7 @@ test.describe("Projects — tile cascade", () => {
     expect(count).toBeGreaterThanOrEqual(3);
   });
 
-  test("SIGNAL_NOISE has a live site link", async ({ page }) => {
+  test("PIOTR_TARACH (SIGNAL_NOISE) has a live site link", async ({ page }) => {
     await page.goto("/projects");
     await page.waitForSelector(".grid");
 

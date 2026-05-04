@@ -63,9 +63,17 @@ const Navbar = () => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/90 backdrop-blur-sm pt-[env(safe-area-inset-top)]">
       <div className="w-full flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link to={editorPrefix("/")} className="font-display text-lg font-bold text-foreground text-glow tracking-wider">
+        <Link
+          to={editorPrefix("/")}
+          className="font-display text-lg font-bold text-foreground text-glow tracking-wider"
+          onClick={() => {
+            if (normalizedPath === "/") {
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+          }}
+        >
           <Terminal className="inline-block mr-2 h-5 w-5" />
-          SIGNAL_NOISE
+          PIOTR_TARACH
         </Link>
 
         <div className="hidden md:flex items-center gap-6">

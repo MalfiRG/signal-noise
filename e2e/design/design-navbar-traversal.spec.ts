@@ -25,10 +25,10 @@ test.describe("editor-aware navbar traversal", () => {
     });
   }
 
-  test("navbar HOME-icon (SIGNAL_NOISE wordmark) returns to /__design from a sub-page", async ({ page }) => {
+  test("navbar HOME-icon (PIOTR_TARACH wordmark) returns to /__design from a sub-page", async ({ page }) => {
     await page.goto("/__design/blog");
     await expect(page.locator(".design-companion-shell")).toBeVisible();
-    await page.getByRole("link", { name: /SIGNAL_NOISE/ }).first().click();
+    await page.getByRole("link", { name: /PIOTR_TARACH/ }).first().click();
     await page.waitForURL((url) => url.pathname === "/__design", { timeout: 5000 });
     expect(new URL(page.url()).pathname).toBe("/__design");
   });
