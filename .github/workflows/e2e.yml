@@ -173,7 +173,7 @@ jobs:
           FUNCTIONAL_RESULT: ${{ needs.e2e-functional.result }}
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
           GIST_ID: 58e37ead5baa74b10aaca477f228b7ae
-          GIST_FILE: digital-matrix-e2e-status.json
+          GIST_FILE: signal-noise-e2e-status.json
         run: |
           if [ -z "$GIST_TOKEN" ]; then
             echo "::warning::GIST_TOKEN secret not set - skipping badge update"
