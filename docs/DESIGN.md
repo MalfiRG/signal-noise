@@ -151,7 +151,7 @@ All colors live as HSL CSS custom properties on `:root` in `src/index.css`. Tail
 | **Primary (yellow)**  | `--primary`            | `57 100% 48%`       | `#f3e600`| Headlines, CTA borders, active nav, scrollbar hover    |
 | Primary foreground    | `--primary-foreground` | `222 15% 5%`        | `#0b0d12`| Text on yellow surfaces                                |
 | **Accent (cyan)**     | `--accent`             | `171 77% 60%`       | `#52e3c8`| Glitch hover overlay, secondary highlights, link hover |
-| **Learning (amber)**  | `--learning`           | `25 95% 55%`        | `#f78a1a`| In-progress skill bars, "still acquiring" state ONLY   |
+| **Learning (amber)**  | `--learning`           | `25 95% 55%`        | `#f78a1a`| "Growing" tier pills on Tech Radar, "still acquiring" state ONLY |
 | Card                  | `--card`               | `222 15% 8%`        | `#11141a`| Card surfaces, popovers                                |
 | Secondary             | `--secondary`          | `222 20% 14%`       | `#1d2230`| Tabs background, subtle backgrounds                    |
 | Muted                 | `--muted`              | `222 15% 15%`       | `#1f2329`| Disabled surfaces                                      |
@@ -177,7 +177,7 @@ Code blocks inside reading mode stay dark (Tomorrow Night palette via Prism) for
 
 - **Yellow primary** — scarce. Reserve for the SINGLE most important element on screen (active nav, headline, primary CTA). If everything is primary, nothing is.
 - **Cyan accent** — decorative. Glitch overlays, hover states, ambient effects (orbs, scan-sweep). Never as primary text color (poor contrast on dark bg).
-- **Amber learning** — exclusively for "still acquiring" state (Learning tab + bars on Skills page). Do NOT use for active/selected states (collides with primary semantics).
+- **Amber learning** — exclusively for "still acquiring" state ("Growing" tier on Tech Radar). Do NOT use for active/selected states (collides with primary semantics).
 - **NEVER hardcode color hex/HSL in components.** Always use Tailwind utility (`text-primary`, `bg-accent`) or `hsl(var(--token))` in CSS. Hardcoded colors break theme cohesion.
 
 ---
@@ -372,7 +372,7 @@ Active route variant — `text-primary` (yellow) plus `text-glow` (text-shadow f
 
 ### card
 
-Project cards, blog cards, skill rows. Sharp corners (`--radius: 0.25rem`) are intentional — they support the cyberdeck identity. Hover swaps to `border-primary/50` and triggers `neon-border-trace`.
+Project cards, blog cards. Sharp corners (`--radius: 0.25rem`) are intentional — they support the cyberdeck identity. Hover swaps to `border-primary/50` and triggers `neon-border-trace`.
 
 ```html
 bg-card border border-border rounded-md p-6
@@ -396,13 +396,18 @@ inline-flex items-center justify-center text-foreground
 
 - 20×20 content + 10px box-content padding = 44×44 touch target (WCAG 2.5.8)
 
-### tab-active
+### skill-pill
 
-Skills-page active tab indicator. `text-primary` (yellow) + `text-glow` for the SKILLS tab. Container is `bg-secondary/50 border border-border` (subtle inset feel).
+Tech Radar skill chip - tier-colored `rounded-full border` pill with inline dot indicator. Four tiers mapped to semantic colors:
 
-### tab-active-learning
+- **Expert** — `border-primary text-primary` (yellow) + `skill-glow-expert`
+- **Strong** — `border-accent text-accent` (cyan) + `skill-glow-strong`
+- **Growing** — `border-learning text-learning` (amber) + `skill-glow-growing`
+- **Exploring** — `border-muted-foreground/50 text-muted-foreground` + `skill-glow-exploring`
 
-Active LEARNING tab variant — uses `text-learning` (amber) instead of `text-primary`. Distinct semantic slot signals "still acquiring", never confused with primary/active.
+```html
+inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-sm
+```
 
 ### code-block
 

@@ -77,7 +77,7 @@ src/
 │   │   └── ...
 │   ├── how-i-do-it/                        # QA methodology pages
 │   ├── projects/                           # Project cards
-│   └── skills/                             # Skills + animated progress bars
+│   └── skills/                             # Tech Radar competency map (tier-colored pills)
 ├── hooks/
 │   ├── useMarkdownContent.ts               # Dynamic markdown loading via contentMap
 │   ├── useScrollRestoration.ts             # Restore scroll on route change
@@ -105,7 +105,7 @@ src/
 ```
 /                    → Index                 (home, hero cascade)
 /projects            → ProjectsPage          (project grid)
-/skills              → SkillsPage            (skills + learning tabs)
+/skills              → SkillsPage            (tech radar competency map)
 /blog                → BlogLayoutPage        (sidebar + outlet)
    └─ /blog          → BlogIndexPage         (post list)
    └─ /blog/:slug    → BlogSlugPage          (markdown post)
