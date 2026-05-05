@@ -44,6 +44,7 @@ test.describe("Tech Radar - layout and content", () => {
 
   test("each badge has a tier-colored dot indicator", async ({ page }) => {
     await page.goto("/skills");
+    await page.locator("span.rounded-full.border").first().waitFor({ timeout: 10000 });
     await settleStyles(page);
 
     const badges = page.locator("span.rounded-full.border");

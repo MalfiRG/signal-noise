@@ -192,6 +192,7 @@ test.describe("Copy content", () => {
 test.describe("Scroll reveal", () => {
   test("blog cards become visible after scroll", async ({ page }) => {
     await page.goto("/blog");
+    await page.locator('.space-y-8 a[href^="/blog/"]').first().waitFor({ timeout: 10000 });
 
     await page.evaluate(() => window.scrollTo({ top: document.body.scrollHeight, behavior: "instant" }));
 
