@@ -40,3 +40,7 @@ unsubscribe.js
 # Internal docs (local-only, never push)
 docs/superpowers/
 docs/test-plans/
+
+# Build-generated SEO files
+public/sitemap.xml
+public/llms.txt

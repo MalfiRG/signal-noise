@@ -58,4 +58,21 @@ test.describe("SEO static files (smoke)", () => {
     const manifestLink = page.locator('link[rel="manifest"]');
     await expect(manifestLink).toHaveAttribute("href", "/manifest.webmanifest");
   });
+
+  test("sitemap.xml lists all public routes", async ({ page }) => {
+    const response = await page.request.get("/sitemap.xml");
+    expect(response.status()).toBe(200);
+    expect(response.headers()["content-type"]).toContain("xml");
+
+    const body = await response.text();
+    expect(body).toContain("<urlset");
+    expect(body).toContain("https://piotrtarach.dev/");
+    expect(body).toContain("https://piotrtarach.dev/projects");
+    expect(body).toContain("https://piotrtarach.dev/skills");
+    expect(body).toContain("https://piotrtarach.dev/blog");
+    expect(body).toContain("https://piotrtarach.dev/how-i-do-it");
+    // Blog post URLs only appear when non-draft posts exist in data.ts.
+    // Currently all posts are draft:true, so /blog (the index route) is the
+    // only blog-related URL asserted here.
+  });
 });
