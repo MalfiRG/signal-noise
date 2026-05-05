@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
 import { ThemeProvider } from "next-themes";
+import { HelmetProvider } from "react-helmet-async";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,6 +10,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import Navbar from "@/components/Navbar";
 import PageTransition from "@/components/PageTransition";
+import JsonLd from "@/components/JsonLd";
 import Index from "./pages/Index";
 import { useScrollRestoration } from "@/hooks/useScrollRestoration";
 
@@ -46,6 +48,32 @@ export const AppContent = () => {
 
   return (
     <>
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "WebSite",
+              name: "PIOTR_TARACH | SIGNAL_NOISE",
+              url: "https://piotrtarach.dev",
+              description:
+                "Personal technical blog and portfolio by Piotr Tarach",
+              author: { "@id": "https://piotrtarach.dev/#person" },
+            },
+            {
+              "@type": "Person",
+              "@id": "https://piotrtarach.dev/#person",
+              name: "Piotr Tarach",
+              url: "https://piotrtarach.dev",
+              jobTitle: "QA Engineer",
+              sameAs: [
+                "https://github.com/MalfiRG",
+                "https://www.linkedin.com/in/piotrtarach/",
+              ],
+            },
+          ],
+        }}
+      />
       <Navbar />
       {!isTextSection && <div className="scanline-overlay scan-sweep" />}
       <div className={isReadingMode ? "theme-reading min-h-screen bg-background" : ""}>
@@ -105,9 +133,11 @@ const App = () => {
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <BrowserRouter>
-            <AppContent />
-          </BrowserRouter>
+          <HelmetProvider>
+            <BrowserRouter>
+              <AppContent />
+            </BrowserRouter>
+          </HelmetProvider>
           <Analytics />
           <SpeedInsights />
         </TooltipProvider>
