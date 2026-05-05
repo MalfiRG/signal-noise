@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -9,15 +10,16 @@ import { SpeedInsights } from "@vercel/speed-insights/react";
 import Navbar from "@/components/Navbar";
 import PageTransition from "@/components/PageTransition";
 import Index from "./pages/Index";
-import ProjectsPage from "./pages/ProjectsPage";
-import BlogLayoutPage from "./pages/BlogLayoutPage";
-import BlogIndexPage from "./pages/BlogIndexPage";
-import BlogSlugPage from "./pages/BlogSlugPage";
-import SkillsPage from "./pages/SkillsPage";
-import HowIDoItIndexPage from "./pages/HowIDoItIndexPage";
-import HowIDoItSlugPage from "./pages/HowIDoItSlugPage";
-import NotFound from "./pages/NotFound";
 import { useScrollRestoration } from "@/hooks/useScrollRestoration";
+
+const ProjectsPage = lazy(() => import("./pages/ProjectsPage"));
+const BlogLayoutPage = lazy(() => import("./pages/BlogLayoutPage"));
+const BlogIndexPage = lazy(() => import("./pages/BlogIndexPage"));
+const BlogSlugPage = lazy(() => import("./pages/BlogSlugPage"));
+const SkillsPage = lazy(() => import("./pages/SkillsPage"));
+const HowIDoItIndexPage = lazy(() => import("./pages/HowIDoItIndexPage"));
+const HowIDoItSlugPage = lazy(() => import("./pages/HowIDoItSlugPage"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 // [§Task 1.0c — C10/C11/H2] Design-companion is dev-only. The ternary collapses to
 // `null` at build time (Vite substitutes `import.meta.env.DEV` → `false`), and Rollup's
@@ -53,33 +55,35 @@ export const AppContent = () => {
             Centralizing here means every route gets exactly one main, and
             BlogLayout's main was downgraded to <div> to avoid duplicates. */}
         <main id="main-content">
-          <PageTransition>
-            <Routes location={location}>
-              <Route path="/" element={<Index />} />
-              <Route path="/projects" element={<ProjectsPage />} />
-              <Route path="/skills" element={<SkillsPage />} />
-              <Route path="/how-i-do-it" element={<HowIDoItIndexPage />} />
-              <Route path="/how-i-do-it/:slug" element={<HowIDoItSlugPage />} />
-              <Route path="/blog" element={<BlogLayoutPage />}>
-                <Route index element={<BlogIndexPage />} />
-                <Route path=":slug" element={<BlogSlugPage />} />
-              </Route>
-              {DesignCompanion && (
-                <Route path="/__design" element={<DesignCompanion />}>
-                  <Route index element={<Index />} />
-                  <Route path="projects" element={<ProjectsPage />} />
-                  <Route path="skills" element={<SkillsPage />} />
-                  <Route path="how-i-do-it" element={<HowIDoItIndexPage />} />
-                  <Route path="how-i-do-it/:slug" element={<HowIDoItSlugPage />} />
-                  <Route path="blog" element={<BlogLayoutPage />}>
-                    <Route index element={<BlogIndexPage />} />
-                    <Route path=":slug" element={<BlogSlugPage />} />
-                  </Route>
+          <Suspense fallback={null}>
+            <PageTransition>
+              <Routes location={location}>
+                <Route path="/" element={<Index />} />
+                <Route path="/projects" element={<ProjectsPage />} />
+                <Route path="/skills" element={<SkillsPage />} />
+                <Route path="/how-i-do-it" element={<HowIDoItIndexPage />} />
+                <Route path="/how-i-do-it/:slug" element={<HowIDoItSlugPage />} />
+                <Route path="/blog" element={<BlogLayoutPage />}>
+                  <Route index element={<BlogIndexPage />} />
+                  <Route path=":slug" element={<BlogSlugPage />} />
                 </Route>
-              )}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </PageTransition>
+                {DesignCompanion && (
+                  <Route path="/__design" element={<DesignCompanion />}>
+                    <Route index element={<Index />} />
+                    <Route path="projects" element={<ProjectsPage />} />
+                    <Route path="skills" element={<SkillsPage />} />
+                    <Route path="how-i-do-it" element={<HowIDoItIndexPage />} />
+                    <Route path="how-i-do-it/:slug" element={<HowIDoItSlugPage />} />
+                    <Route path="blog" element={<BlogLayoutPage />}>
+                      <Route index element={<BlogIndexPage />} />
+                      <Route path=":slug" element={<BlogSlugPage />} />
+                    </Route>
+                  </Route>
+                )}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </PageTransition>
+          </Suspense>
         </main>
       </div>
       {DesignToggle && <DesignToggle />}
