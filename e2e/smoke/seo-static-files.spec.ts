@@ -40,4 +40,22 @@ test.describe("SEO static files (smoke)", () => {
     const ogUrl = page.locator('meta[property="og:url"]');
     await expect(ogUrl).toHaveAttribute("content", "https://piotrtarach.dev/");
   });
+
+  test("manifest.webmanifest is served and valid", async ({ page }) => {
+    const response = await page.request.get("/manifest.webmanifest");
+    expect(response.status()).toBe(200);
+
+    const manifest = await response.json();
+    expect(manifest.name).toBe("PIOTR_TARACH | SIGNAL_NOISE");
+    expect(manifest.short_name).toBe("PIOTR_TARACH");
+    expect(manifest.theme_color).toBe("#0b0d12");
+    expect(manifest.background_color).toBe("#0b0d12");
+    expect(manifest.display).toBe("standalone");
+  });
+
+  test("index.html links to manifest", async ({ page }) => {
+    await page.goto("/");
+    const manifestLink = page.locator('link[rel="manifest"]');
+    await expect(manifestLink).toHaveAttribute("href", "/manifest.webmanifest");
+  });
 });
