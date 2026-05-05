@@ -59,8 +59,11 @@ test.describe("SEO head management", () => {
     await page.goto("/projects");
     await page.waitForLoadState("domcontentloaded");
 
-    const canonical = page.locator('link[rel="canonical"][href="https://piotrtarach.dev/projects"]');
-    await expect(canonical).toBeAttached();
+    const canonical = page.locator('link[rel="canonical"]');
+    await expect(canonical).toHaveAttribute(
+      "href",
+      "https://piotrtarach.dev/projects"
+    );
   });
 
   test("JSON-LD WebSite + Person schema present on homepage", async ({ page }) => {

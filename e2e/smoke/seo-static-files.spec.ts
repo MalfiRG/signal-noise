@@ -34,10 +34,10 @@ test.describe("SEO static files (smoke)", () => {
     const themeColor = page.locator('meta[name="theme-color"]');
     await expect(themeColor).toHaveAttribute("content", "#0b0d12");
 
-    const canonical = page.locator('link[rel="canonical"]').first();
+    const canonical = page.locator('link[rel="canonical"]');
     await expect(canonical).toHaveAttribute("href", "https://piotrtarach.dev/");
 
-    const ogUrl = page.locator('meta[property="og:url"]').first();
+    const ogUrl = page.locator('meta[property="og:url"]');
     await expect(ogUrl).toHaveAttribute("content", "https://piotrtarach.dev/");
   });
 
