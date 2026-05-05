@@ -12,4 +12,19 @@ test.describe("SEO static files (smoke)", () => {
     expect(body).toContain("User-agent: PerplexityBot");
     expect(body).toContain("Sitemap: https://piotrtarach.dev/sitemap.xml");
   });
+
+  test("vercel.json has noindex headers for preview deploys", async () => {
+    const config = JSON.parse(readFileSync("vercel.json", "utf-8"));
+    expect(config.headers).toBeDefined();
+    expect(config.headers).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          source: "/(.*)",
+          has: expect.arrayContaining([
+            expect.objectContaining({ type: "host", value: ".*\\.vercel\\.app" }),
+          ]),
+        }),
+      ])
+    );
+  });
 });
