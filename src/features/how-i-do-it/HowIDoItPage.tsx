@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { useMarkdownContent } from "@/hooks/useMarkdownContent";
 import { MarkdownRenderer } from "@/components/markdown/MarkdownRenderer";
 import { TableOfContents, TocHeading } from "@/components/TableOfContents";
+import Seo from "@/components/Seo";
 import { howIDoItPages } from "./data";
 import LetterReveal from "@/components/LetterReveal";
 import { useMotionPolicy } from "@/lib/motion";
@@ -54,12 +55,19 @@ const HowIDoItPage = () => {
         </Link>
 
         {pageInfo && (
-          <div className="mb-8">
-            <LetterReveal key={slug} text={`> cat ~/methodology/${slug}.md`} tag="p" className="text-muted-foreground text-xs tracking-[0.3em] mb-2 hidden-in-reading" delayPerLetter={20} skipAnimation={animationsDisabled} />
-            <h1 className="font-display text-3xl font-bold text-foreground text-glow">
-              {pageInfo.title}
-            </h1>
-          </div>
+          <>
+            <Seo
+              title={pageInfo.title}
+              description={pageInfo.description}
+              path={`/how-i-do-it/${pageInfo.slug}`}
+            />
+            <div className="mb-8">
+              <LetterReveal key={slug} text={`> cat ~/methodology/${slug}.md`} tag="p" className="text-muted-foreground text-xs tracking-[0.3em] mb-2 hidden-in-reading" delayPerLetter={20} skipAnimation={animationsDisabled} />
+              <h1 className="font-display text-3xl font-bold text-foreground text-glow">
+                {pageInfo.title}
+              </h1>
+            </div>
+          </>
         )}
 
         <motion.div

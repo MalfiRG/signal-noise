@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { useMarkdownContent } from "@/hooks/useMarkdownContent";
 import { MarkdownRenderer } from "@/components/markdown/MarkdownRenderer";
 import { TableOfContents, TocHeading } from "@/components/TableOfContents";
+import Seo from "@/components/Seo";
 import { visiblePosts } from "./data";
 import type { BlogOutletContext } from "./data";
 
@@ -44,6 +45,15 @@ const BlogPostPage = () => {
       </Link>
 
       {postInfo && (
+        <>
+        <Seo
+          title={postInfo.title}
+          description={postInfo.excerpt}
+          path={`/blog/${postInfo.slug}`}
+          type="article"
+          publishedTime={postInfo.date}
+          tags={postInfo.tags}
+        />
         <div className="mb-8 space-y-2">
           <span className="block text-muted-foreground text-xs tracking-wider">
             {postInfo.date}
@@ -68,6 +78,7 @@ const BlogPostPage = () => {
             {postInfo.title}
           </h1>
         </div>
+        </>
       )}
 
       <motion.div
