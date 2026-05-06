@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import AboutSection from "@/features/about/AboutSection";
 import HeroSignalNoise from "@/features/hero-signal-noise/HeroSignalNoise";
 import HeroChrome from "@/features/hero-signal-noise/HeroChrome";
+import Seo from "@/components/Seo";
 import { useMotionPolicy } from "@/lib/motion";
 
 const HERO_PLAYED_KEY = "hero-cascade-played";
@@ -117,6 +118,7 @@ const Index = () => {
 
   return (
     <>
+      <Seo path="/" />
       <div className="scanline fixed inset-0 z-10" />
       <HeroChrome />
 
