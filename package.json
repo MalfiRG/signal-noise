@@ -4,9 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "dev:design": "VITE_DESIGN_COMPANION=1 vite",
-    "build": "tsx scripts/update-github-stats.ts && tsx scripts/generate-sitemap.ts && tsx scripts/generate-llms-txt.ts && VITE_VERCEL_ENV=\"${VERCEL_ENV:-}\" vite build",
+    "generate:seo": "tsx scripts/generate-sitemap.ts && tsx scripts/generate-llms-txt.ts",
+    "dev": "npm run generate:seo && vite",
+    "dev:design": "npm run generate:seo && VITE_DESIGN_COMPANION=1 vite",
+    "build": "tsx scripts/update-github-stats.ts && npm run generate:seo && VITE_VERCEL_ENV=\"${VERCEL_ENV:-}\" vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "lint:e2e": "eslint 'e2e/**/*.{ts,tsx}' --max-warnings 0",
