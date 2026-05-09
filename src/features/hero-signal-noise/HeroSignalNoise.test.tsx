@@ -43,7 +43,7 @@ describe("HeroSignalNoise", () => {
   it("renders the terminal line at phase >= 1 (placeholder at phase 0)", () => {
     const { container, rerender } = render(<Wrapper phase={0} />);
     expect(container.textContent?.replace(/ /g, " ")).toContain("INITIALIZING SYSTEM");
-    expect(container.querySelector("p.opacity-0")).not.toBeNull();
+    expect(container.querySelector("p.hero-pre-reveal")).not.toBeNull();
 
     rerender(<Wrapper phase={1} />);
     expect(container.textContent?.replace(/ /g, " ")).toContain("INITIALIZING SYSTEM");
