@@ -16,7 +16,7 @@ async function getRunningAnimations(page: Page): Promise<string[]> {
   });
 }
 
-async function waitForVisible(page: Page, selector: string, timeoutMs = 10000) {
+async function waitForOpacityVisible(page: Page, selector: string, timeoutMs = 10000) {
   await page.waitForFunction(
     ({ sel }) => {
       const el = document.querySelector(sel);
@@ -29,12 +29,26 @@ async function waitForVisible(page: Page, selector: string, timeoutMs = 10000) {
   );
 }
 
-async function getOpacity(page: Page, selector: string): Promise<number> {
+async function isPreReveal(page: Page, selector: string): Promise<boolean> {
   return page.evaluate((sel) => {
     const el = document.querySelector(sel);
-    if (!el) return 0;
-    return parseFloat(window.getComputedStyle(el).opacity);
+    if (!el) return true;
+    const style = window.getComputedStyle(el);
+    return el.classList.contains('hero-pre-reveal') &&
+           style.filter !== 'none';
   }, selector);
+}
+
+async function waitForRevealed(page: Page, selector: string, timeoutMs = 10000) {
+  await page.waitForFunction(
+    ({ sel }) => {
+      const el = document.querySelector(sel);
+      if (!el) return false;
+      return !el.classList.contains('hero-pre-reveal');
+    },
+    { sel: selector },
+    { timeout: timeoutMs }
+  );
 }
 
 const SEL = {
@@ -55,29 +69,35 @@ test.describe("Desktop — full animations", () => {
   test("hero cascade plays in correct phase order", async ({ page }) => {
     await page.goto("/");
 
-    const breakOpacity = await getOpacity(page, SEL.breakIt);
-    expect(breakOpacity).toBe(0);
+    const breakHidden = await isPreReveal(page, SEL.breakIt);
+    expect(breakHidden).toBe(true);
 
-    await waitForVisible(page, SEL.initText, 3000);
+    // Phase 1: INITIALIZING text - waitForRevealed works here via element replacement
+    // (the placeholder <p class="hero-pre-reveal"> unmounts, LetterReveal <p> mounts)
+    await waitForRevealed(page, SEL.initText, 3000);
 
-    await waitForVisible(page, SEL.breakIt, 5000);
+    // Phase 2: BREAK IT revealed with glitch entrance
+    await waitForRevealed(page, SEL.breakIt, 5000);
 
     const hasGlitch = await page.locator(SEL.breakIt).evaluate((el) =>
       el.classList.contains("hero-glitch-entrance")
     );
     expect(hasGlitch).toBe(true);
 
-    await waitForVisible(page, "[data-row='build']", 5000);
+    // Phase 2+1s: BUILD IT - wait for LetterReveal to mount
+    // NOTE: hero-pre-reveal is on the INNER span, not the outer [data-row='build']
+    await page.waitForSelector("[data-row='build'] .letter-reveal, [data-row='build'] .block:not(.hero-pre-reveal)", { timeout: 5000 });
 
-    await waitForVisible(page, SEL.subtitle, 8000);
-    await waitForVisible(page, SEL.buttons, 8000);
-    await waitForVisible(page, SEL.scrollHint, 8000);
+    // Phase 3: Subtitle, buttons, scroll hint (framer-motion opacity-based)
+    await waitForOpacityVisible(page, SEL.subtitle, 8000);
+    await waitForOpacityVisible(page, SEL.buttons, 8000);
+    await waitForOpacityVisible(page, SEL.scrollHint, 8000);
   });
 
   test("CSS animations fire on BREAK IT", async ({ page }) => {
     await page.goto("/");
 
-    await waitForVisible(page, SEL.breakIt, 5000);
+    await waitForRevealed(page, SEL.breakIt, 5000);
 
     const animations = await getRunningAnimations(page);
     const hasPseudo = await page.evaluate(() => {
@@ -105,9 +125,8 @@ test.describe("Mobile — animations ON", () => {
   test("hero cascade plays on mobile", async ({ page }) => {
     await page.goto("/");
 
-    await waitForVisible(page, SEL.initText, 3000);
-
-    await waitForVisible(page, SEL.breakIt, 5000);
+    await waitForRevealed(page, SEL.initText, 3000);
+    await waitForRevealed(page, SEL.breakIt, 5000);
 
     const pseudoVisible = await page.evaluate(() => {
       const el = document.querySelector('[data-text="BREAK IT"]');
@@ -117,8 +136,8 @@ test.describe("Mobile — animations ON", () => {
     });
     expect(pseudoVisible).toBe(true);
 
-    await waitForVisible(page, SEL.subtitle, 8000);
-    await waitForVisible(page, SEL.buttons, 8000);
+    await waitForOpacityVisible(page, SEL.subtitle, 8000);
+    await waitForOpacityVisible(page, SEL.buttons, 8000);
   });
 
   test("no reduced-motion banner on mobile with animations", async ({ page }) => {
@@ -138,12 +157,11 @@ test.describe("Mobile — reduced motion", () => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
 
-    await waitForVisible(page, SEL.initText, 1000);
+    await expect(page.locator(SEL.initText)).toBeVisible({ timeout: 1000 });
+    await expect(page.locator(SEL.breakIt)).toBeVisible({ timeout: 2000 });
 
-    await waitForVisible(page, SEL.breakIt, 2000);
-
-    await waitForVisible(page, SEL.subtitle, 3000);
-    await waitForVisible(page, SEL.buttons, 3000);
+    await waitForOpacityVisible(page, SEL.subtitle, 3000);
+    await waitForOpacityVisible(page, SEL.buttons, 3000);
   });
 
   test("reduced-motion banner visible", async ({ page }) => {
@@ -158,7 +176,7 @@ test.describe("Mobile — reduced motion", () => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
 
-    await waitForVisible(page, SEL.subtitle, 3000);
+    await waitForOpacityVisible(page, SEL.subtitle, 3000);
 
     const heroAnimations = await page.evaluate(() => {
       const heroNames = [
