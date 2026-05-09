@@ -8,6 +8,7 @@ export const designable: Omit<DesignableSpec, 'file'> = {
     '.hero-h',
     '.h-row',
     '.letter-reveal-linear',
+    '.hero-pre-reveal',
     '.hero-glitch-entrance',
     '.hero-stamp-entrance',
     '.box-glow',

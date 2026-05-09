@@ -13,7 +13,7 @@ interface HeroSignalNoiseProps {
 }
 
 const animClass = (gateMet: boolean, cls: string, animationsDisabled: boolean): string => {
-  if (!gateMet) return "opacity-0";
+  if (!gateMet) return "hero-pre-reveal";
   return animationsDisabled ? "" : cls;
 };
 
@@ -44,7 +44,7 @@ const HeroSignalNoise = ({
           skipAnimation={animationsDisabled}
         />
       ) : (
-        <p className="text-muted-foreground text-sm tracking-[0.3em] mb-4 opacity-0">
+        <p className="text-muted-foreground text-sm tracking-[0.3em] mb-4 hero-pre-reveal">
           {">"} INITIALIZING SYSTEM...
         </p>
       )}
@@ -68,7 +68,7 @@ const HeroSignalNoise = ({
               skipAnimation={animationsDisabled}
             />
           ) : (
-            <span className="block opacity-0" aria-hidden="true">BUILD IT</span>
+            <span className="block hero-pre-reveal" aria-hidden="true">BUILD IT</span>
           )}
         </span>
         <span
