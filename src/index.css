@@ -1281,6 +1281,7 @@ code[class*="language-"] span::selection {
   line-height: 1;
   letter-spacing: 0.02em;
   padding-top: 8px;
+  overflow: hidden;
 }
 
 @media (min-width: 768px) { .hero-h { gap: 22px; } }

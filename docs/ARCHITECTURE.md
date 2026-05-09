@@ -310,7 +310,7 @@ The home page hero is a 3-phase cascade orchestrated by `Index.tsx:Index`. State
 ### Skip-on-return mechanism
 
 Per-element conditional in `animClass()` helper:
-- `phase < gate` → return `"opacity-0"` (hidden)
+- `phase < gate` → return `"hero-pre-reveal"` (filter-hidden for LCP optimization)
 - `phase >= gate && skipAnimation` → return `""` (settled, no animation)
 - `phase >= gate && !skipAnimation` → return the animation class (entrance plays)
 
@@ -566,6 +566,20 @@ The CTA region uses HTML `inert` (React 19 boolean prop) to gate it during phase
 `LetterReveal skipAnimation` receives `animationsDisabled` (which already composes `heroReplaySkip` via `useMotionPolicy`) — no double-pass needed per spec §5.3.
 
 Tri-state badge (`F-UX-03 + F-CONS-05` convergence): `animationsDisabled` can be caused by (1) OS reduced-motion, (2) session replay-skip, or (3) tier default. The cause determines the badge label so the user understands WHY motion is off. Priority follows the §4 evaluation chain: OS > session > tier. Badge dismissal persists in `localStorage` (`hero-badge-dismissed`); the dismissal is cosmetic, so the write is wrapped in a swallowed `try/catch`.
+
+### Hero LCP optimization - filter-based pre-reveal
+
+The `hero-pre-reveal` CSS class uses `filter: blur(10px) brightness(0)` plus `color: transparent` instead of `opacity: 0` to hide elements during the cascade pre-gate phase. This is a Core Web Vitals optimization: the browser's LCP heuristic considers elements with `opacity: 0` as "not yet painted" and defers the LCP timestamp until opacity > 0. Filter-based hiding keeps `opacity: 1` so the browser counts the element as an LCP candidate at initial render. The `brightness(0)` renders text as pure black (invisible on the #0b0d12 background), `color: transparent` ensures invisibility regardless of background color (theme-independent), and `blur(10px)` prevents edge artifacts.
+
+`hero-pre-reveal` lives in `index.css` alongside its sibling animation classes (`hero-glitch-entrance`, `hero-stamp-entrance`, `letter-reveal`) because all four form a single animation system - splitting them across files fragments the cascade-hiding/entrance contract.
+
+Main-element animation keyframes (`hero-glitch-flash`, `hero-stamp`) were simultaneously reworked to remove opacity transitions, using `filter` (brightness/blur) and `transform` (scale/translate) only. Pseudo-element overlay keyframes (`hero-glitch-cyan`, `hero-glitch-magenta`) retain opacity for chromatic-aberration fade-out - pseudo-elements are not independent LCP candidates so this does not affect the optimization. The visual theater is preserved - text emerges from a blurred/bright state rather than fading from transparent.
+
+`.hero-stamp-entrance` uses `animation-fill-mode: both` (not `forwards`). The `backwards` component projects the 0% keyframe values (`filter: blur(12px) brightness(2)`) into the 2.2s `animationDelay` period. Without it, PROVE IT renders with default styles during the delay - fully readable text that then snaps to the blurred 0% state. `.hero-h` has `overflow: hidden` to clip the 0%-keyframe `letter-spacing: 0.3em` and `transform: scale(1.4)` that would overflow narrow mobile viewports during the delay window.
+
+Accessibility: `@media (forced-colors: active)` strips CSS filters entirely, so a separate rule disables the cascade under forced-colors (same approach as `prefers-reduced-motion`). The brightness flickers in the glitch animation may exceed the WCAG 2.3.1 three-flashes threshold, but are mitigated by the `prefers-reduced-motion` media query and the SKIP button (available during phases 1-2).
+
+Known trade-off: `Ctrl+F` (browser find-in-page) can reveal pre-gate text because the browser's text search ignores CSS filter/color - the text content exists in the DOM at full opacity. This is inherent to any non-`display:none` hiding strategy and is accepted.
 
 ### Visual determinism fixture (Playwright)
 
