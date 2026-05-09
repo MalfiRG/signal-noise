@@ -814,7 +814,6 @@ code[class*="language-"] span::selection {
   0% {
     filter: blur(12px) brightness(2);
     transform: scale(1.4) translateY(-10px);
-    letter-spacing: 0.3em;
   }
   30% {
     filter: blur(6px) brightness(1.5);
@@ -1281,7 +1280,6 @@ code[class*="language-"] span::selection {
   line-height: 1;
   letter-spacing: 0.02em;
   padding-top: 8px;
-  overflow: hidden;
 }
 
 @media (min-width: 768px) { .hero-h { gap: 22px; } }
