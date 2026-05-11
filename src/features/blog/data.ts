@@ -5,6 +5,7 @@ export interface BlogPost {
   tags: string[];
   category: string;
   excerpt: string;
+  reading_time?: number;
   draft?: boolean;
 }
 
