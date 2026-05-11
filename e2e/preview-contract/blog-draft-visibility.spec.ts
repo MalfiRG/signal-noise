@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("Blog draft visibility — Vercel preview build", () => {
+test.describe("Blog draft visibility - Vercel preview build", () => {
   test("posts marked draft:true appear on /blog index in preview mode", async ({
     page,
   }) => {

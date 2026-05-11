@@ -5,7 +5,6 @@ const DESKTOP_VIEWPORT = { width: 1440, height: 900 };
 
 async function gotoFreshCascade(page: import("@playwright/test").Page) {
   await page.setViewportSize(DESKTOP_VIEWPORT);
-  // No origin before first navigation — clear after goto then reload
   await page.goto("/");
   await page.evaluate(() => {
     try {
@@ -41,7 +40,7 @@ test.describe("Hero skip-intro paths (spec §5.6)", () => {
   });
 
   test("SKIP button activates via native Space when focused (keyboard a11y)", async ({ page }) => {
-    // Wave 3 F-UX-01 — Space is reserved for native scroll; only focused button activates
+    // Wave 3 F-UX-01 - Space is reserved for native scroll; only focused button activates
     await gotoFreshCascade(page);
 
     const skipButton = page.getByRole("button", { name: /skip intro/i });
@@ -56,7 +55,7 @@ test.describe("Hero skip-intro paths (spec §5.6)", () => {
   test("Space key with no focused element does NOT skip (preserves native scroll)", async ({
     page,
   }) => {
-    // Wave 3 F-UX-01 — Space without focus must not skip
+    // Wave 3 F-UX-01 - Space without focus must not skip
     await gotoFreshCascade(page);
 
     await expect(page.locator('[data-testid="hero-cascading"]')).toBeVisible({ timeout: 2000 });
@@ -81,7 +80,6 @@ test.describe("Hero skip-intro paths (spec §5.6)", () => {
     await page.reload();
     await page.waitForLoadState("networkidle");
 
-    // spec §5.6 - mobile tier skips cascade; CTAs visible, SKIP absent in settled state
     await expect(page.getByRole("link", { name: "VIEW PROJECTS" })).toBeVisible({ timeout: 5000 });
     await expect(page.getByRole("button", { name: /skip intro/i })).not.toBeVisible({ timeout: 3000 });
   });
@@ -111,15 +109,11 @@ test.describe("Hero sessionStorage round-trip (spec §5.6 + §5.9)", () => {
     await expect(page.locator('[data-testid="hero-phase3"]')).toBeVisible({ timeout: 2000 });
 
     await page.reload();
-    // After reload with persisted flag, hero should land directly in phase3 — no SKIP visible
     await expect(page.locator('[data-testid="hero-phase3"]')).toBeVisible({ timeout: 2000 });
     await expect(page.getByRole("button", { name: /skip intro/i })).toHaveCount(0);
   });
 
-  // Regression: sessionStorage is per-tab. A fresh browser context (= new tab)
-  // must NOT inherit the flag and must show the cascade again.
   test("fresh context (simulated new tab) replays the cascade", async ({ browser }) => {
-    // First context: complete cascade, persist flag
     const ctx1 = await browser.newContext({ viewport: DESKTOP_VIEWPORT });
     const page1 = await ctx1.newPage();
     await page1.goto("/");
@@ -131,7 +125,6 @@ test.describe("Hero sessionStorage round-trip (spec §5.6 + §5.9)", () => {
     await expect(page1.locator('[data-testid="hero-phase3"]')).toBeVisible({ timeout: 2000 });
     await ctx1.close();
 
-    // Second context = new tab: no shared sessionStorage; SKIP must reappear.
     const ctx2 = await browser.newContext({ viewport: DESKTOP_VIEWPORT });
     const page2 = await ctx2.newPage();
     await page2.goto("/");
@@ -140,11 +133,8 @@ test.describe("Hero sessionStorage round-trip (spec §5.6 + §5.9)", () => {
   });
 });
 
+// see ARCHITECTURE.md §12 / Scroll-to-explore arrow fade regression
 test.describe("Hero scroll-to-explore arrow (regression: post-scroll fade)", () => {
-  // Regression guard: the ▼ SCROLL TO EXPLORE ▼ prompt must fade out once the
-  // user starts scrolling, otherwise it lingers on top of content. Bug origin:
-  // framer-motion variants set inline opacity that overrode Tailwind opacity-0
-  // until we split the scroll-fade onto an outer plain div wrapper.
   for (const viewport of [
     { width: 1280, height: 720, name: "desktop" },
     { width: 414, height: 900, name: "mobile-portrait" },
@@ -152,9 +142,6 @@ test.describe("Hero scroll-to-explore arrow (regression: post-scroll fade)", () 
     test(`arrow visible at top, hidden after scroll @ ${viewport.name}`, async ({ page }) => {
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
       await page.goto("/");
-      // Pre-set the replay-skip flag so the page lands directly in phase 3
-      // regardless of viewport/UA-tier classification — the arrow's fade
-      // behavior is what's under test, not the cascade itself.
       await page.evaluate(() => {
         try { sessionStorage.setItem("hero-cascade-played", "1"); } catch { /* noop */ }
       });
@@ -165,7 +152,6 @@ test.describe("Hero scroll-to-explore arrow (regression: post-scroll fade)", () 
       const arrow = page.getByText(/SCROLL TO EXPLORE/i).first();
       await expect(arrow).toBeVisible({ timeout: 5000 });
 
-      // Read the wrapper that owns the scroll-fade transition (outer plain div).
       const arrowWrapperOpacityBefore = await arrow.evaluate((el) => {
         const wrapper = el.closest('[aria-hidden], .transition-opacity') as HTMLElement | null;
         return wrapper ? Number(getComputedStyle(wrapper).opacity) : Number(getComputedStyle(el).opacity);
@@ -268,7 +254,6 @@ test.describe("Hero keyboard-focus accessibility (spec §5.8)", () => {
 
     await page.waitForTimeout(300);
 
-    // scope to hero data-testid — earlier shadcn Toaster <section> would match first otherwise
     const hiddenCount = await page.evaluate(() => {
       const hero = document.querySelector(
         '[data-testid="hero-cascading"], [data-testid="hero-phase3"]',
@@ -281,7 +266,7 @@ test.describe("Hero keyboard-focus accessibility (spec §5.8)", () => {
     expect(hiddenCount).toBeGreaterThan(0);
   });
 
-  test("post-phase-3 CTAs ARE reachable — aria-hidden is removed", async ({ page }) => {
+  test("post-phase-3 CTAs ARE reachable - aria-hidden is removed", async ({ page }) => {
     await gotoFreshCascade(page);
 
     const skipButton = page.getByRole("button", { name: /skip intro/i });

@@ -5,7 +5,7 @@ test.beforeEach(async ({ page }) => {
   await prepareContext(page);
 });
 
-test.describe("How I Do It — methodology pages", () => {
+test.describe("How I Do It - methodology pages", () => {
   const pages = [
     { slug: "test-plan", heading: "Test Plan", content: "pipeline" },
     { slug: "test-case", heading: "Test Case Design", content: "contract" },
@@ -87,7 +87,7 @@ test.describe("CodeBlock expand overlay", () => {
   });
 });
 
-test.describe("Projects page — buttons", () => {
+test.describe("Projects page - buttons", () => {
   test("project cards have labeled SOURCE and VISIT SITE buttons", async ({ page }) => {
     await page.goto("/projects");
     await expect(page.locator("h1")).toContainText("PROJECTS");

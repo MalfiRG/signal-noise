@@ -30,7 +30,7 @@ test.describe("Desktop (1280x720)", () => {
   });
 });
 
-test.describe("Below lg breakpoint (1023x768) — TOC hides, nav stays", () => {
+test.describe("Below lg breakpoint (1023x768) - TOC hides, nav stays", () => {
   test.use({ viewport: { width: 1023, height: 768 } });
 
   test("sidebar TOC is hidden", async ({ page, blogPage }) => {
@@ -62,7 +62,7 @@ test.describe("Below lg breakpoint (1023x768) — TOC hides, nav stays", () => {
   });
 });
 
-test.describe("Below md breakpoint (767x1024) — hamburger appears", () => {
+test.describe("Below md breakpoint (767x1024) - hamburger appears", () => {
   test.use({ viewport: { width: 767, height: 1024 } });
 
   test("sidebar TOC is hidden", async ({ page, blogPage }) => {
@@ -154,9 +154,7 @@ test.describe("Mobile no-overflow contract", () => {
       await page.goto("/blog");
       await stabilizeForLayout(page);
 
-      // spec §1.1 — bound 4.5 × line-height fires on 5+ rows of wrapped tags
       const tagList = page.locator("[data-testid='blog-tag-list']").first();
-      // test.skip registers skip but does NOT halt — explicit return required
       const exists = await tagList.count();
       if (exists === 0) {
         test.skip(true, "blog-tag-list testid not present yet");

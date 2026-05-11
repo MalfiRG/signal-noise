@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("Blog draft visibility — dev mode", () => {
+test.describe("Blog draft visibility - dev mode", () => {
   test("draft posts appear in /blog index during dev", async ({ page }) => {
     await page.goto("/blog");
 

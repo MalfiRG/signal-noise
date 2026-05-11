@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("Index — SocialProof removed", () => {
+test.describe("Index - SocialProof removed", () => {
   test("no SIGNALS section on homepage", async ({ page }) => {
     await page.goto("/");
     await expect(page.locator("text=SIGNALS")).not.toBeVisible();
@@ -13,7 +13,7 @@ test.describe("Index — SocialProof removed", () => {
   });
 });
 
-test.describe("Index — About below fold", () => {
+test.describe("Index - About below fold", () => {
   test("whoami is not visible without scrolling on desktop", async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
     await page.goto("/");
@@ -51,7 +51,7 @@ test.describe("Index — About below fold", () => {
   });
 });
 
-test.describe("Index — Hero viewport height", () => {
+test.describe("Index - Hero viewport height", () => {
   test("hero section is at least 100vh tall", async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
     await page.goto("/");
@@ -66,7 +66,7 @@ test.describe("Index — Hero viewport height", () => {
   });
 });
 
-test.describe("Projects — tile cascade", () => {
+test.describe("Projects - tile cascade", () => {
   test("project tiles render on /projects", async ({ page }) => {
     await page.goto("/projects");
 

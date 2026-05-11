@@ -12,10 +12,6 @@ test.describe("editor-aware navbar traversal", () => {
       await page.goto("/__design");
       await expect(page.locator(".design-companion-shell")).toBeVisible();
 
-      // Top-bar nav link (desktop layout — viewport is plenty wide).
-      // Use data-text attribute selector — getByRole struggles with the
-      // glitch-hover wrapper layout. Restrict to <nav> scope to avoid
-      // matching the social-icon links.
       const link = page.locator(`nav a[data-text="${target.label}"]`);
       await link.first().click();
       await page.waitForURL((url) => url.pathname === target.expectedPath, { timeout: 5000 });

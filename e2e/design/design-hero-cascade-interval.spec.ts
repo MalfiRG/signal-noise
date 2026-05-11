@@ -16,8 +16,7 @@ test.beforeAll(async () => {
 });
 
 for (const route of ROUTES) {
-  test(`hero cascade interval — ${route.slug}`, async ({ page, context }) => {
-    // Clear sessionStorage so the hero cascade replay-skip flag never short-circuits.
+  test(`hero cascade interval - ${route.slug}`, async ({ page, context }) => {
     await context.clearCookies();
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.addInitScript(() => {

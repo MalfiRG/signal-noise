@@ -49,7 +49,7 @@ const SEL = {
   reducedBanner: "text=reduce-motion: on",
 };
 
-test.describe("Desktop — full animations", () => {
+test.describe("Desktop - full animations", () => {
   test.use({ viewport: { width: 1280, height: 720 } });
 
   test("hero cascade plays in correct phase order", async ({ page }) => {
@@ -95,7 +95,7 @@ test.describe("Desktop — full animations", () => {
   });
 });
 
-test.describe("Mobile — animations ON", () => {
+test.describe("Mobile - animations ON", () => {
   test.use({
     viewport: { width: 375, height: 812 },
     userAgent:
@@ -127,7 +127,7 @@ test.describe("Mobile — animations ON", () => {
   });
 });
 
-test.describe("Mobile — reduced motion", () => {
+test.describe("Mobile - reduced motion", () => {
   test.use({
     viewport: { width: 375, height: 812 },
     userAgent:

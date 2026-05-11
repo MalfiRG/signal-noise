@@ -1,16 +1,12 @@
 import type { Page, Locator } from "@playwright/test";
 import { expect } from "@playwright/test";
 
-// ---------------------------------------------------------------------------
-// Pre-goto primitives — call BEFORE page.goto (typically inside a fixture).
-// ---------------------------------------------------------------------------
-
 /**
  * Inject a stylesheet that zeros animations/transitions; prepended as first
  * <head> child so author rules cannot win the source-order tie-break.
  *
  * NOTE: framer-motion `layout` animations are rAF-driven via useLayoutEffect
- * and are NOT covered — tests using `layout` must wrap with
+ * and are NOT covered - tests using `layout` must wrap with
  * <MotionConfig reducedMotion="always"> in a test-only render.
  */
 export async function freezeAnimationsViaInitScript(page: Page) {
@@ -48,7 +44,7 @@ export async function skipHeroCascadeViaInitScript(page: Page) {
  *
  * Note: process.env.TZ=UTC must also be set in playwright.config.ts so
  * formatTimeOfDay() (which uses local zone in production) renders the same
- * local hours as the UTC instant — otherwise CI (UTC) and local-dev (Prague)
+ * local hours as the UTC instant - otherwise CI (UTC) and local-dev (Prague)
  * baselines diverge.
  */
 export async function freezeClockViaInitScript(page: Page) {
@@ -59,7 +55,7 @@ export async function freezeClockViaInitScript(page: Page) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function FrozenDate(this: unknown, ...args: any[]): unknown {
       if (!(this instanceof FrozenDate)) {
-        // Date() called without `new` — return a string of the FIXED instant.
+        // Date() called without `new` - return a string of the FIXED instant.
         return new RealDate(FIXED_INSTANT_MS).toString();
       }
       if (args.length === 0) {
@@ -74,7 +70,7 @@ export async function freezeClockViaInitScript(page: Page) {
     (FrozenDate as unknown as { UTC: typeof Date.UTC }).UTC = RealDate.UTC;
     (window as unknown as { Date: unknown }).Date = FrozenDate;
 
-    // performance.now → fixed value relative to navigation start.
+    // performance.now - fixed value relative to navigation start.
     const realPerfNow = performance.now.bind(performance);
     const frozenPerfStart = realPerfNow();
     try {
@@ -88,10 +84,6 @@ export async function freezeClockViaInitScript(page: Page) {
     }
   });
 }
-
-// ---------------------------------------------------------------------------
-// Post-goto primitives — call AFTER page.goto.
-// ---------------------------------------------------------------------------
 
 /**
  * Wait for pending @font-face downloads. Watchdog timeout prevents stalled
@@ -111,7 +103,7 @@ export async function waitForFonts(page: Page, timeoutMs = 10_000) {
 /**
  * Wait for every rendered Mermaid SVG to have a measurable bbox.
  * Selector targets `svg[id^='mermaid-']` (id lives on the svg itself).
- * getBBox() throws on hidden/detached SVGs — try/catch keeps polling.
+ * getBBox() throws on hidden/detached SVGs - try/catch keeps polling.
  */
 export async function waitForMermaid(page: Page) {
   await page.waitForFunction(
@@ -131,7 +123,7 @@ export async function waitForMermaid(page: Page) {
 }
 
 /**
- * Double-rAF — single rAF resolves before paint in Chromium's pipeline,
+ * Double-rAF - single rAF resolves before paint in Chromium's pipeline,
  * so two are required to guarantee the screenshot captures post-paint state.
  */
 export async function settleStyles(page: Page) {
@@ -144,10 +136,6 @@ export async function settleStyles(page: Page) {
       )
   );
 }
-
-// ---------------------------------------------------------------------------
-// Composed convenience entry points (the façade layer).
-// ---------------------------------------------------------------------------
 
 export async function prepareContext(
   page: Page,

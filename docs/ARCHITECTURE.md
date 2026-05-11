@@ -664,7 +664,23 @@ The 768–1279px tier still gets visible asymmetric stagger from padding alone (
 
 `docs-over-code-comments.md` mandates that the WHY for the threshold lives here, not inline; the rule itself only carries the threshold value.
 
-### Inline-code overflow guard — defensive containment
+### Code-block uniform-background regression
+
+`<code class="language-...">` background can drift from the `.code-block-wrapper` inline style (`#2d2d2d` / `rgb(45, 45, 45)`). Because `<code>` renders `display: inline` with `white-space: pre`, any background mismatch tiles only behind text on each visual line - producing per-line dark stripes. The invariant: `codeBg === wrapperBg`. `e2e/functional/code-block-styling.spec.ts` "Blog code-block - uniform background" locks this across desktop and mobile.
+
+### Fenced-code pill exclusion regression
+
+The inline-code pill rule originally used `:not(pre code)` as its fenced-code exclusion. When `CodeBlock.tsx` replaced `<pre>` with `<div class="code-block-wrapper">`, the selector silently became inert and the pill border + padding tiled across each visual line of fenced code. Fix: anchor the exclusion on the `language-*` class instead - that survives wrapper-tag substitution. `e2e/functional/code-block-styling.spec.ts` "Fenced code excluded from inline-pill styling" asserts zero border + zero pill padding on `code[class*="language-"]`.
+
+### Reading-mode code-block frame regression
+
+Reading-mode `.code-block-wrapper` used to inherit a frame border via `pre[class*="language-"]`, but `CodeBlock.tsx` replaced `<pre>` with `<div class="code-block-wrapper">` so the rule never fired - frame went missing, code blocks looked like floating background patches on the cream page. Border was re-anchored to `.code-block-wrapper` directly with a warm-brown tone tuned against the cream page background. `e2e/functional/code-block-styling.spec.ts` "Reading-mode code-block frame" asserts `borderWidth >= 1px`, `borderRadius >= 4px`, and `boxShadow !== "none"`.
+
+### Reading-mode inline-code pill regression
+
+Reading-mode inline-code used to use a darker background than the cream page (looked like a dingy stripe) and lacked the GitHub-style padding + radius + border convention. Fix: explicit pill styling with visible padding, rounded corners, and a hairline border. `e2e/functional/code-block-styling.spec.ts` "Reading-mode inline-code pill styling" asserts `paddingLeft > 4px`, `borderRadius >= 3px`, `borderWidth >= 1px`, and non-transparent background.
+
+### Inline-code overflow guard - defensive containment
 
 `.markdown-body { overflow-x: hidden }` is intentional, NOT cargo-culted. Long unbreakable identifiers in inline `<code>` (e.g. `message.usage.cache_creation.ephemeral_5m_input_tokens`) used to push document width past viewport width on mobile, triggering horizontal page scroll that clipped the navbar/title/tags off-screen. Two-layer fix:
 

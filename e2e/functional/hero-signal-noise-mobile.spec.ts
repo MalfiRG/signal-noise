@@ -35,11 +35,8 @@ test.describe("HeroSignalNoise mobile reflow", () => {
       );
 
       if (vp.asymmetric) {
-        // At >=768px, .h-row.left gets padding-left via clamp(0px, 4vw, 48px).
-        // .h-row.right uses justify-content: flex-end (no padding).
         expect(leftPadding).toBeGreaterThan(0);
       } else {
-        // Below 768px, no asymmetric padding - rows are flex-centered.
         expect(leftPadding).toBe(0);
       }
     });

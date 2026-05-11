@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("Blog draft filter — production build", () => {
+test.describe("Blog draft filter - production build", () => {
   test("posts marked draft:true are absent from /blog index", async ({
     page,
   }) => {

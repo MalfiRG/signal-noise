@@ -2,11 +2,9 @@ import { test, expect } from "@playwright/test";
 import { existsSync } from "node:fs";
 import { prepareContext, stabilizeForLayout } from "../fixtures/visual-determinism";
 
-// spec §4 — hard-fail --update-snapshots outside pinned Docker image
-// Playwright 1.58.2 — beforeAll requires destructuring pattern on first arg
+// spec §4 - hard-fail --update-snapshots outside pinned Docker image
 // eslint-disable-next-line no-empty-pattern
 test.beforeAll(({}, testInfo) => {
-  // Playwright 1.58.2 updateSnapshots default is "missing"; only "all"/"changed" overwrite
   const updateMode = testInfo.config.updateSnapshots;
   if (updateMode === "all" || updateMode === "changed") {
     const isDocker = existsSync("/.dockerenv");

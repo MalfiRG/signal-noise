@@ -1,4 +1,3 @@
-// WCAG 2.4.1 single <main>, aria-hidden+focusable hygiene, WCAG AA 4.5:1 contrast
 import { test, expect, type Page } from "@playwright/test";
 
 const PAGES = ["/", "/projects", "/skills"] as const;
@@ -63,7 +62,7 @@ function contrastRatio(fg: string, bg: string): number {
   return (hi + 0.05) / (lo + 0.05);
 }
 
-test.describe("A11y — landmarks and aria-hidden hygiene", () => {
+test.describe("A11y - landmarks and aria-hidden hygiene", () => {
   for (const path of PAGES) {
     test(`${path} has exactly one <main> landmark`, async ({ page }) => {
       await page.goto(path);
@@ -161,7 +160,7 @@ test.describe("A11y — landmarks and aria-hidden hygiene", () => {
   });
 });
 
-test.describe("A11y — color contrast", () => {
+test.describe("A11y - color contrast", () => {
   test("/skills tech radar badges meet WCAG AA 4.5:1 normal-text contrast", async ({
     page,
   }) => {

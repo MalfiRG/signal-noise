@@ -20,7 +20,6 @@ test.describe("Routes load (smoke)", () => {
       await prepareContext(page);
       const response = await page.goto(path);
       expect(response?.status()).toBe(200);
-      // SPA NotFound returns 200 — assert URL match to detect client-side redirect
       await expect(page).toHaveURL(new RegExp(path.replace(/\//g, "\\/") + "$"));
       await expect(check(page)).toBeVisible({ timeout: 5000 });
     });

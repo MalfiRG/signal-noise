@@ -71,9 +71,6 @@ test.describe("SEO static files (smoke)", () => {
     expect(body).toContain("https://piotrtarach.dev/skills");
     expect(body).toContain("https://piotrtarach.dev/blog");
     expect(body).toContain("https://piotrtarach.dev/how-i-do-it");
-    // Blog post URLs only appear when non-draft posts exist in data.ts.
-    // Currently all posts are draft:true, so /blog (the index route) is the
-    // only blog-related URL asserted here.
   });
 
   test("llms.txt describes site content for AI crawlers", async ({ page }) => {
@@ -83,8 +80,6 @@ test.describe("SEO static files (smoke)", () => {
     const body = await response.text();
     expect(body).toContain("# PIOTR_TARACH | SIGNAL_NOISE");
     expect(body).toContain("## Blog Posts");
-    // /blog/ (with trailing slash) only appears when non-draft posts exist.
-    // All current posts are draft:true, so we assert the static route /blog instead.
     expect(body).toContain("/blog");
     expect(body).toContain("## How I Do It");
     expect(body).toContain("/how-i-do-it/");

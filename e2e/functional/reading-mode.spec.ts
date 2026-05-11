@@ -1,7 +1,5 @@
 import { test, expect } from "../fixtures/blog-page";
 
-// jsdom does not resolve CSS-variable cascades — these assertions need real CSSOM
-
 test.describe("CSS variable overrides", () => {
   test("background color is warm, not dark green", async ({ page, blogPage }) => {
     const wrapper = page.locator(".theme-reading");

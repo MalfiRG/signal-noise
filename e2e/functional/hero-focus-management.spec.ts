@@ -1,4 +1,4 @@
-// Wave 3 F-CONS-06 — locks focus-after-skip a11y invariant
+// Wave 3 F-CONS-06 - locks focus-after-skip a11y invariant
 import { test, expect } from "@playwright/test";
 
 const DESKTOP_VIEWPORT = { width: 1440, height: 900 };
@@ -6,7 +6,6 @@ const DESKTOP_VIEWPORT = { width: 1440, height: 900 };
 async function gotoFreshCascade(page: import("@playwright/test").Page) {
   await page.setViewportSize(DESKTOP_VIEWPORT);
   await page.goto("/");
-  // No origin before first navigation — storage clear must follow goto
   await page.evaluate(() => {
     try { sessionStorage.clear(); } catch { /* storage may throw in private mode; ignore */ }
     try { localStorage.removeItem("hero-badge-dismissed"); } catch { /* storage may throw in private mode; ignore */ }
@@ -39,7 +38,6 @@ test.describe("Hero focus management after skip", () => {
   test("clicking hero area does NOT skip cascade (no section click handler)", async ({ page }) => {
     await gotoFreshCascade(page);
 
-    // spec §5.6 - <section> has no click handler; only SKIP button skips
     const heroArea = page.locator('[data-testid="hero-cascading"]');
     await expect(heroArea).toBeVisible({ timeout: 5_000 });
     await heroArea.click({ position: { x: 100, y: 100 }, force: true });

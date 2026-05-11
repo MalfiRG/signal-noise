@@ -1,7 +1,5 @@
 import { test, expect, type Locator, type Page } from "@playwright/test";
 
-// jsdom has no layout engine; geometric containment must run in a real browser
-
 const VIEWPORTS = [
   { name: "mobile-narrow", width: 360, height: 800 },
   { name: "mobile", width: 375, height: 812 },
@@ -9,7 +7,6 @@ const VIEWPORTS = [
   { name: "desktop", width: 1280, height: 800 },
 ] as const;
 
-// Sub-pixel rounding margin — browser layout may round to ±0.5px
 const TOLERANCE_PX = 1;
 
 interface Rect {
@@ -45,7 +42,7 @@ async function gotoAncovaPost(page: Page): Promise<void> {
   ).toBeVisible({ timeout: 5000 });
 }
 
-test.describe("Blog tile (index) — content stays inside card boundaries", () => {
+test.describe("Blog tile (index) - content stays inside card boundaries", () => {
   test.use({ reducedMotion: "reduce" });
 
   for (const vp of VIEWPORTS) {
@@ -67,7 +64,6 @@ test.describe("Blog tile (index) — content stays inside card boundaries", () =
         await tile.scrollIntoViewIfNeeded();
         const tileBox = await rectOrFail(tile, `tile #${i}`);
 
-        // hyphen-heavy headlines need `overflow-wrap: anywhere` to break
         const titleBox = await rectOrFail(
           tile.locator("h2"),
           `tile #${i} title`,
@@ -97,7 +93,7 @@ test.describe("Blog tile (index) — content stays inside card boundaries", () =
   }
 });
 
-test.describe("Blog post header — tags wrap inside the content area", () => {
+test.describe("Blog post header - tags wrap inside the content area", () => {
   test.use({ reducedMotion: "reduce" });
 
   for (const vp of VIEWPORTS) {
