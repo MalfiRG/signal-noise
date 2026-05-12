@@ -1,6 +1,7 @@
 import { motion, type Variants } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useDiagramMotion } from "./useDiagramMotion";
+import { useReadingMode } from "./useReadingMode";
 import { DiagramShell } from "./DiagramShell";
 
 interface TreeNode {
@@ -349,21 +350,7 @@ function TreeNodeComponent({
 export function PalaceStructure() {
   const { animate } = useDiagramMotion();
 
-  const [isReadingMode, setIsReadingMode] = useState(
-    () => document.documentElement.classList.contains("theme-reading")
-  );
-
-  useEffect(() => {
-    const observer = new MutationObserver((mutations) => {
-      for (const m of mutations) {
-        if (m.attributeName === "class") {
-          setIsReadingMode(document.documentElement.classList.contains("theme-reading"));
-        }
-      }
-    });
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-    return () => observer.disconnect();
-  }, []);
+  const isReadingMode = useReadingMode();
 
   const getColorScheme = (expanded: boolean) => {
     if (expanded) return expandedColors;
