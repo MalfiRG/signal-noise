@@ -6,6 +6,7 @@ import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import remarkGfm from "remark-gfm";
 import mermaid from "mermaid";
 import { CodeBlock } from "./CodeBlock";
+import { AnimatedDiagram } from "@/features/blog/diagrams/DiagramRegistry";
 
 interface MarkdownRendererProps {
   content: string;
@@ -364,16 +365,16 @@ export function MarkdownRenderer({ content, className = "", onHeadingsExtracted 
 
             const allClasses = `${preClassName || ""} ${codeClassName}`;
 
-            if (allClasses.includes("mermaid")) {
+            if (allClasses.includes("mermaid") || allClasses.includes("animated-diagram")) {
               return <>{children}</>;
             }
 
-            const language = /language-(\w+)/.exec(allClasses)?.[1] || "";
+            const language = /language-([\w-]+)/.exec(allClasses)?.[1] || "";
             return <CodeBlock language={language}>{children}</CodeBlock>;
           },
 
           code({ className, children, ...props }) {
-            const match = /language-(\w+)/.exec(className || "");
+            const match = /language-([\w-]+)/.exec(className || "");
             const language = match ? match[1] : "";
 
             if (language === "mermaid") {
@@ -387,6 +388,19 @@ export function MarkdownRenderer({ content, className = "", onHeadingsExtracted 
                 return "";
               };
               return <MermaidRenderer code={extractText(children).replace(/\n$/, "")} />;
+            }
+
+            if (language === "animated-diagram") {
+              const extractText = (node: React.ReactNode): string => {
+                if (typeof node === "string") return node;
+                if (typeof node === "number") return String(node);
+                if (Array.isArray(node)) return node.map(extractText).join("");
+                if (React.isValidElement(node) && node.props?.children) {
+                  return extractText(node.props.children);
+                }
+                return "";
+              };
+              return <AnimatedDiagram name={extractText(children).replace(/\n$/, "")} />;
             }
 
             if (className) {

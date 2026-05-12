@@ -76,6 +76,16 @@ export function getVisiblePosts(
 
 export const blogPosts: BlogPost[] = [
   {
+    slug: "mempalace-sqlite-vec-migration",
+    title: "How I Broke ChromaDB at 100K Vectors and Fixed It with sqlite-vec",
+    date: "2026-05-10",
+    tags: ["AI", "vector-databases", "sqlite-vec", "ChromaDB", "MemPalace"],
+    category: "AI & Automation",
+    excerpt:
+      "I mined 85K conversation drawers into a memory palace and ChromaDB silently lost 17% of them. Here's why, and how sqlite-vec's ACID transactions fix it by construction.",
+    draft: true,
+  },
+  {
     slug: "claude-code-cache-ttl-worktree-trap",
     title:
       "Two Independent Causes of Claude Code's 5-Minute-TTL Cache Drift — Session Size and Git Worktrees (an ANCOVA)",
