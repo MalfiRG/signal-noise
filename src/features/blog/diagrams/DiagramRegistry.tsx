@@ -6,10 +6,18 @@ const PalaceStructure = lazy(() =>
 const DualWriteVsACID = lazy(() =>
   import("./DualWriteVsACID").then((m) => ({ default: m.DualWriteVsACID }))
 );
+const KGTunnelOverlay = lazy(() =>
+  import("./KGTunnelOverlay").then((m) => ({ default: m.KGTunnelOverlay }))
+);
+const QueryFlow = lazy(() =>
+  import("./QueryFlow").then((m) => ({ default: m.QueryFlow }))
+);
 
 const registry: Record<string, React.LazyExoticComponent<React.ComponentType>> = {
   "palace-structure": PalaceStructure,
   "dual-write-vs-acid": DualWriteVsACID,
+  "kg-tunnel-overlay": KGTunnelOverlay,
+  "query-flow": QueryFlow,
 };
 
 export function AnimatedDiagram({ name }: { name: string }) {
