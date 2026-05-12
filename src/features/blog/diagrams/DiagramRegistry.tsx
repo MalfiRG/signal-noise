@@ -3,9 +3,13 @@ import { lazy, Suspense } from "react";
 const PalaceStructure = lazy(() =>
   import("./PalaceStructure").then((m) => ({ default: m.PalaceStructure }))
 );
+const DualWriteVsACID = lazy(() =>
+  import("./DualWriteVsACID").then((m) => ({ default: m.DualWriteVsACID }))
+);
 
 const registry: Record<string, React.LazyExoticComponent<React.ComponentType>> = {
   "palace-structure": PalaceStructure,
+  "dual-write-vs-acid": DualWriteVsACID,
 };
 
 export function AnimatedDiagram({ name }: { name: string }) {
