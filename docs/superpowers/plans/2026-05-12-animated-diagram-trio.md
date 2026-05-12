@@ -2,6 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> Status: Rev 2 - post-adversarial-review (26 findings applied from 6 reviewers: 3C, 7H, 7M, 5L + 4 deferred)
+> Review: 6-agent adversarial team (adversarial-tl-reviewer, architect-review, reviewer-consistency, security-auditor, socratic-challenger, traceability-auditor)
+
 **Goal:** Build 3 animated diagram React components (DualWriteVsACID, KGTunnelOverlay, QueryFlow) for the MemPalace sqlite-vec blog post, each following the PalaceStructure.tsx reference pattern.
 
 **Architecture:** Each component is an exported named function wrapped in `DiagramShell` render prop. Dual layout: vertical compact inline, horizontal cinematic expanded. Dual color scheme: light cream tones inline (matching Mermaid contrast), dark cinematic expanded, reading-mode adaptation via MutationObserver on `.theme-reading`. `useDiagramMotion()` for reduced-motion respect. Lazy-loaded via `DiagramRegistry`.
@@ -14,10 +17,12 @@
 
 | File | Action | Responsibility |
 |------|--------|----------------|
+| `src/features/blog/diagrams/useReadingMode.ts` | Create | Shared MutationObserver hook for `.theme-reading` detection |
 | `src/features/blog/diagrams/DualWriteVsACID.tsx` | Create | Split-screen before/after - ChromaDB dual-write vs sqlite-vec ACID |
 | `src/features/blog/diagrams/KGTunnelOverlay.tsx` | Create | KG entity graph + tunnel bridges over simplified palace wings |
 | `src/features/blog/diagrams/QueryFlow.tsx` | Create | Query pipeline sequence with stage highlighting |
 | `src/features/blog/diagrams/DiagramRegistry.tsx` | Modify | Add 3 lazy imports + registry entries |
+| `src/features/blog/diagrams/PalaceStructure.tsx` | Modify | Replace inline MutationObserver with useReadingMode hook |
 | `src/pages/content/blog/mempalace-sqlite-vec-migration.md` | Modify | Add 3 `animated-diagram` code blocks at content-appropriate seams |
 
 ## Shared Patterns (from PalaceStructure.tsx reference)
@@ -30,39 +35,28 @@ import { motion, type Variants } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useDiagramMotion } from "./useDiagramMotion";
 import { DiagramShell } from "./DiagramShell";
+import { useReadingMode } from "./useReadingMode";
 ```
 
-**Reading-mode observer:**
+**Reading-mode hook (replaces inline MutationObserver):**
 ```tsx
-const [isReadingMode, setIsReadingMode] = useState(
-  () => document.documentElement.classList.contains("theme-reading")
-);
-
-useEffect(() => {
-  const observer = new MutationObserver((mutations) => {
-    for (const m of mutations) {
-      if (m.attributeName === "class") {
-        setIsReadingMode(document.documentElement.classList.contains("theme-reading"));
-      }
-    }
-  });
-  observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-  return () => observer.disconnect();
-}, []);
+const isReadingMode = useReadingMode();
 ```
 
-**Static vs animated variants:**
+Shared hook extracted in Task 0. All 3 new components and PalaceStructure use this import.
+
+**Static vs animated variants (matched to PalaceStructure):**
 ```tsx
 const nodeVariants: Variants = {
-  hidden: { opacity: 0, scale: 0.85, y: 10 },
+  hidden: { opacity: 0, scale: 0.8, y: 12 },
   visible: { opacity: 1, scale: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } },
 };
 const containerVariants: Variants = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
+  visible: { transition: { staggerChildren: 0.12, delayChildren: 0.15 } },
 };
-const staticNode: Variants = { hidden: { opacity: 1 }, visible: { opacity: 1 } };
-const staticContainer: Variants = { hidden: {}, visible: {} };
+const staticNodeVariants: Variants = { hidden: { opacity: 1, scale: 1, y: 0 }, visible: { opacity: 1, scale: 1, y: 0 } };
+const staticContainerVariants: Variants = { hidden: {}, visible: {} };
 ```
 
 **Color reference (Night City palette):**
@@ -86,6 +80,72 @@ const ComponentName = lazy(() =>
 
 ---
 
+### Task 0: Extract useReadingMode shared hook
+
+**Files:**
+- Create: `src/features/blog/diagrams/useReadingMode.ts`
+- Modify: `src/features/blog/diagrams/PalaceStructure.tsx`
+
+Extract the MutationObserver reading-mode detection into a shared hook. All diagram components (PalaceStructure + the 3 new ones) import from this single source.
+
+- [ ] **Step 1: Create useReadingMode.ts**
+
+```tsx
+import { useState, useEffect } from "react";
+
+export function useReadingMode() {
+  const [isReadingMode, setIsReadingMode] = useState(
+    () => document.documentElement.classList.contains("theme-reading")
+  );
+
+  useEffect(() => {
+    const observer = new MutationObserver((mutations) => {
+      for (const m of mutations) {
+        if (m.attributeName === "class") {
+          setIsReadingMode(document.documentElement.classList.contains("theme-reading"));
+        }
+      }
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+
+  return isReadingMode;
+}
+```
+
+- [ ] **Step 2: Update PalaceStructure.tsx to use the shared hook**
+
+Add import:
+```tsx
+import { useReadingMode } from "./useReadingMode";
+```
+
+Replace the inline MutationObserver `useState` + `useEffect` block with:
+```tsx
+const isReadingMode = useReadingMode();
+```
+
+Remove the `useState` and `useEffect` imports if no longer used by other code in the file (verify before removing).
+
+- [ ] **Step 3: Type check**
+
+Run: `npx tsc --noEmit 2>&1 | grep -v TS5101`
+Expected: no errors
+
+- [ ] **Step 4: Commit**
+
+```bash
+git add src/features/blog/diagrams/useReadingMode.ts src/features/blog/diagrams/PalaceStructure.tsx
+git commit -m "refactor(blog): extract useReadingMode shared hook from PalaceStructure
+
+Moves MutationObserver-based .theme-reading detection into a reusable
+hook. PalaceStructure updated to consume it. New diagram components
+will import from the same source."
+```
+
+---
+
 ### Task 1: DualWriteVsACID component
 
 **Files:**
@@ -97,9 +157,10 @@ This is the hero diagram. Split-screen showing ChromaDB dual-write divergence (l
 
 ```tsx
 import { motion, type Variants } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useDiagramMotion } from "./useDiagramMotion";
 import { DiagramShell } from "./DiagramShell";
+import { useReadingMode } from "./useReadingMode";
 
 // --- Data ---
 
@@ -166,38 +227,40 @@ const headerColors: Record<Mode, Record<"broken" | "fixed", { bg: string; border
   },
 };
 
-// --- Motion ---
+// --- Motion (matched to PalaceStructure) ---
 
-const nodeV: Variants = {
-  hidden: { opacity: 0, scale: 0.85, y: 10 },
+const nodeVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.8, y: 12 },
   visible: { opacity: 1, scale: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } },
 };
-const containerV: Variants = {
+const containerVariants: Variants = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
+  visible: { transition: { staggerChildren: 0.12, delayChildren: 0.15 } },
 };
-const staticN: Variants = { hidden: { opacity: 1 }, visible: { opacity: 1 } };
-const staticC: Variants = { hidden: {}, visible: {} };
+const staticNodeVariants: Variants = { hidden: { opacity: 1, scale: 1, y: 0 }, visible: { opacity: 1, scale: 1, y: 0 } };
+const staticContainerVariants: Variants = { hidden: {}, visible: {} };
+
+// --- Timing constants ---
+
+const ENTRANCE_DURATION_MS = (brokenSteps.length * 120) + 150 + 200;
+const PARTICLE_DELAY_MS = ENTRANCE_DURATION_MS;
+const SCATTER_DELAY_MS = PARTICLE_DELAY_MS + 1200;
 
 // --- Counter hook ---
 
 function useCountUp(target: number, duration: number, active: boolean) {
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState(target);
+  const rafRef = useRef(0);
   useEffect(() => {
-    if (!active) {
-      setValue(target);
-      return;
-    }
-    setValue(0);
+    if (!active) { setValue(target); return; }
     const start = performance.now();
-    let raf: number;
     const tick = (now: number) => {
       const progress = Math.min((now - start) / duration, 1);
       setValue(Math.floor(target * progress));
-      if (progress < 1) raf = requestAnimationFrame(tick);
+      if (progress < 1) rafRef.current = requestAnimationFrame(tick);
     };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+    rafRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafRef.current);
   }, [target, duration, active]);
   return value;
 }
@@ -206,6 +269,10 @@ function useCountUp(target: number, duration: number, active: boolean) {
 
 function QueueParticles({ active, scattered }: { active: boolean; scattered: boolean }) {
   const dots = Array.from({ length: 8 }, (_, i) => i);
+  const scatterTargets = useRef(
+    dots.map((_, i) => ({ x: (i - 4) * 28 + 56, y: (Math.random() - 0.5) * 20 }))
+  ).current;
+
   return (
     <div className="relative h-6 w-full overflow-hidden">
       {dots.map((i) => (
@@ -215,7 +282,7 @@ function QueueParticles({ active, scattered }: { active: boolean; scattered: boo
           initial={{ opacity: 0, x: i * 14 + 8, y: 10 }}
           animate={
             scattered
-              ? { opacity: 0, x: (i - 4) * 28 + 56, y: Math.random() * 20 - 10, scale: 0.3 }
+              ? { opacity: 0, x: scatterTargets[i].x, y: scatterTargets[i].y, scale: 0.3 }
               : active
                 ? { opacity: [0, 0.8, 0.8], x: i * 14 + 8, y: 10 }
                 : { opacity: 0 }
@@ -237,7 +304,7 @@ function StepBox({ step, mode, anim }: { step: FlowStep; mode: Mode; anim: boole
   const c = toneColors[mode][step.tone];
   return (
     <motion.div
-      variants={anim ? nodeV : staticN}
+      variants={anim ? nodeVariants : staticNodeVariants}
       className={`rounded-lg ${c.bg} ${c.border} border px-3 py-1.5 text-center`}
     >
       <span className={`block text-xs font-mono font-medium ${c.text}`}>{step.label}</span>
@@ -274,24 +341,18 @@ function SidePanel({
   const vecCount = useCountUp(vectors, 1500, anim && showCounter);
 
   useEffect(() => {
-    if (!anim || !expanded) {
-      setShowCounter(true);
-      return;
-    }
-    const t1 = setTimeout(() => setParticles(true), 800);
-    const t2 = setTimeout(() => {
-      setScatter(true);
-      setShowCounter(true);
-    }, 2000);
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-    };
+    if (!anim || !expanded) { setShowCounter(true); return; }
+    setParticles(false);
+    setScatter(false);
+    setShowCounter(false);
+    const t1 = setTimeout(() => setParticles(true), PARTICLE_DELAY_MS);
+    const t2 = setTimeout(() => { setScatter(true); setShowCounter(true); }, SCATTER_DELAY_MS);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
   }, [anim, expanded]);
 
   const line = mode === "expanded" ? "bg-foreground/30" : "bg-[#67594c]/40";
-  const cv = anim ? containerV : staticC;
-  const nv = anim ? nodeV : staticN;
+  const cv = anim ? containerVariants : staticContainerVariants;
+  const nv = anim ? nodeVariants : staticNodeVariants;
   const counterColor = mode === "expanded"
     ? (diverged ? "text-red-400" : "text-green-400")
     : (diverged ? "text-red-700" : "text-green-700");
@@ -335,22 +396,7 @@ function SidePanel({
 
 export function DualWriteVsACID() {
   const { animate } = useDiagramMotion();
-
-  const [isReadingMode, setIsReadingMode] = useState(
-    () => document.documentElement.classList.contains("theme-reading")
-  );
-
-  useEffect(() => {
-    const observer = new MutationObserver((mutations) => {
-      for (const m of mutations) {
-        if (m.attributeName === "class") {
-          setIsReadingMode(document.documentElement.classList.contains("theme-reading"));
-        }
-      }
-    });
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-    return () => observer.disconnect();
-  }, []);
+  const isReadingMode = useReadingMode();
 
   const getMode = (expanded: boolean): Mode => {
     if (expanded) return "expanded";
@@ -366,7 +412,7 @@ export function DualWriteVsACID() {
             initial={animate ? "hidden" : "visible"}
             whileInView="visible"
             viewport={{ once: true, margin: "-80px" }}
-            variants={animate ? containerV : staticC}
+            variants={animate ? containerVariants : staticContainerVariants}
             className={expanded ? "flex gap-8 min-w-[700px] py-4 justify-center" : "flex flex-col gap-6 py-4 items-center"}
           >
             <SidePanel
@@ -387,6 +433,8 @@ export function DualWriteVsACID() {
 }
 ```
 
+> **Colorblind note (L3):** Text labels ("BROKEN"/"FIXED", "DIVERGED"/"ZERO DIVERGENCE") provide non-color differentiation for the red/green split. Color alone does not carry semantic meaning.
+
 - [ ] **Step 2: Add registry entry to DiagramRegistry.tsx**
 
 Add after the existing `PalaceStructure` lazy import:
@@ -397,7 +445,7 @@ const DualWriteVsACID = lazy(() =>
 );
 ```
 
-Add to the `registry` object:
+Add as the last entry in the `registry` object, after all existing entries:
 
 ```tsx
 "dual-write-vs-acid": DualWriteVsACID,
@@ -432,9 +480,9 @@ Knowledge graph entity overlay with tunnel bridges. Visually distinct from Palac
 
 ```tsx
 import { motion, type Variants } from "framer-motion";
-import { useState, useEffect } from "react";
 import { useDiagramMotion } from "./useDiagramMotion";
 import { DiagramShell } from "./DiagramShell";
+import { useReadingMode } from "./useReadingMode";
 
 // --- Data ---
 
@@ -448,7 +496,8 @@ interface Wing {
 interface Entity {
   id: string;
   label: string;
-  accent: string;
+  borderColor: string;
+  textColor: string;
 }
 
 interface Relation {
@@ -467,20 +516,20 @@ const wings: Wing[] = [
 ];
 
 const entities: Entity[] = [
-  { id: "scoutql", label: "ScoutQL", accent: "border-[#a78bfa] text-[#c4b5fd]" },
-  { id: "fastapi", label: "FastAPI", accent: "border-green-500 text-green-400" },
-  { id: "playwright", label: "Playwright", accent: "border-blue-400 text-blue-300" },
-  { id: "mempalace", label: "MemPalace", accent: "border-primary text-primary" },
-  { id: "chromadb", label: "ChromaDB", accent: "border-red-400 text-red-300" },
-  { id: "sqlitevec", label: "sqlite-vec", accent: "border-accent text-accent" },
+  { id: "scoutql", label: "ScoutQL", borderColor: "border-[#a78bfa]", textColor: "text-[#c4b5fd]" },
+  { id: "fastapi", label: "FastAPI", borderColor: "border-green-500", textColor: "text-green-400" },
+  { id: "playwright", label: "Playwright", borderColor: "border-blue-400", textColor: "text-blue-300" },
+  { id: "mempalace", label: "MemPalace", borderColor: "border-primary", textColor: "text-primary" },
+  { id: "chromadb", label: "ChromaDB", borderColor: "border-red-400", textColor: "text-red-300" },
+  { id: "sqlitevec", label: "sqlite-vec", borderColor: "border-accent", textColor: "text-accent" },
 ];
 
 const relations: Relation[] = [
-  { from: "scoutql", to: "fastapi", label: "uses" },
-  { from: "scoutql", to: "playwright", label: "tested_by" },
-  { from: "mempalace", to: "chromadb", label: "backed_by" },
-  { from: "mempalace", to: "sqlitevec", label: "migrated_to" },
-  { from: "chromadb", to: "sqlitevec", label: "replaced_by" },
+  { from: "ScoutQL", to: "FastAPI", label: "uses" },
+  { from: "ScoutQL", to: "Playwright", label: "tested_by" },
+  { from: "MemPalace", to: "ChromaDB", label: "backed_by" },
+  { from: "MemPalace", to: "sqlite-vec", label: "migrated_to" },
+  { from: "ChromaDB", to: "sqlite-vec", label: "replaced_by" },
 ];
 
 const tunnels: Tunnel[] = [
@@ -520,20 +569,22 @@ const tunnelColors: Record<Mode, { bg: string; text: string; dot: string }> = {
   reading: { bg: "bg-[#67594c]/15", text: "text-[#67594c]", dot: "bg-[#67594c]" },
 };
 
-// --- Motion ---
+// --- Motion (matched to PalaceStructure) ---
 
-const nodeV: Variants = {
-  hidden: { opacity: 0, scale: 0.85, y: 10 },
+const nodeVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.8, y: 12 },
   visible: { opacity: 1, scale: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } },
 };
-const containerV: Variants = {
+const containerVariants: Variants = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.12, delayChildren: 0.15 } },
 };
-const staticN: Variants = { hidden: { opacity: 1 }, visible: { opacity: 1 } };
-const staticC: Variants = { hidden: {}, visible: {} };
+const staticNodeVariants: Variants = { hidden: { opacity: 1, scale: 1, y: 0 }, visible: { opacity: 1, scale: 1, y: 0 } };
+const staticContainerVariants: Variants = { hidden: {}, visible: {} };
 
 // --- Tunnel particle ---
+// 6 tunnel particles use repeat: Infinity - acceptable count for motion.div.
+// For more particles, consider CSS @keyframes instead.
 
 function TunnelParticle({ active, color }: { active: boolean; color: string }) {
   return (
@@ -557,13 +608,13 @@ function WingBox({ wing, mode, anim }: { wing: Wing; mode: Mode; anim: boolean }
   const c = wingColors[mode];
   return (
     <motion.div
-      variants={anim ? nodeV : staticN}
-      className={`rounded-lg ${c.bg} ${c.border} px-4 py-3 text-center min-w-[180px]`}
+      variants={anim ? nodeVariants : staticNodeVariants}
+      className={`rounded-lg ${c.bg} ${c.border} px-4 py-3 text-center min-w-[140px]`}
     >
       <span className={`block text-[10px] tracking-widest uppercase ${c.room}`}>WING</span>
       <span className={`block text-xs font-mono font-medium ${c.text} truncate`}>{wing.label}</span>
       <span className={`block text-[10px] mt-1 ${c.room}`}>{wing.count} drawers</span>
-      <div className="flex gap-2 justify-center mt-2">
+      <div className="flex flex-wrap gap-2 justify-center mt-2">
         {wing.rooms.map((r) => (
           <span key={r} className={`text-[10px] px-1.5 py-0.5 rounded ${mode === "expanded" ? "bg-foreground/10" : "bg-[#67594c]/10"} ${c.room}`}>
             {r}
@@ -579,15 +630,15 @@ function EntityNode({ entity, mode, anim, expanded }: { entity: Entity; mode: Mo
   const glow = expanded ? `shadow-[0_0_12px_rgba(243,230,0,0.15)]` : "";
   return (
     <motion.div
-      variants={anim ? nodeV : staticN}
+      variants={anim ? nodeVariants : staticNodeVariants}
       className={`flex flex-col items-center gap-1`}
     >
-      <div className={`h-8 w-8 rounded-full ${c.bg} border-2 ${entity.accent.split(" ")[0]} ${c.ring} ${glow} flex items-center justify-center`}>
-        <span className={`text-[8px] font-bold ${entity.accent.split(" ")[1]}`}>
+      <div className={`h-8 w-8 rounded-full ${c.bg} border-2 ${entity.borderColor} ${c.ring} ${glow} flex items-center justify-center`}>
+        <span className={`text-[8px] font-bold ${entity.textColor}`}>
           {entity.label.slice(0, 2).toUpperCase()}
         </span>
       </div>
-      <span className={`text-[10px] font-mono ${mode === "expanded" ? entity.accent.split(" ")[1] : "text-[#2d2520]"}`}>
+      <span className={`text-[10px] font-mono ${mode === "expanded" ? entity.textColor : "text-[#2d2520]"}`}>
         {entity.label}
       </span>
     </motion.div>
@@ -598,7 +649,7 @@ function RelationBadge({ rel, mode }: { rel: Relation; mode: Mode }) {
   const textColor = mode === "expanded" ? "text-foreground/40" : "text-[#67594c]/60";
   return (
     <span className={`text-[9px] font-mono ${textColor}`}>
-      {rel.label}
+      {rel.from} -&gt; {rel.label} -&gt; {rel.to}
     </span>
   );
 }
@@ -607,7 +658,7 @@ function TunnelBar({ tunnel, mode, anim, expanded }: { tunnel: Tunnel; mode: Mod
   const c = tunnelColors[mode];
   return (
     <motion.div
-      variants={anim ? nodeV : staticN}
+      variants={anim ? nodeVariants : staticNodeVariants}
       className={`relative flex items-center gap-2 w-full`}
     >
       <div className={`h-1 w-1 rounded-full ${c.dot}`} />
@@ -630,7 +681,7 @@ function KGStats({ mode, anim }: { mode: Mode; anim: boolean }) {
   const bg = mode === "expanded" ? "bg-primary/10 border-primary/20" : "bg-[#f4f2f1] border-[#67594c]/20";
   return (
     <motion.div
-      variants={anim ? nodeV : staticN}
+      variants={anim ? nodeVariants : staticNodeVariants}
       className={`text-center mt-2`}
     >
       <span className={`inline-block rounded-full border px-3 py-0.5 text-[10px] font-mono tracking-wider ${bg} ${textColor}`}>
@@ -644,22 +695,7 @@ function KGStats({ mode, anim }: { mode: Mode; anim: boolean }) {
 
 export function KGTunnelOverlay() {
   const { animate } = useDiagramMotion();
-
-  const [isReadingMode, setIsReadingMode] = useState(
-    () => document.documentElement.classList.contains("theme-reading")
-  );
-
-  useEffect(() => {
-    const observer = new MutationObserver((mutations) => {
-      for (const m of mutations) {
-        if (m.attributeName === "class") {
-          setIsReadingMode(document.documentElement.classList.contains("theme-reading"));
-        }
-      }
-    });
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-    return () => observer.disconnect();
-  }, []);
+  const isReadingMode = useReadingMode();
 
   const getMode = (expanded: boolean): Mode => {
     if (expanded) return "expanded";
@@ -670,7 +706,7 @@ export function KGTunnelOverlay() {
     <DiagramShell title="Knowledge Graph + Tunnels - 534 entities linking across wings">
       {(expanded) => {
         const mode = getMode(expanded);
-        const cv = animate ? containerV : staticC;
+        const cv = animate ? containerVariants : staticContainerVariants;
         return (
           <motion.div
             initial={animate ? "hidden" : "visible"}
@@ -694,7 +730,7 @@ export function KGTunnelOverlay() {
             </motion.div>
 
             {/* Wings */}
-            <motion.div variants={cv} className={`flex ${expanded ? "gap-8" : "gap-4"} justify-center mb-4`}>
+            <motion.div variants={cv} className={`flex flex-wrap ${expanded ? "gap-8" : "gap-4"} justify-center mb-4`}>
               {wings.map((w) => (
                 <WingBox key={w.id} wing={w} mode={mode} anim={animate} />
               ))}
@@ -716,6 +752,8 @@ export function KGTunnelOverlay() {
 }
 ```
 
+> **Mobile note (C3):** Inline KGTunnelOverlay uses `flex-wrap` on wing container and `min-w-[140px]` (down from 180px) for mobile breakpoints. Expanded mode targets desktop viewports. DiagramShell's expand button uses `sm:opacity-0 sm:group-hover:opacity-100` - partially hidden on small screens. Inline is the primary mobile experience.
+
 - [ ] **Step 2: Add registry entry to DiagramRegistry.tsx**
 
 Add after previous lazy imports:
@@ -726,7 +764,7 @@ const KGTunnelOverlay = lazy(() =>
 );
 ```
 
-Add to `registry`:
+Add as the last entry in the `registry` object, after all existing entries:
 
 ```tsx
 "kg-tunnel-overlay": KGTunnelOverlay,
@@ -765,6 +803,7 @@ import { motion, type Variants } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useDiagramMotion } from "./useDiagramMotion";
 import { DiagramShell } from "./DiagramShell";
+import { useReadingMode } from "./useReadingMode";
 
 // --- Data ---
 
@@ -789,24 +828,24 @@ const stages: Stage[] = [
 
 type Mode = "inline" | "expanded" | "reading";
 
-const accentMap: Record<Mode, Record<Stage["accent"], { bg: string; border: string; text: string; glow: string }>> = {
+const accentMap: Record<Mode, Record<Stage["accent"], { bg: string; border: string; text: string; dimText: string; glow: string }>> = {
   inline: {
-    primary: { bg: "bg-[#f4f2f1]", border: "border-primary border-2", text: "text-[#2d2520]", glow: "" },
-    accent: { bg: "bg-[#f4f2f1]", border: "border-accent border-2", text: "text-[#2d2520]", glow: "" },
-    violet: { bg: "bg-[#f4f2f1]", border: "border-[#a78bfa] border-2", text: "text-[#2d2520]", glow: "" },
-    neutral: { bg: "bg-[#e8e5e2]", border: "border-[#67594c]", text: "text-[#2d2520]", glow: "" },
+    primary: { bg: "bg-[#f4f2f1]", border: "border-primary border-2", text: "text-[#2d2520]", dimText: "text-[#67594c]", glow: "" },
+    accent: { bg: "bg-[#f4f2f1]", border: "border-accent border-2", text: "text-[#2d2520]", dimText: "text-[#67594c]", glow: "" },
+    violet: { bg: "bg-[#f4f2f1]", border: "border-[#a78bfa] border-2", text: "text-[#2d2520]", dimText: "text-[#67594c]", glow: "" },
+    neutral: { bg: "bg-[#e8e5e2]", border: "border-[#67594c]", text: "text-[#2d2520]", dimText: "text-[#67594c]", glow: "" },
   },
   expanded: {
-    primary: { bg: "bg-card", border: "border-primary border-2", text: "text-foreground", glow: "shadow-[0_0_20px_rgba(243,230,0,0.3)]" },
-    accent: { bg: "bg-[#1c2640]", border: "border-accent border-2", text: "text-foreground/90", glow: "shadow-[0_0_16px_rgba(82,227,200,0.25)]" },
-    violet: { bg: "bg-[#1e2350]", border: "border-[#a78bfa] border-2", text: "text-foreground/90", glow: "" },
-    neutral: { bg: "bg-[#1a2038]", border: "border-foreground/25", text: "text-foreground/80", glow: "" },
+    primary: { bg: "bg-card", border: "border-primary border-2", text: "text-foreground", dimText: "text-foreground/50", glow: "shadow-[0_0_20px_rgba(243,230,0,0.3)]" },
+    accent: { bg: "bg-[#1c2640]", border: "border-accent border-2", text: "text-foreground/90", dimText: "text-foreground/50", glow: "shadow-[0_0_16px_rgba(82,227,200,0.25)]" },
+    violet: { bg: "bg-[#1e2350]", border: "border-[#a78bfa] border-2", text: "text-foreground/90", dimText: "text-foreground/40", glow: "" },
+    neutral: { bg: "bg-[#1a2038]", border: "border-foreground/25", text: "text-foreground/80", dimText: "text-foreground/40", glow: "" },
   },
   reading: {
-    primary: { bg: "bg-white", border: "border-[#67594c] border-2", text: "text-[#2d2520]", glow: "" },
-    accent: { bg: "bg-white", border: "border-[#2a5d53] border-2", text: "text-[#2d2520]", glow: "" },
-    violet: { bg: "bg-white", border: "border-[#5b3a8a] border-2", text: "text-[#2d2520]", glow: "" },
-    neutral: { bg: "bg-[#f4f2f1]", border: "border-[#67594c]", text: "text-[#2d2520]", glow: "" },
+    primary: { bg: "bg-white", border: "border-[#67594c] border-2", text: "text-[#2d2520]", dimText: "text-[#67594c]", glow: "" },
+    accent: { bg: "bg-white", border: "border-[#2a5d53] border-2", text: "text-[#2d2520]", dimText: "text-[#67594c]", glow: "" },
+    violet: { bg: "bg-white", border: "border-[#5b3a8a] border-2", text: "text-[#2d2520]", dimText: "text-[#67594c]", glow: "" },
+    neutral: { bg: "bg-[#f4f2f1]", border: "border-[#67594c]", text: "text-[#2d2520]", dimText: "text-[#67594c]", glow: "" },
   },
 };
 
@@ -816,18 +855,18 @@ const latencyBadge: Record<Mode, { bg: string; text: string }> = {
   reading: { bg: "bg-[#67594c]/10", text: "text-[#67594c]" },
 };
 
-// --- Motion ---
+// --- Motion (matched to PalaceStructure) ---
 
-const nodeV: Variants = {
-  hidden: { opacity: 0, scale: 0.85, y: 10 },
+const nodeVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.8, y: 12 },
   visible: { opacity: 1, scale: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } },
 };
-const containerV: Variants = {
+const containerVariants: Variants = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.15, delayChildren: 0.1 } },
+  visible: { transition: { staggerChildren: 0.12, delayChildren: 0.15 } },
 };
-const staticN: Variants = { hidden: { opacity: 1 }, visible: { opacity: 1 } };
-const staticC: Variants = { hidden: {}, visible: {} };
+const staticNodeVariants: Variants = { hidden: { opacity: 1, scale: 1, y: 0 }, visible: { opacity: 1, scale: 1, y: 0 } };
+const staticContainerVariants: Variants = { hidden: {}, visible: {} };
 
 // --- Sub-components ---
 
@@ -851,12 +890,10 @@ function StageNode({
 
   return (
     <motion.div
-      variants={anim ? nodeV : staticN}
-      className={`rounded-lg ${c.bg} ${c.border} ${activeGlow} px-3 py-2 text-center transition-shadow duration-300 ${expanded ? "min-w-[120px]" : "w-full max-w-[260px]"}`}
-      animate={isActive ? { scale: 1.05 } : { scale: 1 }}
-      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+      variants={anim ? nodeVariants : staticNodeVariants}
+      className={`rounded-lg ${c.bg} ${c.border} ${activeGlow} px-3 py-2 text-center transition-shadow duration-300 ${isActive ? "scale-105" : "scale-100"} transition-transform duration-300 ${expanded ? "min-w-[120px]" : "w-full max-w-[260px]"}`}
     >
-      <span className={`block text-[10px] tracking-widest uppercase ${mode === "expanded" ? c.text.replace("/90", "/50").replace("/80", "/40") : "text-[#67594c]"}`}>
+      <span className={`block text-[10px] tracking-widest uppercase ${c.dimText}`}>
         {stage.label}
       </span>
       <span className={`block text-[10px] mt-0.5 ${c.text} opacity-70 ${expanded ? "" : "truncate max-w-[240px]"}`}>
@@ -871,85 +908,34 @@ function StageNode({
   );
 }
 
-// --- Main component ---
+// --- Stage flow body (expanded holds activeIdx state) ---
 
-export function QueryFlow() {
-  const { animate } = useDiagramMotion();
-  const [activeStage, setActiveStage] = useState(-1);
-
-  const [isReadingMode, setIsReadingMode] = useState(
-    () => document.documentElement.classList.contains("theme-reading")
-  );
-
-  useEffect(() => {
-    const observer = new MutationObserver((mutations) => {
-      for (const m of mutations) {
-        if (m.attributeName === "class") {
-          setIsReadingMode(document.documentElement.classList.contains("theme-reading"));
-        }
-      }
-    });
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-    return () => observer.disconnect();
-  }, []);
-
-  const getMode = (expanded: boolean): Mode => {
-    if (expanded) return "expanded";
-    return isReadingMode ? "reading" : "inline";
-  };
-
-  return (
-    <DiagramShell title="Query Flow - KG + Closets + Vector search in one pass">
-      {(expanded) => {
-        const mode = getMode(expanded);
-        const cv = animate ? containerV : staticC;
-        const nv = animate ? nodeV : staticN;
-        const lineColor = mode === "expanded" ? "bg-foreground/30" : "bg-[#67594c]/40";
-        const isHorizontal = expanded;
-
-        return (
-          <QueryFlowInner
-            expanded={expanded}
-            mode={mode}
-            animate={animate}
-            cv={cv}
-            nv={nv}
-            lineColor={lineColor}
-            isHorizontal={isHorizontal}
-          />
-        );
-      }}
-    </DiagramShell>
-  );
-}
-
-function QueryFlowInner({
+function StageFlowBody({
   expanded,
   mode,
-  animate: anim,
-  cv,
-  nv,
-  lineColor,
-  isHorizontal,
+  anim,
 }: {
   expanded: boolean;
   mode: Mode;
-  animate: boolean;
-  cv: Variants;
-  nv: Variants;
-  lineColor: string;
-  isHorizontal: boolean;
+  anim: boolean;
 }) {
   const [activeIdx, setActiveIdx] = useState(-1);
+  const cv = anim ? containerVariants : staticContainerVariants;
+  const nv = anim ? nodeVariants : staticNodeVariants;
+  const lineColor = mode === "expanded" ? "bg-foreground/30" : "bg-[#67594c]/40";
+  const isHorizontal = expanded;
 
   useEffect(() => {
-    if (!anim || !expanded) return;
+    if (!anim || !expanded) { setActiveIdx(-1); return; }
     let i = 0;
-    const interval = setInterval(() => {
-      setActiveIdx(i);
-      i = (i + 1) % stages.length;
-    }, 800);
-    return () => clearInterval(interval);
+    let intervalId: ReturnType<typeof setInterval>;
+    const timeoutId = setTimeout(() => {
+      intervalId = setInterval(() => {
+        setActiveIdx(i % stages.length);
+        i++;
+      }, 800);
+    }, 1200);
+    return () => { clearTimeout(timeoutId); clearInterval(intervalId); };
   }, [anim, expanded]);
 
   return (
@@ -987,6 +973,33 @@ function QueryFlowInner({
     </motion.div>
   );
 }
+
+// --- Main component ---
+
+export function QueryFlow() {
+  const { animate } = useDiagramMotion();
+  const isReadingMode = useReadingMode();
+
+  const getMode = (expanded: boolean): Mode => {
+    if (expanded) return "expanded";
+    return isReadingMode ? "reading" : "inline";
+  };
+
+  return (
+    <DiagramShell title="Query Flow - KG + Closets + Vector search in one pass">
+      {(expanded) => {
+        const mode = getMode(expanded);
+        return (
+          <StageFlowBody
+            expanded={expanded}
+            mode={mode}
+            anim={animate}
+          />
+        );
+      }}
+    </DiagramShell>
+  );
+}
 ```
 
 - [ ] **Step 2: Add registry entry to DiagramRegistry.tsx**
@@ -999,7 +1012,7 @@ const QueryFlow = lazy(() =>
 );
 ```
 
-Add to `registry`:
+Add as the last entry in the `registry` object, after all existing entries:
 
 ```tsx
 "query-flow": QueryFlow,
@@ -1124,3 +1137,56 @@ Toggle reading mode (if available via the blog's theme switcher). Confirm inline
 - [ ] **Step 5: Verify reduced-motion**
 
 In browser DevTools, toggle "Prefers reduced motion" emulation. Confirm all diagrams render statically with no animations - all content still visible and labeled.
+
+---
+
+## Deferred Findings
+
+The following findings were identified during adversarial review but deferred from Rev 2. They are pre-existing patterns in the codebase or low-priority items tracked separately.
+
+| ID | Description | Reason |
+|---|---|---|
+| F-ARCH-02 | useDiagramMotion bypasses motion-policy chain | Pre-existing in PalaceStructure. Track separately. |
+| F-SEC-02 | Body scroll-lock race between DiagramShell and CodeBlock | Pre-existing in DiagramShell. |
+| F-ARCH-08 | useCountUp scoped inside DualWriteVsACID | YAGNI - no other consumer. |
+| Q-01 | Expanded mode scroll restoration on close | Pre-existing in DiagramShell. |
+| Q-06 | No focus trap in expanded overlay | Pre-existing in DiagramShell. |
+| Q-07 | Stage highlight interval on backgrounded tabs | Browser throttles setInterval automatically. |
+| Q-08 | Bundle size of 4 lazy chunks | Acceptable - lazy loading mitigates. |
+| F-ARCH-06 | Motion variant primitives duplication across files | Partially addressed by H3 (consistent naming). Full extraction deferred. |
+
+---
+
+## Resolutions Applied in Rev 2
+
+Summary of changes from Rev 1, driven by 6-agent adversarial review (3 Critical, 7 High, 7 Medium, 5 Low findings).
+
+**Critical (3):**
+- C1: Removed direct `animate` and `transition` props from StageNode. Active pulse uses CSS `scale-105`/`scale-100` with `transition-transform` instead.
+- C2: Pre-computed QueueParticles scatter targets with `useRef` to eliminate `Math.random()` in animate prop.
+- C3: Added `flex-wrap` to KGTunnelOverlay wing container, reduced `min-w` to 140px. Added mobile-viewport note.
+
+**High (7):**
+- H1: Extracted `useReadingMode` shared hook into Task 0. All 3 components + PalaceStructure use the import.
+- H2: Deferred (pre-existing in PalaceStructure).
+- H3: Renamed all variant variables to `nodeVariants`, `containerVariants`, `staticNodeVariants`, `staticContainerVariants` matching PalaceStructure.
+- H4: Aligned `nodeVariants.hidden` values to PalaceStructure (`scale: 0.8, y: 12`). Added explicit properties to `staticNodeVariants`.
+- H5: Collapsed `QueryFlowInner` into `StageFlowBody` named sub-component. Removed dead `activeStage`/`setActiveStage` from QueryFlow.
+- H6: Added animation state resets (`setParticles(false)`, `setScatter(false)`, `setShowCounter(false)`) at top of SidePanel effect.
+- H7: Added 1200ms initial delay before QueryFlow stage highlight interval starts.
+
+**Medium (7):**
+- M1: Added named timing constants (`ENTRANCE_DURATION_MS`, `PARTICLE_DELAY_MS`, `SCATTER_DELAY_MS`) to DualWriteVsACID.
+- M2: Unified stagger timing to PalaceStructure values (`staggerChildren: 0.12, delayChildren: 0.15`) across all 3 components.
+- M3: Split `entity.accent` string into typed `borderColor` and `textColor` properties on Entity interface.
+- M4: Added `dimText` property to accentMap entries. StageNode label uses `c.dimText` instead of `.replace()`.
+- M5: Changed RelationBadge to render full triples (`ScoutQL -> uses -> FastAPI`) with display names.
+- M6: Refactored `useCountUp` to use `useRef` for RAF ID, ensuring clean cancellation.
+- M7: Clarified registry insertion instructions to "last entry in the `registry` object, after all existing entries."
+
+**Low (5):**
+- L1: Deferred (pre-existing in DiagramShell).
+- L2: Added note about TunnelParticle `repeat: Infinity` count being acceptable.
+- L3: Added colorblind note - text labels provide non-color differentiation.
+- L4: No separate action (downstream of H1/H3).
+- L5: No change (valid JSX shorthand).
