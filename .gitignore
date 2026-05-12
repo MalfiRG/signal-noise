@@ -44,3 +44,4 @@ docs/test-plans/
 # Build-generated SEO files
 public/sitemap.xml
 public/llms.txt
+.codex-reviews/

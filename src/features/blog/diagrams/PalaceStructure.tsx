@@ -288,25 +288,58 @@ function TreeNodeComponent({
             variants={nv}
             className={`w-0.5 h-5 ${isVertical ? "bg-[#67594c]" : "bg-foreground/40"}`}
           />
-          <motion.div
-            variants={cv}
-            className={
-              isVertical
-                ? "flex flex-col items-center gap-2"
-                : `flex justify-center ${depth < 2 ? "gap-6" : "gap-3"}`
-            }
-          >
-            {node.children!.map((child) => (
-              <TreeNodeComponent
-                key={child.id}
-                node={child}
-                depth={depth + 1}
-                animate={shouldAnimate}
-                layout={layout}
-                colorScheme={colorScheme}
-              />
-            ))}
-          </motion.div>
+          {(isVertical && depth > 0) || node.children!.length === 1 ? (
+            <motion.div
+              variants={cv}
+              className={
+                isVertical
+                  ? "flex flex-col items-center gap-2"
+                  : "flex justify-center"
+              }
+            >
+              {node.children!.map((child) => (
+                <TreeNodeComponent
+                  key={child.id}
+                  node={child}
+                  depth={depth + 1}
+                  animate={shouldAnimate}
+                  layout={layout}
+                  colorScheme={colorScheme}
+                />
+              ))}
+            </motion.div>
+          ) : (
+            <motion.div
+              variants={cv}
+              className="flex justify-center"
+            >
+              {node.children!.map((child, i) => {
+                const connectorColor = isVertical ? "bg-[#67594c]" : "bg-foreground/40";
+                return (
+                  <motion.div key={child.id} variants={cv} className={`flex flex-col items-center ${depth < 2 ? "px-3" : "px-1.5"}`}>
+                    <motion.div
+                      variants={nv}
+                      className={`h-0.5 self-stretch ${connectorColor} ${
+                        i === 0
+                          ? "ml-[50%]"
+                          : i === node.children!.length - 1
+                            ? "mr-[50%]"
+                            : ""
+                      }`}
+                    />
+                    <motion.div variants={nv} className={`w-0.5 h-3 ${connectorColor}`} />
+                    <TreeNodeComponent
+                      node={child}
+                      depth={depth + 1}
+                      animate={shouldAnimate}
+                      layout={layout}
+                      colorScheme={colorScheme}
+                    />
+                  </motion.div>
+                );
+              })}
+            </motion.div>
+          )}
         </>
       )}
     </motion.div>
