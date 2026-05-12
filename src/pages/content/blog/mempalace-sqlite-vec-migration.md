@@ -42,6 +42,10 @@ I implemented the backend - about 400 lines of code. Two tables per collection: 
 
 Then I re-mined from the raw JSONL sources. 85,033 drawers. Health check: 85,033 drawers = 85,033 vectors. Zero divergence. Not because I was more careful - because the architecture doesn't have a seam where data can fall through.
 
+```animated-diagram
+dual-write-vs-acid
+```
+
 ## The Benchmarks
 
 A/B testing against the corrupted ChromaDB palace:
@@ -58,9 +62,17 @@ The latency story is interesting. sqlite-vec uses flat scan (brute-force cosine 
 
 Wing-scoped queries (targeting a specific project's conversations) scan only that partition. 21K drawers in the static wing: 68ms. 60K in conversations: 107ms. The knowledge graph and tunnel queries are sub-4ms regardless - they use their own SQLite B-tree indexes.
 
+```animated-diagram
+query-flow
+```
+
 ## Why This Matters Beyond My Laptop
 
 If you have complex documentation - tens of thousands of pages with dependency graphs, cross-references, relationship mappings - this approach works. The vector layer handles semantic discovery. The knowledge graph (534 entities, 5K+ triples in my case) handles structured navigation. Tunnels bridge domains. Closets provide topic-level boosting.
+
+```animated-diagram
+kg-tunnel-overlay
+```
 
 The total stack: 85K drawers consuming 266MB on disk, queried in 70-120ms, with zero data loss, running on a laptop with 16GB RAM. No GPU. No cloud service. No API fees. Single-file SQLite backup.
 
