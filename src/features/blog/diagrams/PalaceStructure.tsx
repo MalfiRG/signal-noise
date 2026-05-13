@@ -369,7 +369,7 @@ export function PalaceStructure() {
           <div
             className={
               expanded
-                ? "flex justify-center min-w-[900px] py-4"
+                ? "flex justify-center sm:min-w-[900px] py-4"
                 : "flex flex-col items-center py-4"
             }
           >

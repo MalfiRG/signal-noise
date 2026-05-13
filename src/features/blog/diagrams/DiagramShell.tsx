@@ -82,7 +82,7 @@ export function DiagramShell({ title, children }: DiagramShellProps) {
             </button>
           </div>
           <div
-            className="flex-1 overflow-auto flex items-start justify-center p-8"
+            className="flex-1 overflow-auto flex items-center sm:items-start justify-center p-4 sm:p-8"
             style={{ background: EXPANDED_BG }}
             onClick={(e) => e.stopPropagation()}
           >

@@ -189,7 +189,7 @@ function SidePanel({
     : (diverged ? "bg-red-100 border-red-300" : "bg-green-100 border-green-300");
 
   return (
-    <motion.div variants={cv} className={`flex flex-col items-center gap-1.5 ${expanded ? "flex-1 min-w-[280px]" : "w-full"}`}>
+    <motion.div variants={cv} className={`flex flex-col items-center gap-1.5 ${expanded ? "flex-1 w-full sm:min-w-[280px]" : "w-full"}`}>
       <motion.div variants={nv} className={`w-full rounded-t-lg ${hdr.bg} ${hdr.border} border px-3 py-2 text-center`}>
         <span className={`text-xs font-mono font-bold tracking-wider uppercase ${hdr.text}`}>
           {side === "broken" ? "BROKEN: Dual Write" : "FIXED: Single Transaction"}
@@ -239,7 +239,7 @@ export function DualWriteVsACID() {
             whileInView="visible"
             viewport={{ once: true, margin: "-80px" }}
             variants={animate ? containerVariants : staticContainerVariants}
-            className={expanded ? "flex gap-8 min-w-[700px] py-4 justify-center" : "flex flex-col gap-6 py-4 items-center"}
+            className={expanded ? "flex flex-col sm:flex-row gap-6 sm:gap-8 py-4 items-center sm:justify-center" : "flex flex-col gap-6 py-4 items-center"}
           >
             <SidePanel
               side="broken" steps={brokenSteps}

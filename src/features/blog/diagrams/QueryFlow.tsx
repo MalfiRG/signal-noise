@@ -82,7 +82,7 @@ function StageNode({
   return (
     <motion.div
       variants={anim ? nodeVariants : staticNodeVariants}
-      className={`rounded-lg ${c.bg} ${c.border} ${activeGlow} px-3 py-2 text-center ${isActive ? "scale-105" : "scale-100"} transition duration-300 ${expanded ? "min-w-[120px]" : "w-full max-w-[260px]"}`}
+      className={`rounded-lg ${c.bg} ${c.border} ${activeGlow} px-3 py-2 text-center ${isActive ? "scale-105" : "scale-100"} transition duration-300 ${expanded ? "w-full max-w-[260px] sm:w-auto sm:min-w-[120px]" : "w-full max-w-[260px]"}`}
     >
       <span className={`block text-[10px] tracking-widest uppercase ${c.dimText}`}>
         {stage.label}
@@ -133,19 +133,19 @@ function StageFlowBody({
       whileInView="visible"
       viewport={{ once: true, margin: "-80px" }}
       variants={cv}
-      className={`py-4 ${isHorizontal ? "flex items-center gap-2 min-w-[800px] justify-center" : "flex flex-col items-center gap-1.5"}`}
+      className={`py-4 ${isHorizontal ? "flex flex-col sm:flex-row items-center gap-1.5 sm:gap-2 sm:justify-center" : "flex flex-col items-center gap-1.5"}`}
     >
       {stages.map((stage, i) => (
         <div
           key={stage.id}
-          className={isHorizontal ? "flex items-center gap-2" : "flex flex-col items-center gap-1.5"}
+          className={isHorizontal ? "flex flex-col sm:flex-row items-center gap-1.5 sm:gap-2" : "flex flex-col items-center gap-1.5"}
         >
           {i > 0 && (
             <motion.div
               variants={nv}
               className={
                 isHorizontal
-                  ? `h-0.5 w-6 ${lineColor}`
+                  ? `w-0.5 h-4 sm:w-6 sm:h-0.5 ${lineColor}`
                   : `w-0.5 h-4 ${lineColor}`
               }
             />

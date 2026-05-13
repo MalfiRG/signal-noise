@@ -216,7 +216,7 @@ export function KGTunnelOverlay() {
             whileInView="visible"
             viewport={{ once: true, margin: "-80px" }}
             variants={cv}
-            className={`py-4 ${expanded ? "min-w-[700px]" : ""}`}
+            className={`py-4 ${expanded ? "w-full sm:min-w-[700px]" : ""}`}
           >
             <motion.div variants={cv} className="flex flex-wrap justify-center gap-4 mb-4">
               {entities.map((e) => (
