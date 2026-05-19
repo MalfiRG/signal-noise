@@ -12,12 +12,24 @@ const KGTunnelOverlay = lazy(() =>
 const QueryFlow = lazy(() =>
   import("./QueryFlow").then((m) => ({ default: m.QueryFlow }))
 );
+const TokenEconomics = lazy(() =>
+  import("./TokenEconomics").then((m) => ({ default: m.TokenEconomics }))
+);
+const ContextWindowScale = lazy(() =>
+  import("./ContextWindowScale").then((m) => ({ default: m.ContextWindowScale }))
+);
+const LatencyTax = lazy(() =>
+  import("./LatencyTax").then((m) => ({ default: m.LatencyTax }))
+);
 
 const registry: Record<string, React.LazyExoticComponent<React.ComponentType>> = {
   "palace-structure": PalaceStructure,
   "dual-write-vs-acid": DualWriteVsACID,
   "kg-tunnel-overlay": KGTunnelOverlay,
   "query-flow": QueryFlow,
+  "token-economics": TokenEconomics,
+  "context-window-scale": ContextWindowScale,
+  "latency-tax": LatencyTax,
 };
 
 export function AnimatedDiagram({ name }: { name: string }) {
