@@ -23,7 +23,7 @@ const LEFT_STEPS: FlowStep[] = [
 ];
 
 const RIGHT_STEPS: FlowStep[] = [
-  { label: "Query", tone: "neutral" },
+  { label: "Query", tone: "accent" },
   { label: "KNN cosine search", detail: "85K drawers, 119ms", tone: "neutral" },
   { label: "KG entity lookup", detail: "3ms", tone: "neutral" },
   { label: "Top-5 drawers", tone: "success" },
