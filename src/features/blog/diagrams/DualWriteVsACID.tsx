@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { useDiagramMotion } from "./useDiagramMotion";
 import { DiagramShell } from "./DiagramShell";
 import { useReadingMode } from "./useReadingMode";
+import { useCountUp } from "./useCountUp";
 
 interface FlowStep {
   id: string;
@@ -80,22 +81,6 @@ const ENTRANCE_DURATION_MS = (brokenSteps.length * 120) + 150 + 200;
 const PARTICLE_DELAY_MS = ENTRANCE_DURATION_MS;
 const SCATTER_DELAY_MS = PARTICLE_DELAY_MS + 1200;
 
-function useCountUp(target: number, duration: number, active: boolean) {
-  const [value, setValue] = useState(target);
-  const rafRef = useRef(0);
-  useEffect(() => {
-    if (!active) { setValue(target); return; }
-    const start = performance.now();
-    const tick = (now: number) => {
-      const progress = Math.min((now - start) / duration, 1);
-      setValue(Math.floor(target * progress));
-      if (progress < 1) rafRef.current = requestAnimationFrame(tick);
-    };
-    rafRef.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafRef.current);
-  }, [target, duration, active]);
-  return value;
-}
 
 function QueueParticles({ active, scattered }: { active: boolean; scattered: boolean }) {
   const dots = Array.from({ length: 8 }, (_, i) => i);
@@ -165,8 +150,8 @@ function SidePanel({
   const [scatter, setScatter] = useState(false);
   const [showCounter, setShowCounter] = useState(!anim);
 
-  const rowCount = useCountUp(rows, 1500, anim && showCounter);
-  const vecCount = useCountUp(vectors, 1500, anim && showCounter);
+  const rowCount = useCountUp(rows, 1.5, anim && showCounter);
+  const vecCount = useCountUp(vectors, 1.5, anim && showCounter);
 
   useEffect(() => {
     if (!anim || !expanded) { setShowCounter(true); return; }
