@@ -31,8 +31,12 @@ const RIGHT_STEPS: FlowStep[] = [
 
 const STAGGER_MS = 120;
 const SPRING_SETTLE_MS = 300;
-const PHASE_1_MS =
-  Math.max(LEFT_STEPS.length, RIGHT_STEPS.length) * STAGGER_MS + SPRING_SETTLE_MS;
+const STAGGER_S = STAGGER_MS / 1000;
+const SETTLE_S = SPRING_SETTLE_MS / 1000;
+const LEFT_DELAY_S = 0.15;
+const LEFT_DONE_S = LEFT_DELAY_S + (LEFT_STEPS.length - 1) * STAGGER_S + SETTLE_S;
+const RIGHT_DONE_S = LEFT_DONE_S + (RIGHT_STEPS.length - 1) * STAGGER_S + SETTLE_S;
+const PHASE_1_MS = Math.ceil(RIGHT_DONE_S * 1000);
 const PHASE_2_MS = 400;
 
 const toneColors: Record<
@@ -206,21 +210,21 @@ function TokenEconomicsInner({
       >
         <FlowColumn
           steps={LEFT_STEPS}
-          delayChildren={0.15}
+          delayChildren={LEFT_DELAY_S}
           mode={mode}
           anim={animate}
           dividerColor={dividerLine}
         />
         <FlowColumn
           steps={RIGHT_STEPS}
-          delayChildren={0.55}
+          delayChildren={LEFT_DONE_S}
           mode={mode}
           anim={animate}
           dividerColor={dividerLine}
         />
       </div>
 
-      <div className="relative my-4 flex items-center justify-center">
+      <div className="my-4">
         <motion.div
           className={`h-px w-full ${dividerLine}`}
           initial={animate ? { scaleX: 0, originX: 0 } : { scaleX: 1 }}
@@ -228,20 +232,28 @@ function TokenEconomicsInner({
           transition={{ duration: 0.4, ease: "easeOut" }}
           style={{ transformOrigin: "left" }}
         />
-        <motion.span
-          className={`absolute text-[10px] font-mono uppercase tracking-widest ${resultText} bg-transparent px-2`}
+        <motion.div
+          className="flex justify-center mt-2"
           initial={animate ? { opacity: 0 } : { opacity: 1 }}
           animate={showDivider ? { opacity: 1 } : { opacity: 0 }}
           transition={{ duration: 0.3, delay: 0.2 }}
         >
-          Result
-        </motion.span>
+          <span className={`text-[10px] font-mono uppercase tracking-widest ${resultText}`}>
+            Result
+          </span>
+        </motion.div>
       </div>
 
       <div className="flex flex-col gap-3 mt-2">
         <div className="flex items-center gap-2">
-          {expanded && (
-            <AlertTriangle className="h-4 w-4 shrink-0 text-red-500" />
+          {expanded && showBars && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <AlertTriangle className="h-4 w-4 shrink-0 text-red-500" />
+            </motion.div>
           )}
           <motion.div
             className="flex-1"
@@ -265,8 +277,14 @@ function TokenEconomicsInner({
         </div>
 
         <div className="flex items-center gap-2">
-          {expanded && (
-            <CheckCircle className="h-4 w-4 shrink-0 text-green-500" />
+          {expanded && showBars && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <CheckCircle className="h-4 w-4 shrink-0 text-green-500" />
+            </motion.div>
           )}
           <motion.div
             className="flex-1"
