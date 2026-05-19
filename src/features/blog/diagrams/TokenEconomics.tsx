@@ -11,11 +11,11 @@ import { AnimatedBar } from "./AnimatedBar";
 interface FlowStep {
   label: string;
   detail?: string;
-  tone: "neutral" | "warning" | "success";
+  tone: "neutral" | "warning" | "success" | "accent";
 }
 
 const LEFT_STEPS: FlowStep[] = [
-  { label: "Query", tone: "neutral" },
+  { label: "Query", tone: "accent" },
   { label: "Load architecture.md", tone: "warning" },
   { label: "Load debug-session.jsonl", tone: "warning" },
   { label: "Load auth-notes.md", tone: "warning" },
@@ -45,16 +45,19 @@ const toneColors: Record<
 > = {
   inline: {
     neutral: { bg: "bg-[#f4f2f1]", border: "border-[#67594c]", text: "text-[#2d2520]" },
+    accent: { bg: "bg-amber-50", border: "border-amber-400", text: "text-amber-800" },
     warning: { bg: "bg-red-50", border: "border-red-400", text: "text-red-700" },
     success: { bg: "bg-green-50", border: "border-green-500", text: "text-green-700" },
   },
   expanded: {
     neutral: { bg: "bg-[#1a2038]", border: "border-foreground/25", text: "text-foreground/80" },
+    accent: { bg: "bg-yellow-950/40", border: "border-primary/60", text: "text-primary" },
     warning: { bg: "bg-red-950/40", border: "border-red-500/60", text: "text-red-400" },
     success: { bg: "bg-green-950/40", border: "border-green-500/60", text: "text-green-400" },
   },
   reading: {
     neutral: { bg: "bg-white", border: "border-[#67594c]", text: "text-[#2d2520]" },
+    accent: { bg: "bg-amber-50", border: "border-amber-500", text: "text-amber-900" },
     warning: { bg: "bg-red-50", border: "border-red-400", text: "text-red-800" },
     success: { bg: "bg-green-50", border: "border-green-500", text: "text-green-900" },
   },
