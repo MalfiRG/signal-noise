@@ -34,8 +34,11 @@ const SPRING_SETTLE_MS = 300;
 const STAGGER_S = STAGGER_MS / 1000;
 const SETTLE_S = SPRING_SETTLE_MS / 1000;
 const LEFT_DELAY_S = 0.15;
-const LEFT_DONE_S = LEFT_DELAY_S + (LEFT_STEPS.length - 1) * STAGGER_S + SETTLE_S;
-const RIGHT_DONE_S = LEFT_DONE_S + (RIGHT_STEPS.length - 1) * STAGGER_S + SETTLE_S;
+// staggerChildren applies to ALL motion.* descendants: StepBoxes + divider lines between them
+const LEFT_MOTION_COUNT = LEFT_STEPS.length * 2 - 1;
+const LEFT_DONE_S = LEFT_DELAY_S + (LEFT_MOTION_COUNT - 1) * STAGGER_S + SETTLE_S;
+const RIGHT_MOTION_COUNT = RIGHT_STEPS.length * 2 - 1;
+const RIGHT_DONE_S = LEFT_DONE_S + (RIGHT_MOTION_COUNT - 1) * STAGGER_S + SETTLE_S;
 const PHASE_1_MS = Math.ceil(RIGHT_DONE_S * 1000);
 const PHASE_2_MS = 400;
 
@@ -242,12 +245,12 @@ function TokenEconomicsInner({
           transition={{ duration: 0.3, delay: 0.2 }}
         >
           <span className={`text-[10px] font-mono uppercase tracking-widest ${resultText}`}>
-            Result
+            Result (tokens loaded)
           </span>
         </motion.div>
       </div>
 
-      <div className="flex flex-col gap-3 mt-2">
+      <div className="flex flex-col gap-3 mt-2 overflow-hidden">
         <div className="flex items-center gap-2">
           {expanded && showBars && (
             <motion.div
