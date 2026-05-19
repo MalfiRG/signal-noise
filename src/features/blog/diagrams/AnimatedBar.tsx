@@ -103,7 +103,7 @@ export function AnimatedBar({
         )}
         <motion.div
           variants={barVariants}
-          className={`rounded ${glowing ? "shadow-[0_0_8px_rgba(82,227,200,0.33)]" : ""}`}
+          className={`relative rounded ${glowing ? "shadow-[0_0_8px_rgba(82,227,200,0.33)]" : ""}`}
           style={barStyle}
           onAnimationComplete={handleAnimationComplete}
         >
