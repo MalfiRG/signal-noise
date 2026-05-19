@@ -59,7 +59,7 @@ test.describe("TokenEconomics - Minimized mode", () => {
 
       test("red bar label text has dark red color", async ({ tokenEconomics: te }) => {
         await te.goto();
-        const label = te.redMeter.locator("span").first();
+        const label = te.barLabel(te.redMeter);
         const [r, g, b] = await te.getColor(label, "color");
         expect(r).toBeGreaterThan(150);
         expect(g).toBeLessThan(50);
@@ -157,7 +157,8 @@ test.describe("TokenEconomics - Maximized mode", () => {
       test("red bar label is light for contrast", async ({ tokenEconomics: te }) => {
         await te.goto();
         await te.expand();
-        const label = te.dialog.locator('[aria-label="Flat retrieval: 88,000 tokens"]').locator("span").first();
+        const meter = te.dialog.locator('[aria-label="Flat retrieval: 88,000 tokens"]');
+        const label = te.barLabel(meter);
         const [r, g, b] = await te.getColor(label, "color");
         expect(r).toBeGreaterThan(240);
         expect(g).toBeGreaterThan(230);
@@ -167,7 +168,8 @@ test.describe("TokenEconomics - Maximized mode", () => {
       test("green bar label is light for contrast", async ({ tokenEconomics: te }) => {
         await te.goto();
         await te.expand();
-        const label = te.dialog.locator('[aria-label="MemPalace retrieval: 3,000 tokens"]').locator("span").first();
+        const meter = te.dialog.locator('[aria-label="MemPalace retrieval: 3,000 tokens"]');
+        const label = te.barLabel(meter);
         const [r, g, b] = await te.getColor(label, "color");
         expect(r).toBeGreaterThan(230);
         expect(g).toBeGreaterThan(240);
@@ -273,7 +275,7 @@ test.describe("TokenEconomics - Animation cascade", () => {
     await page.goto(BLOG_PATH);
     await page.waitForTimeout(1000);
 
-    const shell = page.locator(".group").filter({ has: page.locator('text="Token Economics"') });
+    const shell = page.locator(".group").filter({ has: page.locator("text=Token Economics") });
     await shell.locator('button[aria-label="Expand diagram"]').click();
     const dialog = page.locator('[role="dialog"]');
     await expect(dialog).toBeVisible();

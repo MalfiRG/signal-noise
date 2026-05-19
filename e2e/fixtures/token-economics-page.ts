@@ -33,7 +33,7 @@ export class TokenEconomicsPage {
     this.page = page;
     this.figure = page.locator('[aria-label*="Token Economics"]');
     this.diagramShell = page.locator(".group").filter({
-      has: page.locator('text="Token Economics"'),
+      has: page.locator("text=Token Economics"),
     });
     this.expandButton = this.diagramShell.locator('button[aria-label="Expand diagram"]');
     this.dialog = page.locator('[role="dialog"]');
@@ -85,11 +85,15 @@ export class TokenEconomicsPage {
   }
 
   checkIcon(expanded = false): Locator {
-    return this.root(expanded).locator("svg.lucide-circle-check");
+    return this.root(expanded).locator("svg.lucide-circle-check-big");
   }
 
   meters(expanded = false): Locator {
     return this.root(expanded).locator('[role="meter"]');
+  }
+
+  barLabel(meter: Locator): Locator {
+    return meter.locator("span.absolute");
   }
 
   async getColor(el: Locator, prop: "color" | "backgroundColor" | "borderColor"): Promise<[number, number, number]> {
