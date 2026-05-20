@@ -89,7 +89,7 @@ export const blogPosts: BlogPost[] = [
     slug: "mempalace-sqlite-vec-migration",
     title: "How I Broke ChromaDB at 100K Vectors and Fixed It with sqlite-vec",
     date: "2026-05-20",
-    tags: ["AI", "vector-databases", "sqlite-vec", "ChromaDB", "MemPalace"],
+    tags: ["AI", "vector-databases", "sqlite-vec", "ChromaDB", "MemPalace", "local-AI"],
     category: "AI & Automation",
     excerpt:
       "I mined 85K conversation drawers into a memory palace and ChromaDB silently lost 17% of them. Here's why, and how sqlite-vec's ACID transactions fix it by construction.",
