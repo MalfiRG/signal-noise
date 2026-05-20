@@ -210,6 +210,21 @@ test.describe("Links", () => {
       expect(() => new URL(href!)).not.toThrow();
     }
   });
+
+  test("retrieval-economics 'previous post' link opens migration post", async ({ page, context }) => {
+    await page.goto("/blog/mempalace-retrieval-economics");
+    const link = page.locator('.markdown-body a', { hasText: "previous post" });
+    await expect(link).toBeVisible();
+    await expect(link).toHaveAttribute("href", "/blog/mempalace-sqlite-vec-migration");
+    const [newPage] = await Promise.all([
+      context.waitForEvent("page"),
+      link.click(),
+    ]);
+    await newPage.waitForLoadState();
+    await expect(newPage).toHaveURL(/mempalace-sqlite-vec-migration/);
+    await expect(newPage.locator("h1")).toContainText("ChromaDB");
+    await newPage.close();
+  });
 });
 
 test.describe("Blockquotes", () => {
