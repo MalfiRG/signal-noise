@@ -273,9 +273,9 @@ test.describe("TokenEconomics - Animation cascade", () => {
   test("expanded mode cascade follows same sequence", async ({ page }) => {
     await prepareContext(page, { freezeKeyframes: false });
     await page.goto(BLOG_PATH);
-    await page.waitForTimeout(1000);
 
     const shell = page.locator(".group").filter({ has: page.locator("text=Token Economics") });
+    await expect(shell).toBeVisible();
     await shell.locator('button[aria-label="Expand diagram"]').click();
     const dialog = page.locator('[role="dialog"]');
     await expect(dialog).toBeVisible();
