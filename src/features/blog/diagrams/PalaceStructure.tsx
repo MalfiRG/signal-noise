@@ -268,7 +268,7 @@ function TreeNodeComponent({
         className={`relative rounded-lg ${colors.bg} ${colors.border} ${colors.glow} px-3 py-2 text-center cursor-default transition-shadow`}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        style={{ minWidth: isVertical ? undefined : (depth > 2 ? 100 : 140), left: node.tier === "palace" ? (isVertical ? 20 : 70) : undefined }}
+        style={{ minWidth: isVertical ? undefined : (depth > 2 ? 100 : 140) }}
       >
         <span className={`block text-[10px] tracking-widest uppercase ${colors.tierText}`}>
           {tierLabels[node.tier]}
@@ -290,11 +290,12 @@ function TreeNodeComponent({
 
       {showChildren && (
         <>
-          <motion.div
-            variants={nv}
-            className={`w-0.5 h-5 ${isVertical ? "bg-[#67594c]" : "bg-foreground/40"}`}
-            style={depth === 0 ? { position: "relative" as const, left: isVertical ? 20 : 70, marginLeft: !isVertical ? 140 : undefined } : undefined}
-          />
+          {!(isVertical && depth === 0 && node.children!.length > 1) && (
+            <motion.div
+              variants={nv}
+              className={`w-0.5 h-5 ${isVertical ? "bg-[#67594c]" : "bg-foreground/40"}`}
+            />
+          )}
           {(isVertical && depth > 0) || node.children!.length === 1 ? (
             <motion.div
               variants={cv}
