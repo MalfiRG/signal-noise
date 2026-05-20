@@ -85,6 +85,11 @@ test.describe("LatencyTax - Minimized mode", () => {
         await expect(lt.figure.getByText("zero divergence")).toBeVisible();
       });
 
+      test("horizontal separator between sections is visible", async ({ lt }) => {
+        await lt.goto();
+        await expect(lt.separator).toBeVisible();
+      });
+
       test("no icons in inline mode", async ({ lt }) => {
         await lt.goto();
         await expect(lt.alertIcon()).toHaveCount(0);

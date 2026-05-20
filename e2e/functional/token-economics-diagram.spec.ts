@@ -57,13 +57,13 @@ test.describe("TokenEconomics - Minimized mode", () => {
         await expect(te.meters()).toHaveCount(2);
       });
 
-      test("red bar label text has dark red color", async ({ tokenEconomics: te }) => {
+      test("red bar label text has light color for contrast", async ({ tokenEconomics: te }) => {
         await te.goto();
         const label = te.barLabel(te.redMeter);
         const [r, g, b] = await te.getColor(label, "color");
-        expect(r).toBeGreaterThan(150);
-        expect(g).toBeLessThan(50);
-        expect(b).toBeLessThan(50);
+        expect(r).toBeGreaterThan(220);
+        expect(g).toBeGreaterThan(220);
+        expect(b).toBeGreaterThan(220);
       });
 
       test("flow columns are stacked vertically", async ({ tokenEconomics: te }) => {

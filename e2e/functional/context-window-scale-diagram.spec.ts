@@ -47,12 +47,13 @@ test.describe("ContextWindowScale - Minimized mode", () => {
         expect(b).toBeLessThan(45);
       });
 
-      test("MemPalace label has cyan color", async ({ cws }) => {
+      test("MemPalace label has teal color", async ({ cws }) => {
         await cws.goto();
         const label = cws.mempalaceLabel();
         const [r, g, b] = await cws.getColor(label, "color");
-        expect(g).toBeGreaterThan(200);
-        expect(b).toBeGreaterThan(150);
+        expect(r).toBeLessThan(30);
+        expect(g).toBeGreaterThan(100);
+        expect(b).toBeGreaterThan(90);
       });
 
       test("7B 4-bit laptop bar has dark red color", async ({ cws }) => {
@@ -61,6 +62,16 @@ test.describe("ContextWindowScale - Minimized mode", () => {
         const barDiv = meter.locator("div.rounded").first();
         const bg = await barDiv.evaluate((e) => getComputedStyle(e).background);
         expect(bg).toContain("102, 0, 0");
+      });
+
+      test("Opus bar label has light color for contrast on dark bar", async ({ cws }) => {
+        await cws.goto();
+        const meter = cws.page.locator('[aria-label="Opus 4.6: 1,000,000 tokens"]');
+        const label = cws.barLabel(meter);
+        const [r, g, b] = await cws.getColor(label, "color");
+        expect(r).toBeGreaterThan(200);
+        expect(g).toBeGreaterThan(190);
+        expect(b).toBeGreaterThan(120);
       });
 
       test("no AlertTriangle icon in inline mode", async ({ cws }) => {

@@ -30,9 +30,9 @@ function useSafeMode(expanded: boolean): Mode {
   return /^\/(blog|how-i-do-it)\/[^/]+/.test(pathname) ? "reading" : "inline";
 }
 
-function resolveBarColors(mode: Mode): { labelColor: string; subLabelColor: string } {
-  if (mode === "expanded") return { labelColor: "#f5e9a3", subLabelColor: "rgba(245,233,163,0.6)" };
-  return { labelColor: "#2d2520", subLabelColor: "#67594c" };
+function resolveBarColors(mode: Mode): { labelColor: string; labelColorOutside: string; subLabelColor: string } {
+  if (mode === "expanded") return { labelColor: "#f5e9a3", labelColorOutside: "#f5e9a3", subLabelColor: "rgba(245,233,163,0.6)" };
+  return { labelColor: "#f5e9a3", labelColorOutside: "#2d2520", subLabelColor: "#4a3f36" };
 }
 
 function resolveModelNameColor(mode: Mode): string {
@@ -71,7 +71,7 @@ function Inner({ animate, expanded }: { animate: boolean; expanded: boolean }) {
     return () => clearTimeout(t);
   }, [animate, expanded]);
 
-  const { labelColor, subLabelColor } = resolveBarColors(mode);
+  const { labelColor, labelColorOutside, subLabelColor } = resolveBarColors(mode);
   const modelNameColor = resolveModelNameColor(mode);
   const separatorColor = resolveSeparatorColor(mode);
 
@@ -108,6 +108,7 @@ function Inner({ animate, expanded }: { animate: boolean; expanded: boolean }) {
                   maxValue={MAX_VALUE}
                   color={bar.color}
                   labelColor={labelColor}
+                  labelColorOutside={labelColorOutside}
                   subLabelColor={subLabelColor}
                   ariaLabel={`${bar.model}: ${bar.value.toLocaleString()} tokens`}
                   animate={animate}
@@ -136,7 +137,7 @@ function Inner({ animate, expanded }: { animate: boolean; expanded: boolean }) {
         <div className="flex items-center gap-2">
           <span
             className="text-xs font-mono shrink-0 w-36 text-right flex items-center justify-end gap-1"
-            style={{ color: "#52e3c8" }}
+            style={{ color: mode === "expanded" ? "#52e3c8" : "#0f766e" }}
           >
             MemPalace
             <CheckCircle className="inline-block h-3 w-3" aria-hidden="true" />
@@ -148,6 +149,7 @@ function Inner({ animate, expanded }: { animate: boolean; expanded: boolean }) {
               label="2-5K"
               color={{ from: "#52e3c8", to: "#34d399" }}
               labelColor={labelColor}
+              labelColorOutside={labelColorOutside}
               subLabelColor={subLabelColor}
               ariaLabel="MemPalace retrieval: 2-5K tokens regardless of model"
               animate={animate}

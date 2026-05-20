@@ -111,7 +111,7 @@ function StageFlowBody({
   const [activeIdx, setActiveIdx] = useState(-1);
   const cv = anim ? containerVariants : staticContainerVariants;
   const nv = anim ? nodeVariants : staticNodeVariants;
-  const lineColor = mode === "expanded" ? "bg-foreground/30" : "bg-[#67594c]/40";
+  const lineColor = mode === "expanded" ? "bg-foreground/30" : mode === "reading" ? "bg-gray-400" : "bg-[#67594c]/70";
   const isHorizontal = expanded;
 
   useEffect(() => {
@@ -129,6 +129,8 @@ function StageFlowBody({
 
   return (
     <motion.div
+      role="figure"
+      aria-label="Query Flow: 6-stage retrieval pipeline - Query, KG Lookup (3ms), Closet Scan (5ms), Vector KNN (119ms), Rank Fusion, Results"
       initial={anim ? "hidden" : "visible"}
       whileInView="visible"
       viewport={{ once: true, margin: "-80px" }}

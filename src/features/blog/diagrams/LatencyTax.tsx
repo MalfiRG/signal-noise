@@ -72,9 +72,9 @@ const subTextColors: Record<Mode, string> = {
 };
 
 const dividerColors: Record<Mode, string> = {
-  inline: "bg-[#67594c]/40",
+  inline: "bg-[#67594c]/70",
   expanded: "bg-foreground/30",
-  reading: "bg-gray-300",
+  reading: "bg-gray-400",
 };
 
 const verdictColors: Record<Mode, string> = {
@@ -115,7 +115,7 @@ function LatencyTaxContent({ expanded, animate }: { expanded: boolean; animate: 
       whileInView="visible"
       viewport={{ once: true, margin: "-80px" }}
       variants={cv}
-      className="flex flex-col gap-6 py-4 px-2"
+      className="flex flex-col gap-6 py-4 px-2 w-full"
     >
       <div className="flex flex-col gap-3">
         <span className={`text-[10px] font-mono tracking-widest uppercase ${sectionHeaderColors[mode]}`}>
@@ -191,12 +191,21 @@ function LatencyTaxContent({ expanded, animate }: { expanded: boolean; animate: 
         </div>
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div
+        className={`h-px w-full ${dividerColors[mode]}`}
+        style={{
+          transform: showHitRate ? "scaleX(1)" : "scaleX(0)",
+          transformOrigin: "left",
+          transition: animate ? "transform 0.3s ease-out" : "none",
+        }}
+      />
+
+      <div className="flex flex-col items-center gap-3">
         <span className={`text-[10px] font-mono tracking-widest uppercase ${sectionHeaderColors[mode]}`}>
           Hit Rate
         </span>
 
-        <div className="flex items-stretch gap-0">
+        <div className="flex items-stretch gap-0 max-w-xs sm:max-w-none w-full">
           <div className="flex-1 flex flex-col items-center gap-1">
             <div aria-hidden="true" className="font-bold tabular-nums" style={{ fontSize: hitRateFontSize, color: hitRateC.hnsw }}>
               {hnswCount}%

@@ -187,7 +187,7 @@ function TokenEconomicsInner({
   const greenBarColor = { from: "#52e3c8", to: "#34d399" };
 
   const redLabelColor =
-    mode === "expanded" ? "#fef2f2" : "#b91c1c";
+    mode === "expanded" ? "#fef2f2" : "#ffffff";
   const greenLabelColor =
     mode === "expanded" ? "#f0fdf4" : "#15803d";
   const redSubColor =

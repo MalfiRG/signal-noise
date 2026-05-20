@@ -79,9 +79,9 @@ const entityColors: Record<Mode, { bg: string; ring: string }> = {
 };
 
 const tunnelColors: Record<Mode, { bg: string; text: string; dot: string }> = {
-  inline: { bg: "bg-[#67594c]/20", text: "text-[#67594c]", dot: "bg-[#67594c]" },
+  inline: { bg: "bg-[#67594c]/40", text: "text-[#67594c]", dot: "bg-[#67594c]" },
   expanded: { bg: "bg-primary/10", text: "text-primary/70", dot: "bg-primary" },
-  reading: { bg: "bg-[#67594c]/15", text: "text-[#67594c]", dot: "bg-[#67594c]" },
+  reading: { bg: "bg-gray-300", text: "text-gray-600", dot: "bg-gray-500" },
 };
 
 const nodeVariants: Variants = {
@@ -141,7 +141,7 @@ function EntityNode({ entity, mode, anim, expanded }: { entity: Entity; mode: Mo
       className={`flex flex-col items-center gap-1`}
     >
       <div className={`h-8 w-8 rounded-full ${c.bg} border-2 ${entity.borderColor} ${c.ring} ${glow} flex items-center justify-center`}>
-        <span className={`text-[8px] font-bold ${entity.textColor}`}>
+        <span className={`text-[8px] font-bold ${mode === "expanded" ? entity.textColor : "text-[#2d2520]"}`}>
           {entity.label.slice(0, 2).toUpperCase()}
         </span>
       </div>
@@ -153,7 +153,7 @@ function EntityNode({ entity, mode, anim, expanded }: { entity: Entity; mode: Mo
 }
 
 function RelationBadge({ rel, mode }: { rel: Relation; mode: Mode }) {
-  const textColor = mode === "expanded" ? "text-foreground/40" : "text-[#67594c]/60";
+  const textColor = mode === "expanded" ? "text-foreground/40" : mode === "reading" ? "text-gray-500" : "text-[#67594c]";
   return (
     <span className={`text-[9px] font-mono ${textColor}`}>
       {rel.from} -&gt; {rel.label} -&gt; {rel.to}
@@ -182,8 +182,8 @@ function TunnelBar({ tunnel, mode, anim, expanded }: { tunnel: Tunnel; mode: Mod
 }
 
 function KGStats({ mode, anim }: { mode: Mode; anim: boolean }) {
-  const textColor = mode === "expanded" ? "text-primary/60" : "text-[#67594c]";
-  const bg = mode === "expanded" ? "bg-primary/10 border-primary/20" : "bg-[#f4f2f1] border-[#67594c]/20";
+  const textColor = mode === "expanded" ? "text-primary/60" : mode === "reading" ? "text-gray-600" : "text-[#67594c]";
+  const bg = mode === "expanded" ? "bg-primary/10 border-primary/20" : mode === "reading" ? "bg-gray-50 border-gray-300" : "bg-[#f4f2f1] border-[#67594c]/40";
   return (
     <motion.div
       variants={anim ? nodeVariants : staticNodeVariants}
@@ -212,6 +212,8 @@ export function KGTunnelOverlay() {
         const cv = animate ? containerVariants : staticContainerVariants;
         return (
           <motion.div
+            role="figure"
+            aria-label="Knowledge Graph and Tunnels: 534 entities, 5,176 triples, 13 tunnels linking across 2 wings"
             initial={animate ? "hidden" : "visible"}
             whileInView="visible"
             viewport={{ once: true, margin: "-80px" }}

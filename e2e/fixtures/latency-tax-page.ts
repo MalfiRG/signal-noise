@@ -5,12 +5,14 @@ export class LatencyTaxPage extends DiagramBasePage {
   readonly hnswMeter: Locator;
   readonly sqliteMeter: Locator;
   readonly verdictLine: Locator;
+  readonly separator: Locator;
 
   constructor(page: Page) {
     super(page, "Latency Tax", "The Latency Tax");
     this.hnswMeter = page.locator('[aria-label="HNSW query latency: 80ms"]');
     this.sqliteMeter = page.locator('[aria-label="sqlite-vec query latency: 119ms"]');
     this.verdictLine = page.getByText("+39ms per query buys 100% correctness");
+    this.separator = this.figure.locator("div.h-px.w-full");
   }
 
   hnswLabel(expanded = false): Locator {

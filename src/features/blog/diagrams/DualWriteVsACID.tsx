@@ -1,5 +1,5 @@
 import { motion, type Variants } from "framer-motion";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useDiagramMotion } from "./useDiagramMotion";
 import { DiagramShell } from "./DiagramShell";
 import { useReadingMode } from "./useReadingMode";
@@ -80,6 +80,7 @@ const staticContainerVariants: Variants = { hidden: {}, visible: {} };
 const ENTRANCE_DURATION_MS = (brokenSteps.length * 120) + 150 + 200;
 const PARTICLE_DELAY_MS = ENTRANCE_DURATION_MS;
 const SCATTER_DELAY_MS = PARTICLE_DELAY_MS + 1200;
+const HEADER_DELAY_MS = SCATTER_DELAY_MS + 800;
 
 
 function QueueParticles({ active, scattered }: { active: boolean; scattered: boolean }) {
@@ -135,6 +136,7 @@ function SidePanel({
   mode,
   anim,
   expanded,
+  delayMs = 0,
 }: {
   side: "broken" | "fixed";
   steps: FlowStep[];
@@ -144,42 +146,85 @@ function SidePanel({
   mode: Mode;
   anim: boolean;
   expanded: boolean;
+  delayMs?: number;
 }) {
   const hdr = headerColors[mode][side];
   const [particles, setParticles] = useState(false);
   const [scatter, setScatter] = useState(false);
   const [showCounter, setShowCounter] = useState(!anim);
+  const [showHeader, setShowHeader] = useState(!anim);
 
   const rowCount = useCountUp(rows, 1.5, anim && showCounter);
   const vecCount = useCountUp(vectors, 1.5, anim && showCounter);
 
-  useEffect(() => {
-    if (!anim || !expanded) { setShowCounter(true); return; }
-    setParticles(false);
-    setScatter(false);
-    setShowCounter(false);
-    const t1 = setTimeout(() => setParticles(true), PARTICLE_DELAY_MS);
-    const t2 = setTimeout(() => { setScatter(true); setShowCounter(true); }, SCATTER_DELAY_MS);
-    return () => { clearTimeout(t1); clearTimeout(t2); };
-  }, [anim, expanded]);
+  const headerLeads = true;
 
-  const line = mode === "expanded" ? "bg-foreground/30" : "bg-[#67594c]/40";
-  const cv = anim ? containerVariants : staticContainerVariants;
+  useEffect(() => {
+    if (!anim) { setShowCounter(true); setShowHeader(true); return; }
+    setShowCounter(false);
+    setShowHeader(false);
+    const timers: ReturnType<typeof setTimeout>[] = [];
+
+    if (headerLeads) {
+      timers.push(setTimeout(() => setShowHeader(true), delayMs));
+    }
+
+    if (expanded) {
+      setParticles(false);
+      setScatter(false);
+      timers.push(setTimeout(() => setParticles(true), delayMs + PARTICLE_DELAY_MS));
+      timers.push(setTimeout(() => { setScatter(true); setShowCounter(true); }, delayMs + SCATTER_DELAY_MS));
+    } else {
+      timers.push(setTimeout(() => setShowCounter(true), delayMs + SCATTER_DELAY_MS));
+    }
+
+    if (!headerLeads) {
+      timers.push(setTimeout(() => setShowHeader(true), delayMs + HEADER_DELAY_MS));
+    }
+
+    return () => timers.forEach(clearTimeout);
+  }, [anim, expanded, delayMs, headerLeads]);
+
+  const line = mode === "expanded" ? "bg-foreground/30" : mode === "reading" ? "bg-gray-400" : "bg-[#67594c]/70";
+  const cv = useMemo(() => anim ? {
+    hidden: {},
+    visible: { transition: { staggerChildren: 0.12, delayChildren: 0.15 + delayMs / 1000 } },
+  } : staticContainerVariants, [anim, delayMs]);
   const nv = anim ? nodeVariants : staticNodeVariants;
   const counterColor = mode === "expanded"
     ? (diverged ? "text-red-400" : "text-green-400")
-    : (diverged ? "text-red-700" : "text-green-700");
+    : mode === "reading"
+      ? (diverged ? "text-red-800" : "text-green-800")
+      : (diverged ? "text-red-700" : "text-green-700");
   const badgeBg = mode === "expanded"
     ? (diverged ? "bg-red-500/20 border-red-500/40" : "bg-green-500/20 border-green-500/40")
-    : (diverged ? "bg-red-100 border-red-300" : "bg-green-100 border-green-300");
+    : mode === "reading"
+      ? (diverged ? "bg-red-50 border-red-400" : "bg-green-50 border-green-400")
+      : (diverged ? "bg-red-100 border-red-300" : "bg-green-100 border-green-300");
 
   return (
-    <motion.div variants={cv} className={`flex flex-col items-center gap-1.5 ${expanded ? "flex-1 w-full sm:min-w-[280px]" : "w-full"}`}>
-      <motion.div variants={nv} className={`w-full rounded-t-lg ${hdr.bg} ${hdr.border} border px-3 py-2 text-center`}>
-        <span className={`text-xs font-mono font-bold tracking-wider uppercase ${hdr.text}`}>
-          {side === "broken" ? "BROKEN: Dual Write" : "FIXED: Single Transaction"}
-        </span>
-      </motion.div>
+    <motion.div
+      variants={cv}
+      className={`flex flex-col items-center gap-1.5 ${expanded ? "flex-1 w-full sm:min-w-[280px]" : "w-full max-w-[300px]"}`}
+      data-side={side}
+      data-stage={!anim || (showHeader && showCounter) ? "done" : showCounter ? "counter" : showHeader ? "steps" : "hidden"}
+    >
+      <div
+        style={{
+          opacity: showHeader ? 1 : 0,
+          transition: anim ? "opacity 0.4s ease-out" : "none",
+        }}
+        className="w-full"
+      >
+        <motion.div
+          variants={nv}
+          className={`w-full rounded-t-lg ${hdr.bg} ${hdr.border} border px-3 py-2 text-center`}
+        >
+          <span className={`text-xs font-mono font-bold tracking-wider uppercase ${hdr.text}`}>
+            {side === "broken" ? "BROKEN: Dual Write" : "FIXED: Single Transaction"}
+          </span>
+        </motion.div>
+      </div>
 
       {steps.map((step, i) => (
         <div key={step.id} className="flex flex-col items-center gap-1.5 w-full max-w-[220px]">
@@ -220,11 +265,13 @@ export function DualWriteVsACID() {
         const mode = getMode(expanded);
         return (
           <motion.div
+            role="figure"
+            aria-label="Dual Write vs ACID: ChromaDB dual-write diverges at 102,568 rows vs 84,965 vectors, sqlite-vec single transaction guarantees 85,033 = 85,033 zero divergence"
             initial={animate ? "hidden" : "visible"}
             whileInView="visible"
             viewport={{ once: true, margin: "-80px" }}
             variants={animate ? containerVariants : staticContainerVariants}
-            className={expanded ? "flex flex-col sm:flex-row gap-6 sm:gap-8 py-4 items-center sm:justify-center" : "flex flex-col gap-6 py-4 items-center"}
+            className={expanded ? "flex flex-col sm:flex-row gap-6 sm:gap-8 py-4 w-full items-center sm:items-start sm:justify-center" : "flex flex-col gap-6 py-4 w-full items-center"}
           >
             <SidePanel
               side="broken" steps={brokenSteps}
@@ -235,6 +282,7 @@ export function DualWriteVsACID() {
               side="fixed" steps={fixedSteps}
               rows={85033} vectors={85033} diverged={false}
               mode={mode} anim={animate} expanded={expanded}
+              delayMs={HEADER_DELAY_MS + 200}
             />
           </motion.div>
         );

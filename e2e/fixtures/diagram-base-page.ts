@@ -2,6 +2,7 @@ import { test as base, expect, type Page, type Locator } from "@playwright/test"
 import { prepareContext, stabilizeForLayout } from "./visual-determinism";
 
 export const BLOG_PATH = "/blog/mempalace-retrieval-economics";
+export const MIGRATION_BLOG_PATH = "/blog/mempalace-sqlite-vec-migration";
 
 export const VIEWPORTS = {
   desktop: { width: 1440, height: 900 },
@@ -24,8 +25,11 @@ export abstract class DiagramBasePage {
   readonly expandButton: Locator;
   readonly dialog: Locator;
 
-  constructor(page: Page, ariaLabelSubstring: string, titleSubstring: string) {
+  protected blogPath: string;
+
+  constructor(page: Page, ariaLabelSubstring: string, titleSubstring: string, blogPath = BLOG_PATH) {
     this.page = page;
+    this.blogPath = blogPath;
     this.figure = page.locator(`[aria-label*="${ariaLabelSubstring}"]`);
     this.diagramShell = page.locator(".group").filter({
       has: page.locator(`text=${titleSubstring}`),
@@ -36,7 +40,7 @@ export abstract class DiagramBasePage {
 
   async goto(opts?: { freezeKeyframes?: boolean }) {
     await prepareContext(this.page, { freezeKeyframes: opts?.freezeKeyframes ?? true });
-    await this.page.goto(BLOG_PATH);
+    await this.page.goto(this.blogPath);
     await stabilizeForLayout(this.page, { readyLocator: this.figure });
     await this.figure.scrollIntoViewIfNeeded();
   }

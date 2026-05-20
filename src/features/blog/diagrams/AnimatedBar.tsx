@@ -18,6 +18,7 @@ interface AnimatedBarProps {
   countUpDuration?: number;
   height?: number;
   subLabel?: string;
+  labelColorOutside?: string;
 }
 
 export function AnimatedBar({
@@ -36,6 +37,7 @@ export function AnimatedBar({
   countUpDuration = 1.5,
   height = 20,
   subLabel,
+  labelColorOutside,
 }: AnimatedBarProps) {
   const countValue = useCountUp(value, countUpDuration, animate && !!countUp);
   const [glowing, setGlowing] = useState(!animate);
@@ -82,7 +84,8 @@ export function AnimatedBar({
 
   const handleAnimationComplete = useCallback(() => setGlowing(true), []);
 
-  const labelOutside = ratio < 0.15;
+  const labelOutside = ratio < 0.22;
+  const effectiveLabelColor = labelOutside && labelColorOutside ? labelColorOutside : labelColor;
   const displayText =
     label ?? (countUp ? countValue.toLocaleString() : value.toLocaleString());
 
@@ -110,7 +113,7 @@ export function AnimatedBar({
           <span
             aria-hidden={countUp ? "true" : undefined}
             className={`absolute ${labelOutside ? "left-full pl-2 whitespace-nowrap" : "inset-0 flex items-center px-2"} text-xs font-mono font-medium`}
-            style={{ color: labelColor }}
+            style={{ color: effectiveLabelColor }}
           >
             {displayText}
           </span>

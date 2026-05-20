@@ -76,6 +76,6 @@ kg-tunnel-overlay
 
 The total stack: 85K drawers consuming 266MB on disk, queried in 70-120ms, with zero data loss, running on a laptop with 16GB RAM. No GPU. No cloud service. No API fees. Single-file SQLite backup.
 
-The project is open source. The backend abstraction means you can start with sqlite-vec and swap to pgvector or Qdrant when you need concurrent access or billion-scale. The application code doesn't change.
+The project is [open source](https://github.com/MemPalace/mempalace). It ships on ChromaDB by default, but the backend abstraction means you can swap to sqlite-vec, pgvector, or Qdrant when you need concurrent access or billion-scale. The application code doesn't change.
 
 I'm genuinely hyped about what comes next - information decay (drawers aging out), retrieval confidence scoring, maybe eventually running this as a shared team memory. But right now, at this moment, it works. It retrieves what I need. And it doesn't silently lose 17% of my memories doing it.

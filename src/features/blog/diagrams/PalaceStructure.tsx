@@ -207,6 +207,11 @@ const nodeVariants: Variants = {
   },
 };
 
+const fastNodeVariants: Variants = {
+  hidden: { opacity: 0, y: 4 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.15 } },
+};
+
 const containerVariants: Variants = {
   hidden: {},
   visible: {
@@ -226,7 +231,7 @@ const staticContainerVariants: Variants = {
 
 const inlineContainerVariants: Variants = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.2, delayChildren: 0.2 } },
+  visible: { transition: { staggerChildren: 0.03, delayChildren: 0.05 } },
 };
 
 function TreeNodeComponent({
@@ -245,7 +250,7 @@ function TreeNodeComponent({
   const [hovered, setHovered] = useState(false);
   const colors = colorScheme[node.tier];
   const isVertical = layout === "vertical";
-  const nv = shouldAnimate ? nodeVariants : staticNodeVariants;
+  const nv = shouldAnimate ? (isVertical ? fastNodeVariants : nodeVariants) : staticNodeVariants;
   const cv = shouldAnimate
     ? (isVertical ? inlineContainerVariants : containerVariants)
     : staticContainerVariants;
@@ -263,12 +268,12 @@ function TreeNodeComponent({
         className={`relative rounded-lg ${colors.bg} ${colors.border} ${colors.glow} px-3 py-2 text-center cursor-default transition-shadow`}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        style={{ minWidth: isVertical ? 200 : (depth > 2 ? 100 : 140) }}
+        style={{ minWidth: isVertical ? undefined : (depth > 2 ? 100 : 140), left: node.tier === "palace" ? (isVertical ? 20 : 70) : undefined }}
       >
         <span className={`block text-[10px] tracking-widest uppercase ${colors.tierText}`}>
           {tierLabels[node.tier]}
         </span>
-        <span className={`block text-xs font-medium ${colors.labelText} truncate max-w-[220px]`}>
+        <span className={`block text-xs font-medium ${colors.labelText} ${isVertical ? "break-words" : "truncate max-w-[220px]"}`}>
           {node.label}
         </span>
 
@@ -288,6 +293,7 @@ function TreeNodeComponent({
           <motion.div
             variants={nv}
             className={`w-0.5 h-5 ${isVertical ? "bg-[#67594c]" : "bg-foreground/40"}`}
+            style={depth === 0 ? { position: "relative" as const, left: isVertical ? 20 : 70, marginLeft: !isVertical ? 140 : undefined } : undefined}
           />
           {(isVertical && depth > 0) || node.children!.length === 1 ? (
             <motion.div
@@ -312,15 +318,15 @@ function TreeNodeComponent({
           ) : (
             <motion.div
               variants={cv}
-              className="flex justify-center"
+              className={isVertical ? "flex flex-col sm:flex-row justify-center items-center sm:items-start gap-2 sm:gap-0 w-full sm:-mt-1" : "flex justify-center"}
             >
               {node.children!.map((child, i) => {
                 const connectorColor = isVertical ? "bg-[#67594c]" : "bg-foreground/40";
                 return (
-                  <motion.div key={child.id} variants={cv} className={`flex flex-col items-center ${depth < 2 ? "px-3" : "px-1.5"}`}>
+                  <motion.div key={child.id} variants={cv} className={`flex flex-col items-center ${isVertical ? "sm:flex-1" : ""} ${depth < 2 ? "px-1 sm:px-3" : "px-1.5"}`}>
                     <motion.div
                       variants={nv}
-                      className={`h-0.5 self-stretch ${connectorColor} ${
+                      className={`h-0.5 self-stretch ${connectorColor} ${isVertical ? "hidden sm:block" : ""} ${
                         i === 0
                           ? "ml-[50%]"
                           : i === node.children!.length - 1
@@ -328,7 +334,7 @@ function TreeNodeComponent({
                             : ""
                       }`}
                     />
-                    <motion.div variants={nv} className={`w-0.5 h-3 ${connectorColor}`} />
+                    <motion.div variants={nv} className={`w-0.5 ${isVertical ? "h-5 hidden sm:block" : "h-3"} ${connectorColor}`} />
                     <TreeNodeComponent
                       node={child}
                       depth={depth + 1}
@@ -361,6 +367,8 @@ export function PalaceStructure() {
     <DiagramShell title="Palace Structure - 2 wings, 4 rooms (expand for full tree)">
       {(expanded) => (
         <motion.div
+          role="figure"
+          aria-label="Palace Structure: MemPalace with 2 wings - convos_metaorchestrator (60,935 drawers) and metaorchestrator (3,576 drawers)"
           initial={animate ? "hidden" : "visible"}
           whileInView="visible"
           viewport={{ once: true, margin: "-80px" }}
@@ -369,7 +377,7 @@ export function PalaceStructure() {
           <div
             className={
               expanded
-                ? "flex justify-center sm:min-w-[900px] py-4"
+                ? "flex sm:justify-center sm:min-w-[900px] py-4"
                 : "flex flex-col items-center py-4"
             }
           >

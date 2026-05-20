@@ -78,22 +78,22 @@ export const blogPosts: BlogPost[] = [
   {
     slug: "mempalace-retrieval-economics",
     title: "85,000 Memories, 3,000 Tokens - Why Retrieval Beats Context Every Time",
-    date: "2026-05-18",
+    date: "2026-05-20",
     tags: ["AI", "vector-databases", "sqlite-vec", "MemPalace", "local-AI", "token-economics"],
     category: "AI & Automation",
     excerpt:
       "I used to load 50K tokens of context to find a paragraph. Now I search 85K memories for 3K tokens. When local AI shrinks your context window to 128K, efficient retrieval stops being optional.",
-    draft: true,
+    draft: false,
   },
   {
     slug: "mempalace-sqlite-vec-migration",
     title: "How I Broke ChromaDB at 100K Vectors and Fixed It with sqlite-vec",
-    date: "2026-05-10",
+    date: "2026-05-20",
     tags: ["AI", "vector-databases", "sqlite-vec", "ChromaDB", "MemPalace"],
     category: "AI & Automation",
     excerpt:
       "I mined 85K conversation drawers into a memory palace and ChromaDB silently lost 17% of them. Here's why, and how sqlite-vec's ACID transactions fix it by construction.",
-    draft: true,
+    draft: false,
   },
   {
     slug: "claude-code-cache-ttl-worktree-trap",

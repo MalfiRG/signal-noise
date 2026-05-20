@@ -1,7 +1,7 @@
 ---
 title: "85,000 Memories, 3,000 Tokens - Why Retrieval Beats Context Every Time"
 slug: "mempalace-retrieval-economics"
-date: "2026-05-18"
+date: "2026-05-20"
 tags: ["AI", "vector-databases", "sqlite-vec", "MemPalace", "local-AI", "token-economics"]
 category: "AI & Automation"
 reading_time: "5 min"
@@ -10,7 +10,7 @@ og_image: ""
 draft: true
 ---
 
-Last week I wrote about how [ChromaDB silently ate 17% of my memory palace](/blog/mempalace-sqlite-vec-migration) at 100K vectors. If you missed that one - I broke it, diagnosed the dual-write architecture flaw, and rebuilt everything on sqlite-vec. Commit all or nothing. Zero divergence. War over.
+In the [previous post](/blog/mempalace-sqlite-vec-migration) I wrote about how ChromaDB silently ate 17% of my memory palace at 100K vectors. If you missed that one - I broke it, diagnosed the dual-write architecture flaw, and rebuilt everything on sqlite-vec. Commit all or nothing. Zero divergence. War over.
 
 But fixing corruption was just step one. The real problem - the one I wanted to solve before I even started using MemPalace - is that we're burning tokens like they grow on trees. They don't.
 
