@@ -77,7 +77,7 @@ export function getVisiblePosts(
 export const blogPosts: BlogPost[] = [
   {
     slug: "mempalace-retrieval-economics",
-    title: "85,000 Memories, 3,000 Tokens - Why Retrieval Beats Context Every Time",
+    title: "MemPalace II: 85,000 Memories, 3,000 Tokens - Why Retrieval Beats Context Every Time",
     date: "2026-05-20",
     tags: ["AI", "vector-databases", "sqlite-vec", "MemPalace", "local-AI", "token-economics"],
     category: "AI & Automation",
@@ -87,7 +87,7 @@ export const blogPosts: BlogPost[] = [
   },
   {
     slug: "mempalace-sqlite-vec-migration",
-    title: "How I Broke ChromaDB at 100K Vectors and Fixed It with sqlite-vec",
+    title: "MemPalace I: How I Broke ChromaDB at 100K Vectors and Fixed It with sqlite-vec",
     date: "2026-05-20",
     tags: ["AI", "vector-databases", "sqlite-vec", "ChromaDB", "MemPalace", "local-AI"],
     category: "AI & Automation",

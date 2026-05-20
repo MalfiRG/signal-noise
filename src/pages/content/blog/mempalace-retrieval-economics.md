@@ -1,5 +1,5 @@
 ---
-title: "85,000 Memories, 3,000 Tokens - Why Retrieval Beats Context Every Time"
+title: "MemPalace II: 85,000 Memories, 3,000 Tokens - Why Retrieval Beats Context Every Time"
 slug: "mempalace-retrieval-economics"
 date: "2026-05-20"
 tags: ["AI", "vector-databases", "sqlite-vec", "MemPalace", "local-AI", "token-economics"]
