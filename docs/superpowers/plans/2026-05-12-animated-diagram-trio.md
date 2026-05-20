@@ -891,7 +891,7 @@ function StageNode({
   return (
     <motion.div
       variants={anim ? nodeVariants : staticNodeVariants}
-      className={`rounded-lg ${c.bg} ${c.border} ${activeGlow} px-3 py-2 text-center transition-shadow duration-300 ${isActive ? "scale-105" : "scale-100"} transition-transform duration-300 ${expanded ? "min-w-[120px]" : "w-full max-w-[260px]"}`}
+      className={`rounded-lg ${c.bg} ${c.border} ${activeGlow} px-3 py-2 text-center ${isActive ? "scale-105" : "scale-100"} transition duration-300 ${expanded ? "min-w-[120px]" : "w-full max-w-[260px]"}`}
     >
       <span className={`block text-[10px] tracking-widest uppercase ${c.dimText}`}>
         {stage.label}
