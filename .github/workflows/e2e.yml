@@ -12,6 +12,9 @@ on:
         default: false
         description: "Regenerate visual baselines in this run"
 
+permissions:
+  contents: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -45,6 +48,10 @@ jobs:
         if: steps.cache-deps.outputs.cache-hit != 'true'
         run: npm ci --legacy-peer-deps
 
+      - name: Rebuild native binaries
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+        run: npm rebuild esbuild @swc/core
+
       - name: Install Playwright browsers
         if: steps.cache-deps.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
@@ -67,7 +74,7 @@ jobs:
           key: deps-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-playwright-1.58.2
       - name: Install dependencies (cache miss fallback)
         if: needs.setup.outputs.cache-hit != 'true'
-        run: npm ci --legacy-peer-deps && npx playwright install --with-deps chromium
+        run: npm ci --legacy-peer-deps && npm rebuild esbuild @swc/core && npx playwright install --with-deps chromium
       - name: Lint e2e (tier rules)
         run: npm run lint:e2e
       - name: Run smoke tests
@@ -97,7 +104,7 @@ jobs:
   e2e-functional:
     needs: setup
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -112,7 +119,7 @@ jobs:
           key: deps-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-playwright-1.58.2
       - name: Install dependencies (cache miss fallback)
         if: needs.setup.outputs.cache-hit != 'true'
-        run: npm ci --legacy-peer-deps && npx playwright install --with-deps chromium
+        run: npm ci --legacy-peer-deps && npm rebuild esbuild @swc/core && npx playwright install --with-deps chromium
       - name: Run functional tests
         run: npx playwright test --project=functional
       - name: Upload report
@@ -143,7 +150,7 @@ jobs:
           key: deps-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-playwright-1.58.2
       - name: Install dependencies (cache miss fallback)
         if: needs.setup.outputs.cache-hit != 'true'
-        run: npm ci --legacy-peer-deps && npx playwright install --with-deps chromium
+        run: npm ci --legacy-peer-deps && npm rebuild esbuild @swc/core && npx playwright install --with-deps chromium
       - name: Build for preview
         run: SKIP_GITHUB_FETCH=1 npm run build
       - name: Run visual tests

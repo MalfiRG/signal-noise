@@ -38,6 +38,7 @@ jobs:
             -e SKIP_GITHUB_FETCH=1 \
             mcr.microsoft.com/playwright:v1.58.2-jammy \
             sh -c 'npm ci --legacy-peer-deps && \
+                   npm rebuild esbuild @swc/core && \
                    npx playwright install --with-deps chromium && \
                    npm run build && \
                    npx playwright test --config playwright.visual.config.ts --update-snapshots=changed'

@@ -37,6 +37,9 @@ jobs:
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
 
+      - name: Rebuild native binaries
+        run: npm rebuild esbuild @swc/core
+
       - name: Build (production check, hermetic)
         run: npm run build:check
 
