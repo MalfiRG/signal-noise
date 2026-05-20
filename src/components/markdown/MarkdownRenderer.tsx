@@ -330,11 +330,11 @@ export function MarkdownRenderer({ content, className = "", onHeadingsExtracted 
               );
             }
 
+            const isInternal = href?.startsWith("/");
             return (
               <a
                 href={href}
-                target="_blank"
-                rel="noopener noreferrer"
+                {...(!isInternal && { target: "_blank", rel: "noopener noreferrer" })}
                 className="text-primary hover:text-foreground transition-colors"
                 {...props}
               >

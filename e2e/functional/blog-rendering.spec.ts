@@ -211,19 +211,14 @@ test.describe("Links", () => {
     }
   });
 
-  test("retrieval-economics 'previous post' link opens migration post", async ({ page, context }) => {
+  test("retrieval-economics 'previous post' link navigates to migration post", async ({ page }) => {
     await page.goto("/blog/mempalace-retrieval-economics");
     const link = page.locator('.markdown-body a', { hasText: "previous post" });
     await expect(link).toBeVisible();
     await expect(link).toHaveAttribute("href", "/blog/mempalace-sqlite-vec-migration");
-    const [newPage] = await Promise.all([
-      context.waitForEvent("page"),
-      link.click(),
-    ]);
-    await newPage.waitForLoadState();
-    await expect(newPage).toHaveURL(/mempalace-sqlite-vec-migration/);
-    await expect(newPage.locator("h1")).toContainText("ChromaDB");
-    await newPage.close();
+    await link.click();
+    await expect(page).toHaveURL(/mempalace-sqlite-vec-migration/);
+    await expect(page.locator("h1")).toContainText("ChromaDB");
   });
 });
 
