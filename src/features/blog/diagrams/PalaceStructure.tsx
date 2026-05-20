@@ -1,5 +1,5 @@
 import { motion, type Variants } from "framer-motion";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useDiagramMotion } from "./useDiagramMotion";
 import { useReadingMode } from "./useReadingMode";
 import { DiagramShell } from "./DiagramShell";
@@ -248,6 +248,8 @@ function TreeNodeComponent({
   colorScheme: Record<TreeNode["tier"], TierStyle>;
 }) {
   const [hovered, setHovered] = useState(false);
+  const [palaceOffset, setPalaceOffset] = useState(0);
+  const branchRef = useRef<HTMLDivElement>(null);
   const colors = colorScheme[node.tier];
   const isVertical = layout === "vertical";
   const nv = shouldAnimate ? (isVertical ? fastNodeVariants : nodeVariants) : staticNodeVariants;
@@ -257,6 +259,28 @@ function TreeNodeComponent({
 
   const maxDepth = isVertical ? 2 : Infinity;
   const showChildren = depth < maxDepth && node.children && node.children.length > 0;
+  const isPalaceRoot = depth === 0 && node.children !== undefined && node.children.length > 1;
+
+  useEffect(() => {
+    if (!isPalaceRoot) return;
+    const el = branchRef.current;
+    if (!el) return;
+
+    const measure = () => {
+      const cols = Array.from(el.children) as HTMLElement[];
+      if (cols.length < 2) return;
+      const first = cols[0].getBoundingClientRect();
+      const last = cols[cols.length - 1].getBoundingClientRect();
+      const midpoint = (first.left + first.width / 2 + last.left + last.width / 2) / 2;
+      const parentCenter = el.parentElement!.getBoundingClientRect().left + el.parentElement!.getBoundingClientRect().width / 2;
+      setPalaceOffset(Math.round(midpoint - parentCenter));
+    };
+
+    const timer = setTimeout(measure, 250);
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => { clearTimeout(timer); observer.disconnect(); };
+  }, [isPalaceRoot, layout]);
 
   const tooltipBg = isVertical ? "bg-[#f4f2f1] border-[#67594c]/30" : "bg-[#0e1118] border-primary/30";
   const tooltipText = isVertical ? "text-[#2d2520]" : "text-foreground/80";
@@ -268,7 +292,7 @@ function TreeNodeComponent({
         className={`relative rounded-lg ${colors.bg} ${colors.border} ${colors.glow} px-3 py-2 text-center cursor-default transition-shadow`}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        style={{ minWidth: isVertical ? undefined : (depth > 2 ? 100 : 140) }}
+        style={{ minWidth: isVertical ? undefined : (depth > 2 ? 100 : 140), left: isPalaceRoot && palaceOffset ? palaceOffset : undefined }}
       >
         <span className={`block text-[10px] tracking-widest uppercase ${colors.tierText}`}>
           {tierLabels[node.tier]}
@@ -290,12 +314,11 @@ function TreeNodeComponent({
 
       {showChildren && (
         <>
-          {!(isVertical && depth === 0 && node.children!.length > 1) && (
-            <motion.div
-              variants={nv}
-              className={`w-0.5 h-5 ${isVertical ? "bg-[#67594c]" : "bg-foreground/40"}`}
-            />
-          )}
+          <motion.div
+            variants={nv}
+            className={`w-0.5 h-5 ${isVertical ? "bg-[#67594c]" : "bg-foreground/40"} ${isPalaceRoot && isVertical ? "hidden sm:block" : ""}`}
+            style={isPalaceRoot && palaceOffset ? { position: "relative" as const, left: palaceOffset } : undefined}
+          />
           {(isVertical && depth > 0) || node.children!.length === 1 ? (
             <motion.div
               variants={cv}
@@ -318,8 +341,9 @@ function TreeNodeComponent({
             </motion.div>
           ) : (
             <motion.div
+              ref={isPalaceRoot ? branchRef : undefined}
               variants={cv}
-              className={isVertical ? "flex flex-col sm:flex-row justify-center items-center sm:items-start gap-2 sm:gap-0 w-full sm:-mt-1" : "flex justify-center"}
+              className={isVertical ? "flex flex-col sm:flex-row justify-center items-center sm:items-start gap-2 sm:gap-0 w-full" : "flex justify-center"}
             >
               {node.children!.map((child, i) => {
                 const connectorColor = isVertical ? "bg-[#67594c]" : "bg-foreground/40";
