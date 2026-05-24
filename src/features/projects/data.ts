@@ -21,7 +21,7 @@ export const projects: Project[] = [
   {
     title: "MetaOrchestrator",
     description:
-      "The fully agentic workspace. A multi-project monorepo with a routing layer that decides which project a query belongs to, a three-tier memory architecture (lazy file-tier, eager session-tier, semantic mem-palace tier with ~20,000 indexed drawers), and a regression test harness that keeps routing accuracy above 97%. Built by hardening an existing folder structure into a research instrument.",
+      "The fully agentic workspace. A multi-project monorepo with a routing layer (60+ patterns, 97%+ regression-tested accuracy), a semantic knowledge graph (~180K indexed drawers, ~12K knowledge triples), and a multi-agent orchestration stack - adversarial review loops, parallel team dispatch, pattern-graduation from repeated defects into architectural rules. ~30 orchestration skills, ~20 behavioral rules, and a session state machine (checkpoints, handoffs, pre-compaction hooks) keep coherence across context boundaries.",
     tech_stack: ["Python", "Claude Code", "MCP", "pytest", "YAML", "Bash"],
     stars: "0",
     forks: "0",
@@ -54,8 +54,8 @@ export const projects: Project[] = [
   {
     title: "ScoutQL",
     description:
-      "Full-stack job aggregator built end-to-end. Scrapes career pages, stores listings in a centralized DB, scores postings against my CV with an LLM worker, reviewed through a React dashboard. Self-hosted on a hardened VPS with an observability bus, self-healing layer, and the DevOps pipeline that runs the box.",
-    tech_stack: ["React", "TypeScript", "FastAPI", "SQLAlchemy", "Crawlee", "Docker", "Tailwind"],
+      "Full-stack job aggregator built end-to-end. Dual acquisition - Crawlee browser scraper and an API fetcher (Strategy/Factory/Adapter patterns) pulling from multiple sources. Stores listings in a centralized DB, scores postings against my CV with an LLM worker, reviewed through a React dashboard. Self-hosted on a hardened VPS with an observability bus, self-healing layer, and the DevOps pipeline that runs the box.",
+    tech_stack: ["React", "TypeScript", "FastAPI", "SQLAlchemy", "SQLite", "Redis", "Crawlee", "Docker", "Tailwind"],
     stars: "0",
     forks: "0",
     private: true,
@@ -63,8 +63,8 @@ export const projects: Project[] = [
   {
     title: "SIGNAL_NOISE",
     description:
-      "This blog and portfolio. React SPA with a responsive Night City visual identity, Mermaid rendering, and an e-ink reader aesthetic for long-form posts: monochrome, paper-like, distraction-free. Regression-proofed with a Playwright E2E suite that asserts every visual element renders as envisioned.",
-    tech_stack: ["React", "TypeScript", "Vite", "Tailwind", "Framer Motion", "Playwright"],
+      "This blog and portfolio. React SPA with a Night City visual identity, custom animated diagrams (framer-motion + Recharts for interactive technical storytelling), and an e-ink reader aesthetic for long-form posts. Motion-aware - animations gate by device tier and reduced-motion preference. Regression-proofed with a Playwright E2E suite that asserts every visual element renders as designed.",
+    tech_stack: ["React", "TypeScript", "Vite", "Tailwind", "Framer Motion", "Recharts", "Playwright"],
     github_url: "https://github.com/MalfiRG/signal-noise",
     live_url: "https://piotrtarach.dev",
     github_owner_repo: "MalfiRG/signal-noise",
@@ -82,8 +82,8 @@ export const projects: Project[] = [
   {
     title: "Mr. Robot",
     description:
-      "Established a persistent meshnet VPN across multiple devices using NordVPN's Meshnet. SSH hardening, port proxying, and custom routing rules to access home lab services from anywhere. I can literally access my infrastructure from my phone from almost anywhere. Looks quite cool and a bit scary for bystanders, I suppose.",
-    tech_stack: ["Bash", "NordVPN Meshnet", "SSH"],
+      "Persistent meshnet VPN across multiple devices using NordVPN Meshnet. SSH hardening, port proxying, and custom routing rules to access home lab services from anywhere. Tailscale overlay adds a remote LLM server with host-level network isolation - the remote peer sees only the laptop, never the LAN. Full remote dev stack: SSH + tmux + Claude Code from Android. Looks quite cool and a bit scary for bystanders, I suppose.",
+    tech_stack: ["Bash", "NordVPN Meshnet", "Tailscale", "SSH"],
     stars: "0",
     forks: "0",
     private: true,

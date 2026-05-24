@@ -49,6 +49,7 @@ export const categories: SkillCategory[] = [
       { name: "SSH & Networking", tier: "expert" },
       { name: "VMware vSphere", tier: "expert" },
       { name: "Observability (Grafana, Structured Logs)", tier: "strong" },
+      { name: "Git & Version Control", tier: "strong" },
       { name: "Terraform / IaC", tier: "exploring" },
     ],
   },
@@ -61,6 +62,7 @@ export const categories: SkillCategory[] = [
       { name: "Bash", tier: "strong" },
       { name: "C#", tier: "growing" },
       { name: "SQL", tier: "strong" },
+      { name: "Java", tier: "growing" },
     ],
   },
   {
@@ -71,6 +73,7 @@ export const categories: SkillCategory[] = [
       { name: "Tailwind CSS", tier: "growing" },
       { name: "Vite", tier: "growing" },
       { name: "Web Scraping (Crawlee)", tier: "strong" },
+      { name: "Framer Motion", tier: "growing" },
     ],
   },
   {
