@@ -82,7 +82,7 @@ export const projects: Project[] = [
   {
     title: "Mr. Robot",
     description:
-      "Persistent meshnet VPN across multiple devices using NordVPN Meshnet. SSH hardening, port proxying, and custom routing rules to access home lab services from anywhere. Tailscale overlay adds a remote LLM server with host-level network isolation - the remote peer sees only the laptop, never the LAN. Full remote dev stack: SSH + tmux + Claude Code from Android. Looks quite cool and a bit scary for bystanders, I suppose.",
+      "Persistent meshnet VPN across multiple devices using NordVPN Meshnet. SSH hardening, port proxying, and custom routing rules to access home lab services from anywhere. Tailscale overlay adds a remote LLM server with host-level network isolation - the LLM server sees only my laptop, never the LAN behind it. Full remote dev stack: SSH + tmux + Claude Code from Android. Looks quite cool and a bit scary for bystanders, I suppose.",
     tech_stack: ["Bash", "NordVPN Meshnet", "Tailscale", "SSH"],
     stars: "0",
     forks: "0",
