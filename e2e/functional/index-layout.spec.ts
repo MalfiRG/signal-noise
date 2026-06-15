@@ -18,7 +18,7 @@ test.describe("Index - About below fold", () => {
     await page.setViewportSize({ width: 1280, height: 720 });
     await page.goto("/");
 
-    await page.waitForSelector("h1.hero-h");
+    await expect(page.locator("h1.hero-h")).toBeVisible();
 
     const whoami = page.locator('[aria-label="> whoami"]').first();
     const box = await whoami.boundingBox();
@@ -30,7 +30,7 @@ test.describe("Index - About below fold", () => {
   test("whoami is not visible without scrolling on mobile", async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto("/");
-    await page.waitForSelector("h1.hero-h");
+    await expect(page.locator("h1.hero-h")).toBeVisible();
 
     const whoami = page.locator('[aria-label="> whoami"]').first();
     const box = await whoami.boundingBox();
@@ -41,10 +41,9 @@ test.describe("Index - About below fold", () => {
 
   test("whoami becomes visible after scrolling", async ({ page }) => {
     await page.goto("/");
-    await page.waitForSelector("h1.hero-h");
+    await expect(page.locator("h1.hero-h")).toBeVisible();
 
     await page.evaluate(() => window.scrollBy(0, window.innerHeight + 200));
-    await page.waitForTimeout(500);
 
     const whoami = page.locator('[aria-label="> whoami"]').first();
     await expect(whoami).toBeVisible();
@@ -81,7 +80,7 @@ test.describe("Projects - tile cascade", () => {
 
   test("project tiles have GitHub and external links", async ({ page }) => {
     await page.goto("/projects");
-    await page.waitForSelector(".grid");
+    await expect(page.locator(".grid").first()).toBeVisible();
 
     const githubLinks = page.locator('a[href*="github.com/MalfiRG"]');
     const count = await githubLinks.count();
@@ -90,7 +89,7 @@ test.describe("Projects - tile cascade", () => {
 
   test("PIOTR_TARACH (SIGNAL_NOISE) has a live site link", async ({ page }) => {
     await page.goto("/projects");
-    await page.waitForSelector(".grid");
+    await expect(page.locator(".grid").first()).toBeVisible();
 
     const liveLink = page.locator('a[href*="piotrtarach.dev"]');
     await expect(liveLink).toBeVisible();

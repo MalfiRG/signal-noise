@@ -48,7 +48,7 @@ export abstract class DiagramBasePage {
   async expand() {
     await this.expandButton.click();
     await expect(this.dialog).toBeVisible();
-    await this.page.waitForTimeout(500);
+    await expect(this.dialog.locator(".flex-1.overflow-auto")).toBeVisible();
   }
 
   async collapse() {

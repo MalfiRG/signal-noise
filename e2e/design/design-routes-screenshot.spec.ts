@@ -51,7 +51,7 @@ for (const route of ROUTES) {
     });
 
     if (errors.length > 0) {
-      console.log(`[${route.slug}] runtime errors:\n  ${errors.join("\n  ")}`);
+      test.info().annotations.push({ type: "runtime-errors", description: errors.join("\n  ") });
     }
     expect(errors, `runtime errors on ${route.path}`).toHaveLength(0);
   });

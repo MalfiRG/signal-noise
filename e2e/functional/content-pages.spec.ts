@@ -146,22 +146,20 @@ test.describe("Blog tag filtering", () => {
     await page.goto("/blog");
 
     const tagButton = page.locator("button", { hasText: /^#/ }).first();
-    if (await tagButton.isVisible()) {
-      await tagButton.click();
-      await page.waitForTimeout(500);
+    await expect(tagButton).toBeVisible();
+    await tagButton.click();
 
-      await tagButton.click();
-      await page.waitForTimeout(500);
+    await tagButton.click();
 
-      const posts = page.locator(".space-y-8 a[href^='/blog/']");
-      const count = await posts.count();
-      expect(count).toBeGreaterThan(0);
+    const posts = page.locator(".space-y-8 a[href^='/blog/']");
+    await expect(posts.first()).toBeVisible();
+    const count = await posts.count();
+    expect(count).toBeGreaterThan(0);
 
-      for (let i = 0; i < count; i++) {
-        await expect(posts.nth(i)).toBeVisible();
-        const text = await posts.nth(i).textContent();
-        expect(text!.length).toBeGreaterThan(20);
-      }
+    for (let i = 0; i < count; i++) {
+      await expect(posts.nth(i)).toBeVisible();
+      const text = await posts.nth(i).textContent();
+      expect(text!.length).toBeGreaterThan(20);
     }
   });
 });
@@ -172,7 +170,6 @@ test.describe("Mobile scroll-reveal", () => {
   test("project cards are not all visible immediately on mobile", async ({ page }) => {
     await page.goto("/projects");
     await expect(page.locator("h1")).toContainText("PROJECTS");
-    await page.waitForTimeout(500);
 
     const cards = page.locator(".grid > div");
     const count = await cards.count();
@@ -188,7 +185,6 @@ test.describe("Mobile scroll-reveal", () => {
   test("how-i-do-it cards reveal progressively on mobile scroll", async ({ page }) => {
     await page.goto("/how-i-do-it");
     await expect(page.locator("h1")).toContainText("HOW I DO IT");
-    await page.waitForTimeout(500);
 
     await page.evaluate(() => window.scrollTo({ top: document.body.scrollHeight, behavior: "instant" }));
 

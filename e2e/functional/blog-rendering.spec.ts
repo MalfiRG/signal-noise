@@ -38,7 +38,6 @@ test.describe("Headings & TOC interaction", () => {
         window.scrollTo({ top, behavior: "instant" });
       }
     });
-    await page.waitForTimeout(800);
 
     const activeTocLink = tocNav.locator("a.text-foreground.font-medium");
     await expect(activeTocLink).toBeVisible({ timeout: 5000 });

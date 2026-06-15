@@ -63,7 +63,6 @@ test.describe("Hero skip-intro paths (spec §5.6)", () => {
     await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
     await page.keyboard.press(" ");
 
-    await page.waitForTimeout(200);
     await expect(page.locator('[data-testid="hero-cascading"]')).toBeVisible();
     await expect(page.locator('[data-testid="hero-phase3"]')).toHaveCount(0);
   });
@@ -78,7 +77,6 @@ test.describe("Hero skip-intro paths (spec §5.6)", () => {
       } catch { /* storage may throw in private mode; ignore */ }
     });
     await page.reload();
-    await page.waitForLoadState("networkidle");
 
     await expect(page.getByRole("link", { name: "VIEW PROJECTS" })).toBeVisible({ timeout: 5000 });
     await expect(page.getByRole("button", { name: /skip intro/i })).not.toBeVisible({ timeout: 3000 });
@@ -146,7 +144,6 @@ test.describe("Hero scroll-to-explore arrow (regression: post-scroll fade)", () 
         try { sessionStorage.setItem("hero-cascade-played", "1"); } catch { /* noop */ }
       });
       await page.reload();
-      await page.waitForLoadState("networkidle");
       await expect(page.getByRole("link", { name: "VIEW PROJECTS" })).toBeVisible({ timeout: 10000 });
 
       const arrow = page.getByText(/SCROLL TO EXPLORE/i).first();
@@ -159,7 +156,7 @@ test.describe("Hero scroll-to-explore arrow (regression: post-scroll fade)", () 
       expect(arrowWrapperOpacityBefore).toBeGreaterThan(0.5);
 
       await page.evaluate(() => window.scrollTo(0, 200));
-      await page.waitForTimeout(450); // 300ms transition + headroom
+      await expect(arrow).not.toBeVisible({ timeout: 1000 });
 
       const arrowWrapperOpacityAfter = await arrow.evaluate((el) => {
         const wrapper = el.closest('[aria-hidden], .transition-opacity') as HTMLElement | null;
@@ -200,7 +197,6 @@ test.describe("Hero feedback badge (spec §5.7)", () => {
       } catch { /* storage may throw in private mode; ignore */ }
     });
     await page.reload();
-    await page.waitForLoadState("networkidle");
 
     await expect(page.locator('[data-testid="badge-animations-off-device"]')).toBeVisible({
       timeout: 5000,
@@ -233,7 +229,6 @@ test.describe("Hero feedback badge (spec §5.7)", () => {
       } catch { /* storage may throw in private mode; ignore */ }
     });
     await page.reload();
-    await page.waitForLoadState("networkidle");
 
     const badge = page.locator('[data-testid="badge-animations-off-device"]');
     await expect(badge).toBeVisible({ timeout: 5000 });
@@ -252,7 +247,7 @@ test.describe("Hero keyboard-focus accessibility (spec §5.8)", () => {
   }) => {
     await gotoFreshCascade(page);
 
-    await page.waitForTimeout(300);
+    await expect(page.locator('[data-testid="hero-cascading"]')).toBeVisible();
 
     const hiddenCount = await page.evaluate(() => {
       const hero = document.querySelector(

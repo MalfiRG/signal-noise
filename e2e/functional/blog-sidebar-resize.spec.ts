@@ -29,7 +29,6 @@ async function dragHandle(page: Page, deltaX: number) {
   await page.mouse.move(startX + deltaX, startY, { steps: 20 });
   await page.mouse.up();
   await page.waitForFunction(() => !document.body.classList.contains("select-none"), null, { timeout: 2000 }).catch(() => {});
-  await page.waitForTimeout(50);
 }
 
 test.describe("Blog sidebar resize - desktop", () => {

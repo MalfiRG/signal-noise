@@ -14,7 +14,7 @@ test.describe("HeroSignalNoise mobile reflow", () => {
       await page.setViewportSize({ width: vp.width, height: vp.height });
       await skipHeroCascadeViaInitScript(page);
       await page.goto("/");
-      await page.waitForSelector("[data-testid='hero-phase3']");
+      await expect(page.locator("[data-testid='hero-phase3']")).toBeVisible();
       const overflow = await page.evaluate(
         () => document.documentElement.scrollWidth - window.innerWidth
       );
@@ -25,7 +25,7 @@ test.describe("HeroSignalNoise mobile reflow", () => {
       await page.setViewportSize({ width: vp.width, height: vp.height });
       await skipHeroCascadeViaInitScript(page);
       await page.goto("/");
-      await page.waitForSelector("[data-testid='hero-phase3']");
+      await expect(page.locator("[data-testid='hero-phase3']")).toBeVisible();
 
       const leftPadding = await page.locator("[data-row='break']").evaluate(
         (el) => parseFloat(getComputedStyle(el as HTMLElement).paddingLeft)
