@@ -225,7 +225,7 @@ export function MarkdownRenderer({ content, className = "", onHeadingsExtracted 
       h3: "text-lg font-bold mt-4 mb-2",
     };
 
-    return ({ children, ...props }: any) => {
+    return ({ node, children, ...props }: any) => {
       const cleanChildren = cleanTextFromIdTags(children);
       const HeadingTag = level;
 
@@ -301,13 +301,13 @@ export function MarkdownRenderer({ content, className = "", onHeadingsExtracted 
           h2: renderHeading("h2"),
           h3: renderHeading("h3"),
 
-          ol: ({ ...props }) => <ol className="list-decimal pl-6 my-4 space-y-1" {...props} />,
+          ol: ({ node, ...props }) => <ol className="list-decimal pl-6 my-4 space-y-1" {...props} />,
 
-          ul: ({ ...props }) => <ul className="list-disc pl-6 my-4 space-y-1" {...props} />,
+          ul: ({ node, ...props }) => <ul className="list-disc pl-6 my-4 space-y-1" {...props} />,
 
-          li: ({ ...props }) => <li className="ml-2" {...props} />,
+          li: ({ node, ...props }) => <li className="ml-2" {...props} />,
 
-          a: ({ href, children, ...props }) => {
+          a: ({ node, href, children, ...props }) => {
             if (href?.startsWith("#")) {
               const expectedElementId = findElementId(href);
 
@@ -343,17 +343,17 @@ export function MarkdownRenderer({ content, className = "", onHeadingsExtracted 
             );
           },
 
-          table: ({ ...props }) => (
+          table: ({ node, ...props }) => (
             <div className="overflow-x-auto my-4">
               <table className="border-collapse border border-border" {...props} />
             </div>
           ),
-          thead: ({ ...props }) => <thead className="bg-secondary" {...props} />,
-          th: ({ ...props }) => (
+          thead: ({ node, ...props }) => <thead className="bg-secondary" {...props} />,
+          th: ({ node, ...props }) => (
             <th className="border border-border p-2 text-left font-bold whitespace-nowrap" {...props} />
           ),
-          td: ({ ...props }) => <td className="border border-border p-2" {...props} />,
-          tr: ({ ...props }) => <tr className="even:bg-card odd:bg-background" {...props} />,
+          td: ({ node, ...props }) => <td className="border border-border p-2" {...props} />,
+          tr: ({ node, ...props }) => <tr className="even:bg-card odd:bg-background" {...props} />,
 
           pre({ children, className: preClassName, ...preProps }) {
             const codeEl = React.Children.toArray(children).find(
@@ -373,7 +373,7 @@ export function MarkdownRenderer({ content, className = "", onHeadingsExtracted 
             return <CodeBlock language={language}>{children}</CodeBlock>;
           },
 
-          code({ className, children, ...props }) {
+          code({ node, className, children, ...props }) {
             const match = /language-([\w-]+)/.exec(className || "");
             const language = match ? match[1] : "";
 

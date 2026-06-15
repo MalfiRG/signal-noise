@@ -12,6 +12,17 @@ describe("MarkdownRenderer inline code", () => {
     if (!inlineCode) throw new Error("unreachable");
     expect(inlineCode.className).toContain("bg-secondary");
   });
+
+  it("does not leak the react-markdown hast `node` prop onto the DOM", () => {
+    const { container } = render(
+      <MarkdownRenderer
+        content={
+          "Para with `code` and [link](#x).\n\n- item\n\n| a | b |\n|---|---|\n| 1 | 2 |"
+        }
+      />
+    );
+    expect(container.querySelector("[node]")).toBeNull();
+  });
 });
 
 describe("customSlugify (anchor-link resolution helper)", () => {
