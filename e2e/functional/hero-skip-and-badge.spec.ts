@@ -156,13 +156,21 @@ test.describe("Hero scroll-to-explore arrow (regression: post-scroll fade)", () 
       expect(arrowWrapperOpacityBefore).toBeGreaterThan(0.5);
 
       await page.evaluate(() => window.scrollTo(0, 200));
-      await expect(arrow).not.toBeVisible({ timeout: 1000 });
 
-      const arrowWrapperOpacityAfter = await arrow.evaluate((el) => {
-        const wrapper = el.closest('[aria-hidden], .transition-opacity') as HTMLElement | null;
-        return wrapper ? Number(getComputedStyle(wrapper).opacity) : Number(getComputedStyle(el).opacity);
-      });
-      expect(arrowWrapperOpacityAfter).toBeLessThan(0.05);
+      // The arrow fades via opacity-0 only (stays in layout); Playwright treats
+      // opacity:0 as visible, so poll computed opacity rather than toBeVisible.
+      await expect
+        .poll(
+          () =>
+            arrow.evaluate((el) => {
+              const wrapper = el.closest('[aria-hidden], .transition-opacity') as HTMLElement | null;
+              return wrapper
+                ? Number(getComputedStyle(wrapper).opacity)
+                : Number(getComputedStyle(el).opacity);
+            }),
+          { timeout: 2000 },
+        )
+        .toBeLessThan(0.05);
     });
   }
 });
