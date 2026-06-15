@@ -38,7 +38,6 @@ test.describe("Headings & TOC interaction", () => {
         window.scrollTo({ top, behavior: "instant" });
       }
     });
-    await page.waitForTimeout(800);
 
     const activeTocLink = tocNav.locator("a.text-foreground.font-medium");
     await expect(activeTocLink).toBeVisible({ timeout: 5000 });
@@ -74,14 +73,13 @@ test.describe("Code blocks", () => {
 
   test("code blocks have scroll container with overflow-x-auto", async ({ page, blogPage }) => {
     const scrollContainers = page.locator(".code-block-wrapper .code-scroll-container");
-    const count = await scrollContainers.count();
-    expect(count).toBeGreaterThan(0);
+    await expect(scrollContainers.first()).toBeVisible();
+    expect(await scrollContainers.count()).toBeGreaterThan(0);
 
-    const firstContainer = scrollContainers.first();
-    const overflowX = await firstContainer.evaluate(
-      (el) => window.getComputedStyle(el).getPropertyValue("overflow-x") || window.getComputedStyle(el).overflow
-    );
-    expect(["auto", "scroll"]).toContain(overflowX);
+    // toHaveCSS re-resolves the locator each poll, so it survives the brief
+    // code-block remount (syntax-highlight pass) that detaches the node and
+    // made a one-shot getComputedStyle read "" on a disconnected element.
+    await expect(scrollContainers.first()).toHaveCSS("overflow-x", /auto|scroll/);
   });
 
   test("code blocks have a copy button", async ({ page, blogPage }) => {

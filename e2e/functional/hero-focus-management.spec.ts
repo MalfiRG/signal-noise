@@ -11,7 +11,7 @@ async function gotoFreshCascade(page: import("@playwright/test").Page) {
     try { localStorage.removeItem("hero-badge-dismissed"); } catch { /* storage may throw in private mode; ignore */ }
   });
   await page.reload();
-  await page.waitForSelector('[data-testid="hero-cascading"]', { timeout: 5_000 });
+  await expect(page.locator('[data-testid="hero-cascading"]')).toBeVisible({ timeout: 5_000 });
 }
 
 test.describe("Hero focus management after skip", () => {
@@ -24,7 +24,13 @@ test.describe("Hero focus management after skip", () => {
     await skipBtn.click();
 
     await expect(page.locator('[data-testid="hero-phase3"]')).toBeVisible({ timeout: 5_000 });
-    await page.waitForTimeout(200);
+
+    await page.waitForFunction(() => {
+      const el = document.activeElement as HTMLElement | null;
+      if (!el) return false;
+      const name = el.getAttribute("aria-label") || el.textContent?.trim() || "";
+      return name === "VIEW PROJECTS";
+    }, { timeout: 2_000 });
 
     const focusedAccessibleName = await page.evaluate(() => {
       const el = document.activeElement as HTMLElement | null;

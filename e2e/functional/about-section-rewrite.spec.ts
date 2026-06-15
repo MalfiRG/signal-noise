@@ -5,7 +5,7 @@ test.describe("AboutSection rewrite", () => {
   test.beforeEach(async ({ page }) => {
     await skipHeroCascadeViaInitScript(page);
     await page.goto("/");
-    await page.waitForSelector("[data-testid='hero-phase3']");
+    await expect(page.locator("[data-testid='hero-phase3']")).toBeVisible();
   });
 
   test("renders cat-block with $ cat ~/profile.txt header", async ({ page }) => {

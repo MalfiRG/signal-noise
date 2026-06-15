@@ -9,7 +9,6 @@ test.describe("Hero CTA buttons - border visibility", () => {
       await page.setViewportSize(viewport);
       await page.emulateMedia({ reducedMotion: "reduce" });
       await page.goto("/");
-      await page.waitForLoadState("networkidle");
 
       const readBlog = page.locator('a[href="/blog"]', {
         hasText: "READ BLOG",
@@ -38,7 +37,6 @@ test.describe("Hero CTA buttons - border visibility", () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
 
     const viewProjects = page.locator('a[href="/projects"]', {
       hasText: "VIEW PROJECTS",

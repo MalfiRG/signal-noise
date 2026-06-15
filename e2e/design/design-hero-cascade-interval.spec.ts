@@ -28,14 +28,8 @@ for (const route of ROUTES) {
       const padded = String(ms).padStart(5, "0");
       await page.waitForTimeout(ms === TIMEPOINTS_MS[0] ? ms : ms - TIMEPOINTS_MS[TIMEPOINTS_MS.indexOf(ms) - 1]);
 
-      const phase = await page.evaluate(() => {
-        const el = document.querySelector('[data-testid^="hero-"]');
-        return el ? el.getAttribute("data-testid") : null;
-      });
-
       const frame = path.join(OUT_DIR, `${route.slug}-t${padded}.png`);
       await page.screenshot({ path: frame, fullPage: false });
-      console.log(`[${route.slug}] t=${ms}ms phase=${phase ?? "n/a"}`);
     }
 
     expect(true).toBe(true);

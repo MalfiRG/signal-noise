@@ -24,8 +24,8 @@ test.describe("Blog code-block - uniform background (regression)", () => {
   ]) {
     test(`<code> bg matches wrapper bg @ ${viewport.name}`, async ({ page }) => {
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
-      await page.goto(STYLE_TEST_URL, { waitUntil: "networkidle" });
-      await page.waitForSelector('code[class*="language-"]', { timeout: 5000 });
+      await page.goto(STYLE_TEST_URL);
+      await page.locator('code[class*="language-"]').first().waitFor({ timeout: 5000 });
 
       const result = await getCodeAndWrapperBg(page);
       expect(result.error, result.error ?? "").toBeNull();
@@ -35,8 +35,8 @@ test.describe("Blog code-block - uniform background (regression)", () => {
 
     test(`every code-block on the page has matching code/wrapper bg @ ${viewport.name}`, async ({ page }) => {
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
-      await page.goto(STYLE_TEST_URL, { waitUntil: "networkidle" });
-      await page.waitForSelector('code[class*="language-"]', { timeout: 5000 });
+      await page.goto(STYLE_TEST_URL);
+      await page.locator('code[class*="language-"]').first().waitFor({ timeout: 5000 });
 
       const mismatches = await page.evaluate(() => {
         const codes = Array.from(document.querySelectorAll('code[class*="language-"]')) as HTMLElement[];
@@ -62,8 +62,8 @@ test.describe("Inline-code overflow guard (regression)", () => {
   ]) {
     test(`document does not exceed viewport width with long inline-code @ ${viewport.name}`, async ({ page }) => {
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
-      await page.goto(STYLE_TEST_URL, { waitUntil: "networkidle" });
-      await page.waitForSelector(".markdown-body code", { timeout: 5000 });
+      await page.goto(STYLE_TEST_URL);
+      await page.locator(".markdown-body code").first().waitFor({ timeout: 5000 });
 
       const widths = await page.evaluate(() => ({
         scrollWidth: document.documentElement.scrollWidth,
@@ -76,8 +76,8 @@ test.describe("Inline-code overflow guard (regression)", () => {
 
     test(`inline-code element wraps inside the pill (overflow-wrap: anywhere) @ ${viewport.name}`, async ({ page }) => {
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
-      await page.goto(STYLE_TEST_URL, { waitUntil: "networkidle" });
-      await page.waitForSelector(".markdown-body code", { timeout: 5000 });
+      await page.goto(STYLE_TEST_URL);
+      await page.locator(".markdown-body code").first().waitFor({ timeout: 5000 });
 
       const wrap = await page.evaluate(() => {
         const inline = Array.from(document.querySelectorAll(".markdown-body code"))
@@ -97,8 +97,8 @@ test.describe("Fenced code excluded from inline-pill styling (regression)", () =
   ]) {
     test(`fenced <code> has zero border + zero pill padding @ ${viewport.name}`, async ({ page }) => {
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
-      await page.goto(STYLE_TEST_URL, { waitUntil: "networkidle" });
-      await page.waitForSelector('code[class*="language-"]', { timeout: 5000 });
+      await page.goto(STYLE_TEST_URL);
+      await page.locator('code[class*="language-"]').first().waitFor({ timeout: 5000 });
 
       const violations = await page.evaluate(() => {
         const codes = Array.from(document.querySelectorAll('code[class*="language-"]')) as HTMLElement[];
@@ -127,8 +127,8 @@ test.describe("Reading-mode code-block frame (regression)", () => {
   ]) {
     test(`.code-block-wrapper has visible frame in reading mode @ ${viewport.name}`, async ({ page }) => {
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
-      await page.goto(STYLE_TEST_URL, { waitUntil: "networkidle" });
-      await page.waitForSelector(".theme-reading .code-block-wrapper", { timeout: 5000 });
+      await page.goto(STYLE_TEST_URL);
+      await page.locator(".theme-reading .code-block-wrapper").first().waitFor({ timeout: 5000 });
 
       const frame = await page.evaluate(() => {
         const wrapper = document.querySelector(".theme-reading .code-block-wrapper") as HTMLElement | null;
@@ -158,8 +158,8 @@ test.describe("Reading-mode inline-code pill styling (regression)", () => {
   ]) {
     test(`inline <code> has pill styling (padding, radius, border, bg) @ ${viewport.name}`, async ({ page }) => {
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
-      await page.goto(STYLE_TEST_URL, { waitUntil: "networkidle" });
-      await page.waitForSelector(".markdown-body code", { timeout: 5000 });
+      await page.goto(STYLE_TEST_URL);
+      await page.locator(".markdown-body code").first().waitFor({ timeout: 5000 });
 
       const pill = await page.evaluate(() => {
         const inline = Array.from(document.querySelectorAll(".markdown-body code"))

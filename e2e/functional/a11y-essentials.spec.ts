@@ -78,7 +78,7 @@ test.describe("A11y - landmarks and aria-hidden hygiene", () => {
       page,
     }) => {
       await page.goto(path);
-      await page.waitForLoadState("networkidle");
+      await expect(page.locator("main")).toBeVisible();
       const violations = await findAriaHiddenViolations(page);
       const formatted = violations
         .map(
@@ -97,10 +97,9 @@ test.describe("A11y - landmarks and aria-hidden hygiene", () => {
   }) => {
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.goto("/");
-    await page.waitForSelector(
-      '[data-testid="hero-cascading"], [data-testid="hero-phase3"]',
-      { timeout: 6000 },
-    );
+    await expect(
+      page.locator('[data-testid="hero-cascading"], [data-testid="hero-phase3"]').first(),
+    ).toBeVisible({ timeout: 6000 });
 
     const violations = await findAriaHiddenViolations(page);
     const formatted = violations
@@ -117,10 +116,9 @@ test.describe("A11y - landmarks and aria-hidden hygiene", () => {
   }) => {
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.goto("/");
-    await page.waitForSelector(
-      '[data-testid="hero-cascading"], [data-testid="hero-phase3"]',
-      { timeout: 6000 },
-    );
+    await expect(
+      page.locator('[data-testid="hero-cascading"], [data-testid="hero-phase3"]').first(),
+    ).toBeVisible({ timeout: 6000 });
 
     const result = await page.evaluate(() => {
       const projectsLink = document.querySelector('a[href="/projects"]');
@@ -165,7 +163,7 @@ test.describe("A11y - color contrast", () => {
     page,
   }) => {
     await page.goto("/skills");
-    await page.waitForLoadState("networkidle");
+    await expect(page.locator("span.rounded-full.border").first()).toBeVisible();
 
     const samples = await page.evaluate(() => {
       const badges = Array.from(

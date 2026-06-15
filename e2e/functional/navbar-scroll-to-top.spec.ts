@@ -5,12 +5,14 @@ test.describe("Navbar wordmark scroll-to-top", () => {
   test("clicking wordmark on homepage scrolls to top when already scrolled", async ({ page }) => {
     await prepareContext(page);
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await expect(page.getByRole("link", { name: /PIOTR_TARACH/ }).first()).toBeVisible();
 
     await page.evaluate(() =>
       window.scrollTo({ top: document.body.scrollHeight, behavior: "instant" })
     );
-    await page.waitForTimeout(300);
+    await expect
+      .poll(() => page.evaluate(() => window.scrollY), { timeout: 3000 })
+      .toBeGreaterThan(200);
 
     const scrolledY = await page.evaluate(() => window.scrollY);
     expect(scrolledY).toBeGreaterThan(200);

@@ -59,7 +59,6 @@ test.describe("WCAG touch targets (mobile)", () => {
     await page.goto("/");
     const hamburger = page.locator('nav .md\\:hidden button[data-testid="hamburger-menu"]');
     await hamburger.click();
-    await page.waitForTimeout(500);
 
     await expect(page.getByText("NAVIGATION")).toBeVisible();
     const sheetLinks = page.locator('[data-state="open"] a');
@@ -93,7 +92,6 @@ test.describe("Explorer sidebar", () => {
 
       const explorer = page.locator('.md\\:hidden button[aria-label="Open blog file explorer"]');
       await explorer.click();
-      await page.waitForTimeout(800);
 
       await expect(page.getByText("BLOG EXPLORER")).toBeVisible();
       await expect(page.getByText("FILE EXPLORER")).toBeVisible();
@@ -108,7 +106,7 @@ test.describe("Explorer sidebar", () => {
 
       const explorer = page.locator('.md\\:hidden button[aria-label="Open blog file explorer"]');
       await explorer.click();
-      await page.waitForTimeout(800);
+      await expect(page.getByText("FILE EXPLORER")).toBeVisible();
 
       const categoryColor = await page.locator('[role="treeitem"] button span').first().evaluate(
         (el) => window.getComputedStyle(el).color

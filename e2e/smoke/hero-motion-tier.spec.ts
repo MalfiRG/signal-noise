@@ -20,7 +20,6 @@ test.describe("Hero device-tier motion policy", () => {
     await page.goto("/");
     await page.evaluate(() => sessionStorage.clear());
     await page.reload();
-    await page.waitForLoadState("networkidle");
 
     await expect(page.getByRole("link", { name: "VIEW PROJECTS" })).toBeVisible({ timeout: 5_000 });
     await expect(page.getByRole("link", { name: "READ BLOG" })).toBeVisible();
