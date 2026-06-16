@@ -12,6 +12,7 @@ export interface BlogPostRaw {
   tags: string[];
   category: string;
   excerpt: string;
+  reading_time?: number;
   draft?: boolean;
 }
 
